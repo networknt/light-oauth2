@@ -1,7 +1,7 @@
 package com.networknt.oauth.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.oauth.JwtGenerator;
+import com.networknt.security.JwtHelper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
@@ -22,14 +22,14 @@ public class TokenHandler implements HttpHandler {
                 Headers.CONTENT_TYPE, "application/json");
 
         Map<String, Object> resMap = new HashMap<String, Object>();
-        resMap.put("access_token", JwtGenerator.getJwt(mockClaims()));
+        resMap.put("access_token", JwtHelper.getJwt(mockClaims()));
         exchange.getResponseSender().send(ByteBuffer.wrap(
                 objectMapper.writeValueAsBytes(
                         resMap)));
     }
 
     public JwtClaims mockClaims() {
-        JwtClaims claims = JwtGenerator.getDefaultJwtClaims();
+        JwtClaims claims = JwtHelper.getDefaultJwtClaims();
         claims.setClaim("user_id", "steve");
         claims.setClaim("user_type", "EMPLOYEE");
         claims.setClaim("client_id", "aaaaaaaa-1234-1234-1234-bbbbbbbb");
