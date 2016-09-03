@@ -6,13 +6,13 @@
     <groupId>com.networknt</groupId>
     <artifactId>oauth2</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.0</version>
+    <version>0.1.1-SNAPSHOT</version>
     <name>oauth2</name>
 
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.framework>0.1.0</version.framework>
+        <version.framework>0.1.1-SNAPSHOT</version.framework>
         <version.jackson>2.8.2</version.jackson>
         <version.slf4j>1.7.21</version.slf4j>
         <version.jose4j>0.5.2</version.jose4j>
