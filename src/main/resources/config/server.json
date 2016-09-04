@@ -1,0 +1,5 @@
+{
+  "description": "server config - overwrite default port to 8888 from default 8080",
+  "ip": "localhost",
+  "port": 8888
+}

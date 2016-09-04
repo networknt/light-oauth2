@@ -23,6 +23,8 @@ public class TokenHandler implements HttpHandler {
 
         Map<String, Object> resMap = new HashMap<String, Object>();
         resMap.put("access_token", JwtHelper.getJwt(mockClaims()));
+        resMap.put("token_type", "bearer");
+        resMap.put("expires_in", 600);
         exchange.getResponseSender().send(ByteBuffer.wrap(
                 objectMapper.writeValueAsBytes(
                         resMap)));

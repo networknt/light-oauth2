@@ -37,7 +37,7 @@ mvn exec:exec
 # Token endpoint
 /oauth/token can be used to get JWT access token. Here is one of the responses.
 
-curl localhost:8080/oauth/token
+curl localhost:8888/oauth/token
 
 
 ```
@@ -50,6 +50,7 @@ Not implemented yet.
 
 
 # User login
+
 
 # Admin interface
 
