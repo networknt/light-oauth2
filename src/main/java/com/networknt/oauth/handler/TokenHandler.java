@@ -15,9 +15,9 @@ import java.util.*;
 
 public class TokenHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(TokenHandler.class);
-    static final String DATA = "data";
+    static final String CLIENTS = "clients";
     private final ObjectMapper objectMapper;
-    private final Map<String, Object> data = Config.getInstance().getJsonMapConfig(DATA);
+    private final Map<String, Object> data = Config.getInstance().getJsonMapConfig(CLIENTS);
 
     public TokenHandler(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
@@ -57,6 +57,7 @@ public class TokenHandler implements HttpHandler {
                     } else {
                         String secret = (String)cs.get("client_secret");
                         if(clientSecret.equals(secret)) {
+
                             String scope = (String)cs.get("scope");
                             Map<String, Object> resMap = new HashMap<String, Object>();
                             resMap.put("access_token", JwtHelper.getJwt(mockClaims(clientId, scope)));
