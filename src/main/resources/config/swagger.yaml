@@ -1,0 +1,106 @@
+swagger: '2.0'
+info:
+  title: Authentication API
+  description: |
+    Implementation of [OAuth 2.0](https://tools.ietf.org/html/rfc6749  "Docs") with Client Credentials Grant type
+  version: "1.0.0"
+host: localhost:8888
+schemes:
+  - http
+  - https
+basePath: /oauth2
+produces:
+  - application/json
+securityDefinitions:
+  Basic:
+    type: basic
+paths:
+  /token:
+    post:
+      summary: Request Access Token
+      description: |
+        Partner makes a request to the token endpoint by adding the following parameters describerd below
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - name: grant_type
+          in: formData
+          description: Value MUST be set to "client_credentials" as per RFC
+          required: true
+          type: string
+          enum: 
+            - client_credentials
+        - name: scope
+          in: formData
+          description: Value MUST be set to a list of space-delimited, case-sensitive strings as per RFC
+          required: false
+          type: string
+      tags:
+        - Oauth2
+      responses:
+        200:
+          description: Authorisation token (Bearer)
+          schema:
+              $ref: '#/definitions/Token'
+          examples:
+            application/json: |-
+              {
+                 "access_token":"eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJhdWQiOiJ1cm46Y29tLm5ldHdvcmtudCIsImV4cCI6MTc4ODEzMjczNSwianRpIjoiNWtyM2ZWOHJaelBZNEJrSnNYZzFpQSIsImlhdCI6MTQ3Mjc3MjczNSwibmJmIjoxNDcyNzcyNjE1LCJ2ZXJzaW9uIjoiMS4wIiwidXNlcl9pZCI6InN0ZXZlIiwidXNlcl90eXBlIjoiRU1QTE9ZRUUiLCJjbGllbnRfaWQiOiJkZGNhZjBiYS0xMTMxLTIyMzItMzMxMy1kNmYyNzUzZjI1ZGMiLCJzY29wZSI6WyJhcGkuciIsImFwaS53Il19.gteJiy1uao8HLeWRljpZxHWUgQfofwmnFP-zv3EPUyXjyCOy3xclnfeTnTE39j8PgBwdFASPcDLLk1YfZJbsU6pLlmYXLtdpHDBsVmIRuch6LFPCVQ3JdqSQVci59OhSK0bBThGWqCD3UzDI_OnX4IVCAahcT9Bu94m5u_H_JNmwDf1XaP3Lt4I34buYMuRD9stchsnZi-tuIRkL13FARm1XA9aPZUMUXFdedBWDXo1zMREQ_qCJXOpaZDJM9Im0rIkq9wTEVU00pbRp_Vcdya3dfkFteBMHiwFVt6VNQaco5BXURDAIzXidwQxNEbX1ek03wra8AIani65ZK7fy_w",
+                 "token_type":"Bearer",
+                 "expires_in":600,
+               }
+        400: 
+          description: As per RFC authorisation server responds with 400 in case of error
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |-
+              {
+                "error":"invalid_request"
+              }
+      security:
+        - Basic: []
+definitions:
+  Token:
+    type: object
+    properties:
+      access_token:
+        type: string
+        description: The access token value
+      token_type:
+        type: string
+        enum: 
+          - Bearer
+        description: Type of the token is set to "Bearer"
+      expires_in:
+        type: integer
+        format: int32
+        description: The lifetime in seconds of the access token
+      refresh_token:
+        type: string
+        description: The fresh token value
+      scope:
+        type: string
+        description: The scope of access token
+    required: [access_token, token_type, expires_in]    
+  Error:
+    type: object
+    properties:
+      error:
+        type: string
+        enum:
+          - invalid_request
+          - invalid_client
+          - invalid_grant
+          - unauthorized_client
+          - unsupported_grant_type
+      error_description:
+        type: string
+        description: Human-readable text providing additional information
+      error_uri:
+        type: string
+        description: A URI identifying a human-readable web page with
+         information about the error
+    required: [error]     

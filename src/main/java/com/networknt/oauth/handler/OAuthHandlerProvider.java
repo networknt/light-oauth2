@@ -11,9 +11,9 @@ import io.undertow.server.handlers.PathTemplateHandler;
 public class OAuthHandlerProvider implements HandlerProvider {
 
     public HttpHandler getHandler() {
-        return Handlers.path().addPrefixPath("/oauth/token",
+        return Handlers.path().addPrefixPath("/oauth2/token",
                 new TokenHandler(Config.getInstance().getMapper()))
-                .addPrefixPath("/oauth/code",
+                .addPrefixPath("/oauth2/code",
                         new CodeHandler(Config.getInstance().getMapper()));
     }
 }
