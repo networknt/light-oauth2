@@ -1,22 +1,17 @@
 package com.networknt.oauth.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.networknt.utility.Util;
+import io.undertow.security.api.SecurityContext;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.server.handlers.form.FormData;
-import io.undertow.server.handlers.form.FormDataParser;
-import io.undertow.server.handlers.form.FormParserFactory;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.nio.ByteBuffer;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class CodeHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(CodeHandler.class);
@@ -35,33 +30,56 @@ public class CodeHandler implements HttpHandler {
         exchange.getResponseHeaders().put(
                 Headers.CONTENT_TYPE, "application/json");
 
-        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        Map<String, Object> formMap = new HashMap<String, Object>();
-
-        final FormParserFactory parserFactory = FormParserFactory.builder().build();
-        final FormDataParser parser = parserFactory.createParser(exchange);
-        try {
-            FormData data = parser.parseBlocking();
-            Iterator<String> it = data.iterator();
-            while(it.hasNext()) {
-                String fd = it.next();
-                for (FormData.FormValue val : data.get(fd)) {
-                    logger.debug("fd = " + fd + " value = " + val.getValue());
-                    formMap.put(fd, val.getValue());
-                }
+        // parse all the parameters here as this is a redirected get request.
+        Map<String, String> params = new HashMap<String, String>();
+        Map<String, Deque<String>> pnames = exchange.getQueryParameters();
+        for (Map.Entry<String, Deque<String>> entry : pnames.entrySet()) {
+            String pname = entry.getKey();
+            Iterator<String> pvalues = entry.getValue().iterator();
+            if(pvalues.hasNext()) {
+                params.put(pname, pvalues.next());
             }
-        } catch (Exception e) {
-            exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+        logger.debug("params", params);
+        String responseType = params.get("response_type");
+        String clientId = params.get("client_id");
+        if(responseType == null || clientId == null) {
+            exchange.setStatusCode(StatusCodes.BAD_REQUEST);
             exchange.getResponseSender().send(ByteBuffer.wrap(
                     objectMapper.writeValueAsBytes(
-                            Collections.singletonMap("error", "Unable to parse form data"))));
+                            Collections.singletonMap("error", "invalid_request"))));
+
+        } else {
+            if(!"code".equals(responseType)) {
+                exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+                exchange.getResponseSender().send(ByteBuffer.wrap(
+                        objectMapper.writeValueAsBytes(
+                                Collections.singletonMap("error", "unsupported_response_type"))));
+            } else {
+                // check if the client_id is valid
+                Map<String, Object> cMap = (Map<String, Object>)TokenHandler.clients.get(clientId);
+                if(cMap == null) {
+                    exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+                    exchange.getResponseSender().send(ByteBuffer.wrap(
+                            objectMapper.writeValueAsBytes(
+                                    Collections.singletonMap("error", "unauthorized_client"))));
+                } else {
+                    // generate auth code
+                    String code = Util.getUUID();
+                    final SecurityContext context = exchange.getSecurityContext();
+                    String userId = context.getAuthenticatedAccount().getPrincipal().getName();
+                    codes.put(code, userId);
+                    String redirectUri = params.get("redirect_uri");
+                    if(redirectUri == null) {
+                        redirectUri = (String)cMap.get("redirect_uri");
+                    }
+                    redirectUri = redirectUri + "?code=" + code;
+                    // now redirect here.
+                    exchange.setStatusCode(StatusCodes.FOUND);
+                    exchange.getResponseHeaders().put(Headers.LOCATION, redirectUri);
+                    exchange.endExchange();
+                }
+            }
         }
-        
-
-
-
-        exchange.getResponseSender().send(ByteBuffer.wrap(
-                objectMapper.writeValueAsBytes(
-                        Collections.singletonMap("message", "Hello World"))));
     }
 }

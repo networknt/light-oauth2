@@ -23,8 +23,8 @@ public class TokenHandler implements HttpHandler {
     static final String CLIENTS = "clients";
     static final String USERS = "users";
     private final ObjectMapper objectMapper;
-    private final Map<String, Object> clients = Config.getInstance().getJsonMapConfig(CLIENTS);
-    private final Map<String, Object> users = Config.getInstance().getJsonMapConfig(USERS);
+    public static final Map<String, Object> clients = Config.getInstance().getJsonMapConfig(CLIENTS);
+    public static final Map<String, Object> users = Config.getInstance().getJsonMapConfig(USERS);
 
     public TokenHandler(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
