@@ -4,7 +4,7 @@
   <groupId>com.networknt</groupId>
   <artifactId>oauth2</artifactId>
   <name>oauth2</name>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.1.2-SNAPSHOT</version>
   <build>
     <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>
@@ -79,7 +79,7 @@
     <version.commons-lang>2.6</version.commons-lang>
     <java.version>1.8</java.version>
     <version.jackson>2.8.2</version.jackson>
-    <version.framework>0.1.1</version.framework>
+    <version.framework>0.1.2</version.framework>
     <version.mockito>2.1.0-beta.124</version.mockito>
     <version.slf4j>1.7.21</version.slf4j>
     <version.commons.io>2.5</version.commons.io>

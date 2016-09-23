@@ -1,5 +1,6 @@
 # undertow-server-oauth2
-An OAuth2 service provider based on undertow-server and embedded orientdb
+An OAuth2 service provider based on undertow-server and embedded json data for clients and users. This server is
+designed for development only and it cannot be used on production.
 
 
 # Key generation
@@ -32,6 +33,11 @@ Bearer eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJh
 # Start the server
 
 mvn exec:exec
+
+or
+
+java -jar target/oauth2-0.1.1-SNAPSHOT.jar
+
 
 
 # Token endpoint
