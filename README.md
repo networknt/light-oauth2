@@ -15,35 +15,39 @@ keytool -export -alias selfsigned -keystore primary.jks -rfc -file primary.crt
 
 # Long live JWT token for testing
 
-The undertow-server-oauth2 contains a testing key pair for testing only. Both private key and public key certificate
-can be found in resources/config/oauth folder. The same public key certificate is included in undertow-server so that
+The undertow-server-oauth2 contains two testing key pairs for testing only. Both private keys and public key certificates
+can be found in resources/config/oauth folder. The same public key certificates are included in undertow-server so that
 the server can verify any token issued by this oauth server.
 
 Important note:
 For your official deployment, please create key pair of your own or buy certificate from one of
 the CAs.
 
+The following is a token generated for petstore api with scope write:pets and read:pets
 
 ```
-Bearer eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJhdWQiOiJ1cm46Y29tLm5ldHdvcmtudCIsImV4cCI6MTc4ODEzMjczNSwianRpIjoiNWtyM2ZWOHJaelBZNEJrSnNYZzFpQSIsImlhdCI6MTQ3Mjc3MjczNSwibmJmIjoxNDcyNzcyNjE1LCJ2ZXJzaW9uIjoiMS4wIiwidXNlcl9pZCI6InN0ZXZlIiwidXNlcl90eXBlIjoiRU1QTE9ZRUUiLCJjbGllbnRfaWQiOiJkZGNhZjBiYS0xMTMxLTIyMzItMzMxMy1kNmYyNzUzZjI1ZGMiLCJzY29wZSI6WyJhcGkuciIsImFwaS53Il19.gteJiy1uao8HLeWRljpZxHWUgQfofwmnFP-zv3EPUyXjyCOy3xclnfeTnTE39j8PgBwdFASPcDLLk1YfZJbsU6pLlmYXLtdpHDBsVmIRuch6LFPCVQ3JdqSQVci59OhSK0bBThGWqCD3UzDI_OnX4IVCAahcT9Bu94m5u_H_JNmwDf1XaP3Lt4I34buYMuRD9stchsnZi-tuIRkL13FARm1XA9aPZUMUXFdedBWDXo1zMREQ_qCJXOpaZDJM9Im0rIkq9wTEVU00pbRp_Vcdya3dfkFteBMHiwFVt6VNQaco5BXURDAIzXidwQxNEbX1ek03wra8AIani65ZK7fy_w
+Bearer eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJhdWQiOiJ1cm46Y29tLm5ldHdvcmtudCIsImV4cCI6MTc5MDAwMDU1MSwianRpIjoicHVEMEN2RWNFblZyQVEtNEtBNENKQSIsImlhdCI6MTQ3NDY0MDU1MSwibmJmIjoxNDc0NjQwNDMxLCJ2ZXJzaW9uIjoiMS4wIiwidXNlcl9pZCI6InN0ZXZlIiwidXNlcl90eXBlIjoiRU1QTE9ZRUUiLCJjbGllbnRfaWQiOiJmN2Q0MjM0OC1jNjQ3LTRlZmItYTUyZC00YzU3ODc0MjFlNzIiLCJzY29wZSI6WyJ3cml0ZTpwZXRzIiwicmVhZDpwZXRzIl19.U9HPvFOxeyWD_zTxMWY8JI263Am81KNpgRDMdHX42epNk_pDpPv2_rYjDHMGWrUfVLQKKLXueKxJuMyCmbBHfCkJqkmb6__44Y2t8CMHcUPvtKpuoF-YbG-LzMDSC1weYwMsC9kq84raFPHN0LevdjwKCoPBNIeYO8Oc1M5klglWBMIONnpxQyE5lM6HF-S3B45Pg0jE6acQ9ha1IrrHvTN3IZHU7YgS4SkEaxdxkziRQJh6Ml_r8j5kkkjeij8G6cCjn4XSQ0L6J3iGXmeClnAEYkDmoZBpYb_RCcNRxEmNaqz-M6LHILqDZDunPKTb98rPhqHseJPppLDsAWaAZg
 ```
 
 
 
-# Start the server
+# Start a standalone server
 
-mvn exec:exec
+Given you have JDK8 and Maven 3 installed.
 
-or
+```
+git clone https://github.com/networknt/undertow-server-oauth2.git
+cd undertow-server-oauth2
+mvn install exec:exec
 
-java -jar target/oauth2-0.1.1-SNAPSHOT.jar
+```
+
+# Start a docker container
 
 
 
 # Token endpoint
-/oauth/token can be used to get JWT access token. Here is one of the responses.
-
-curl localhost:8888/oauth/token
+/oauth2/token can be used to get JWT access token. Here is one of the responses.
 
 
 ```
@@ -52,11 +56,29 @@ curl localhost:8888/oauth/token
 
 
 # Code endpoint
-Not implemented yet.
+/oauth2/code can be used to get authorization code. The code is redirect to the uri specified by the
+client. Here is an example of redirected uri.
 
+```
+http://localhost:8080/oauth?code=Gp6GHT02SJ6G_-wyvaMNPw
+```
 
 # User login
+
+When using authorization flow, the client application will redirect to authorization code endpoint on
+OAuth2 server, the server will authenticate the user by poping up a login page. Please use the
+following builtin credentials:
+
+username: stevehu
+password: 123456
 
 
 # Admin interface
 
+Not implemented yet. If you want to add new client or new user, please update clients.json and users.json
+in config folder. Also, the config folder can be externalized for you standalone instance or docker
+container instance.
+
+# Further info
+
+[Wiki - OAuth2 Introduction](https://github.com/networknt/undertow-server-oauth2/wiki/OAuth2-Introduction)

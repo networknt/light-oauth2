@@ -1,4 +1,9 @@
 {
+  "f7d42348-c647-4efb-a52d-4c5787421e72": {
+    "client_secret":"f6h1FTI8Q3-7UScPZDzfXA",
+    "scope": "write:pets read:pets",
+    "redirect_uri": "http://localhost:8080/oauth"
+  },
   "3798d583-275c-47d7-bf46-a3c436846336": {
     "client_secret":"CeHJjNRjRiS1dH1qqme2LQ",
     "scope": "customer.r customer.w",
