@@ -26,7 +26,7 @@ the CAs.
 The following is a token generated for petstore api with scope write:pets and read:pets
 
 ```
-Bearer eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJhdWQiOiJ1cm46Y29tLm5ldHdvcmtudCIsImV4cCI6MTc5MDAwMDU1MSwianRpIjoicHVEMEN2RWNFblZyQVEtNEtBNENKQSIsImlhdCI6MTQ3NDY0MDU1MSwibmJmIjoxNDc0NjQwNDMxLCJ2ZXJzaW9uIjoiMS4wIiwidXNlcl9pZCI6InN0ZXZlIiwidXNlcl90eXBlIjoiRU1QTE9ZRUUiLCJjbGllbnRfaWQiOiJmN2Q0MjM0OC1jNjQ3LTRlZmItYTUyZC00YzU3ODc0MjFlNzIiLCJzY29wZSI6WyJ3cml0ZTpwZXRzIiwicmVhZDpwZXRzIl19.U9HPvFOxeyWD_zTxMWY8JI263Am81KNpgRDMdHX42epNk_pDpPv2_rYjDHMGWrUfVLQKKLXueKxJuMyCmbBHfCkJqkmb6__44Y2t8CMHcUPvtKpuoF-YbG-LzMDSC1weYwMsC9kq84raFPHN0LevdjwKCoPBNIeYO8Oc1M5klglWBMIONnpxQyE5lM6HF-S3B45Pg0jE6acQ9ha1IrrHvTN3IZHU7YgS4SkEaxdxkziRQJh6Ml_r8j5kkkjeij8G6cCjn4XSQ0L6J3iGXmeClnAEYkDmoZBpYb_RCcNRxEmNaqz-M6LHILqDZDunPKTb98rPhqHseJPppLDsAWaAZg
+Bearer eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpvYXV0aDI6djEiLCJhdWQiOiJ1cm46Y29tLm5ldHdvcmtudCIsImV4cCI6MTc5MDAzNTcwOSwianRpIjoiSTJnSmdBSHN6NzJEV2JWdUFMdUU2QSIsImlhdCI6MTQ3NDY3NTcwOSwibmJmIjoxNDc0Njc1NTg5LCJ2ZXJzaW9uIjoiMS4wIiwidXNlcl9pZCI6InN0ZXZlIiwidXNlcl90eXBlIjoiRU1QTE9ZRUUiLCJjbGllbnRfaWQiOiJmN2Q0MjM0OC1jNjQ3LTRlZmItYTUyZC00YzU3ODc0MjFlNzIiLCJzY29wZSI6WyJ3cml0ZTpwZXRzIiwicmVhZDpwZXRzIl19.mue6eh70kGS3Nt2BCYz7ViqwO7lh_4JSFwcHYdJMY6VfgKTHhsIGKq2uEDt3zwT56JFAePwAxENMGUTGvgceVneQzyfQsJeVGbqw55E9IfM_uSM-YcHwTfR7eSLExN4pbqzVDI353sSOvXxA98ZtJlUZKgXNE1Ngun3XFORCRIB_eH8B0FY_nT_D1Dq2WJrR-re-fbR6_va95vwoUdCofLRa4IpDfXXx19ZlAtfiVO44nw6CS8O87eGfAm7rCMZIzkWlCOFWjNHnCeRsh7CVdEH34LF-B48beiG5lM7h4N12-EME8_VDefgMjZ8eqs1ICvJMxdIut58oYbdnkwTjkA
 ```
 
 
@@ -44,7 +44,16 @@ mvn install exec:exec
 
 # Start a docker container
 
+with default configuration
 
+```
+docker run -d -p 8888:8888 networknt/oauth2-server
+```
+
+with externalized configuration in /home/steve/tmp/config/oauth2 folder
+```
+docker run -d -v /home/steve/tmp/config/oauth2:/config -p 8888:8888 networknt/oauth2-server
+```
 
 # Token endpoint
 /oauth2/token can be used to get JWT access token. Here is one of the responses.
@@ -70,6 +79,7 @@ OAuth2 server, the server will authenticate the user by poping up a login page. 
 following builtin credentials:
 
 username: stevehu
+
 password: 123456
 
 
