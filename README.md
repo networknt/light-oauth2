@@ -42,6 +42,12 @@ mvn install exec:exec
 
 ```
 
+In order to start the server with externalized configuration.
+
+```
+java -jar -D target/oauth2
+```
+
 # Start a docker container
 
 with default configuration
@@ -92,3 +98,17 @@ container instance.
 # Further info
 
 [Wiki - OAuth2 Introduction](https://github.com/networknt/undertow-server-oauth2/wiki/OAuth2-Introduction)
+
+
+How to start the oauth2 server as standalone Java application
+
+https://youtu.be/MZfRH-AAzWU
+
+How to start the oauth2 server in docker container
+
+https://youtu.be/w0a8f0hJVmU
+
+How to customize the oauth2 server
+
+https://youtu.be/eq1BxjDFg6o
+
