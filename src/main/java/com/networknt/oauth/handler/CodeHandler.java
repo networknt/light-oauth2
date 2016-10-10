@@ -31,7 +31,7 @@ public class CodeHandler implements HttpHandler {
         this.objectMapper = objectMapper;
     }
 
-    public void handleRequest(HttpServerExchange exchange) throws ApiException {
+    public void handleRequest(HttpServerExchange exchange) throws Exception {
         exchange.getResponseHeaders().put(
                 Headers.CONTENT_TYPE, "application/json");
 
@@ -49,15 +49,22 @@ public class CodeHandler implements HttpHandler {
         String responseType = params.get("response_type");
         String clientId = params.get("client_id");
         if(responseType == null || clientId == null) {
-            throw new ApiException(new Status(INVALID_CODE_REQUEST));
+            Status status = new Status(INVALID_CODE_REQUEST);
+            exchange.setStatusCode(status.getStatusCode());
+            exchange.getResponseSender().send(status.toString());
+            return;
         } else {
             if(!"code".equals(responseType)) {
-                throw new ApiException(new Status(INVALID_RESPONSE_TYPE, responseType));
+                Status status = new Status(INVALID_RESPONSE_TYPE, responseType);
+                exchange.setStatusCode(status.getStatusCode());
+                exchange.getResponseSender().send(status.toString());
             } else {
                 // check if the client_id is valid
                 Map<String, Object> cMap = (Map<String, Object>)TokenHandler.clients.get(clientId);
                 if(cMap == null) {
-                    throw new ApiException(new Status(CLIENT_ID_NOTFOUND, clientId));
+                    Status status = new Status(CLIENT_ID_NOTFOUND, clientId);
+                    exchange.setStatusCode(status.getStatusCode());
+                    exchange.getResponseSender().send(status.toString());
                 } else {
                     // generate auth code
                     String code = Util.getUUID();

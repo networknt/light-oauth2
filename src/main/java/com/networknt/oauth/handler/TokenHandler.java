@@ -62,7 +62,10 @@ public class TokenHandler implements HttpHandler {
                 }
             }
         } catch (Exception e) {
-            throw new ApiException(new Status(UNABLE_TO_PARSE_FORM_DATA, e.getMessage()));
+            Status status = new Status(UNABLE_TO_PARSE_FORM_DATA, e.getMessage());
+            exchange.setStatusCode(status.getStatusCode());
+            exchange.getResponseSender().send(status.toString());
+            return;
         }
         try {
             if("client_credentials".equals(formMap.get("grant_type"))) {
@@ -73,9 +76,16 @@ public class TokenHandler implements HttpHandler {
                 Status status = new Status(UNSUPPORTED_GRANT_TYPE, formMap.get("grant_type"));
                 exchange.setStatusCode(status.getStatusCode());
                 exchange.getResponseSender().send(status.toString());
+                return;
             }
         } catch (JsonProcessingException e) {
-            throw new ApiException(new Status(JSON_PROCESSING_EXCEPTION, e.getMessage()));
+            Status status = new Status(JSON_PROCESSING_EXCEPTION, e.getMessage());
+            exchange.setStatusCode(status.getStatusCode());
+            exchange.getResponseSender().send(status.toString());
+            return;
+        } catch (ApiException e) {
+            exchange.setStatusCode(e.getStatus().getStatusCode());
+            exchange.getResponseSender().send(e.getStatus().toString());
         }
     }
 

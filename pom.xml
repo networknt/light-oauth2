@@ -6,7 +6,7 @@
     <groupId>com.networknt</groupId>
     <artifactId>oauth2</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.2-SNAPSHOT</version>
+    <version>0.1.2</version>
     <name>oauth2</name>
 
     <properties>
@@ -114,6 +114,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${version.junit}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${version.httpclient}</version>
             <scope>test</scope>
         </dependency>
 
