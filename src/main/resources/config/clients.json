@@ -13,5 +13,21 @@
     "client_secret": "sQesTWAnTwaw-Nn0oK35GA",
     "scope": "account.r account.w",
     "redirect_uri": "http://localhost:8080/oauth"
+  },
+  "dbb1bd33-d7d6-4157-b732-c79335b5ed40": {
+    "client_secret":"3C-bPwj3SMq0yQQKQlVP3w",
+    "scope": "api_a.r api_a.w",
+    "redirect_uri": "http://localhost:8080/oauth"
+  },
+  "fe5dadd9-34ad-430f-a8f7-c75e81cc5d7b": {
+    "client_secret":"GXkHy-1aSPyo4pst8WBWbg",
+    "scope": "api_b.r api_b.w api_c.r api_c.w",
+    "redirect_uri": "http://localhost:8080/oauth"
+  },
+  "10a0a743-4674-4a9d-8867-db63ad4c8b4e": {
+    "client_secret":"tcahI1dvT1OsxXxg-IB_-w",
+    "scope": "api_d.r api_d.w",
+    "redirect_uri": "http://localhost:8080/oauth"
   }
+
 }

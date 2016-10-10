@@ -1,8 +1,11 @@
 package com.networknt.oauth.handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.networknt.exception.ApiException;
 import com.networknt.security.JwtHelper;
 import com.networknt.config.Config;
+import com.networknt.status.Status;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormData;
@@ -20,6 +23,18 @@ import java.util.*;
 
 public class TokenHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(TokenHandler.class);
+
+    static final String UNABLE_TO_PARSE_FORM_DATA = "ERR12000";
+    static final String UNSUPPORTED_GRANT_TYPE = "ERR12001";
+    static final String MISSING_AUTHORIZATION_HEADER = "ERR12002";
+    static final String INVALID_AUTHORIZATION_HEADER = "ERR12003";
+    static final String INVALID_BASIC_CREDENTIALS = "ERR12004";
+    static final String JSON_PROCESSING_EXCEPTION = "ERR12005";
+    static final String CLIENT_ID_NOTFOUND = "ERR12006";
+    static final String UNAUTHORIZED_CLIENT = "ERR12007";
+    static final String INVALID_AUTHORIZATION_CODE = "ERR12008";
+    static final String GENERIC_EXCEPTION = "ERR10014";
+
     static final String CLIENTS = "clients";
     static final String USERS = "users";
     private final ObjectMapper objectMapper;
@@ -30,7 +45,7 @@ public class TokenHandler implements HttpHandler {
         this.objectMapper = objectMapper;
     }
 
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
+    public void handleRequest(HttpServerExchange exchange) throws ApiException {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         Map<String, Object> formMap = new HashMap<String, Object>();
 
@@ -47,32 +62,28 @@ public class TokenHandler implements HttpHandler {
                 }
             }
         } catch (Exception e) {
-            exchange.setStatusCode(StatusCodes.INTERNAL_SERVER_ERROR);
-            exchange.getResponseSender().send(ByteBuffer.wrap(
-                    objectMapper.writeValueAsBytes(
-                            Collections.singletonMap("error", "Unable to parse form data"))));
+            throw new ApiException(new Status(UNABLE_TO_PARSE_FORM_DATA, e.getMessage()));
         }
-
-        if("client_credentials".equals(formMap.get("grant_type"))) {
-            exchange.getResponseSender().send(objectMapper.writeValueAsString(handleClientCredentials(exchange)));
-        } else if("authorization_code".equals(formMap.get("grant_type"))) {
-            exchange.getResponseSender().send(objectMapper.writeValueAsString(handleAuthorizationCode(exchange, (String)formMap.get("code"))));
-        } else {
-            exchange.setStatusCode(StatusCodes.BAD_REQUEST);
-            exchange.getResponseSender().send(ByteBuffer.wrap(
-                    objectMapper.writeValueAsBytes(
-                            Collections.singletonMap("error", "Unsupported grant type"))));
+        try {
+            if("client_credentials".equals(formMap.get("grant_type"))) {
+                exchange.getResponseSender().send(objectMapper.writeValueAsString(handleClientCredentials(exchange)));
+            } else if("authorization_code".equals(formMap.get("grant_type"))) {
+                exchange.getResponseSender().send(objectMapper.writeValueAsString(handleAuthorizationCode(exchange, (String)formMap.get("code"))));
+            } else {
+                Status status = new Status(UNSUPPORTED_GRANT_TYPE, formMap.get("grant_type"));
+                exchange.setStatusCode(status.getStatusCode());
+                exchange.getResponseSender().send(status.toString());
+            }
+        } catch (JsonProcessingException e) {
+            throw new ApiException(new Status(JSON_PROCESSING_EXCEPTION, e.getMessage()));
         }
     }
 
-    private Map<String, Object> handleClientCredentials(HttpServerExchange exchange) throws Exception {
+    private Map<String, Object> handleClientCredentials(HttpServerExchange exchange) throws ApiException {
         // get Authorization header.
         String auth = exchange.getRequestHeaders().getFirst("Authorization");
         if(auth == null || auth.trim().length() == 0) {
-            exchange.setStatusCode(StatusCodes.UNAUTHORIZED);
-            Map<String, Object> result = new HashMap<String, Object> ();
-            result.put("error", "Missing authorization header");
-            return result;
+            throw new ApiException(new Status(MISSING_AUTHORIZATION_HEADER));
         } else {
             String basic = auth.substring(0, 5);
             if("BASIC".equalsIgnoreCase(basic)) {
@@ -89,51 +100,42 @@ public class TokenHandler implements HttpHandler {
                     clientSecret = credentials.substring(pos + 1);
                     Map<String, Object> cs = (Map<String, Object>)clients.get(clientId);
                     if(cs == null) {
-                        exchange.setStatusCode(StatusCodes.NOT_FOUND);
-                        Map<String, Object> result = new HashMap<String, Object> ();
-                        result.put("error", "Invalid client-id");
-                        return result;
+                        throw new ApiException(new Status(CLIENT_ID_NOTFOUND, clientId));
                     } else {
                         String secret = (String)cs.get("client_secret");
                         if(secret.equals(clientSecret)) {
                             String scope = (String)cs.get("scope");
+                            String jwt = null;
+                            try {
+                                jwt = JwtHelper.getJwt(mockCcClaims(clientId, scope));
+                            } catch (Exception e) {
+                                throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
+                            }
                             Map<String, Object> resMap = new HashMap<String, Object>();
-                            resMap.put("access_token", JwtHelper.getJwt(mockCcClaims(clientId, scope)));
+                            resMap.put("access_token", jwt);
                             resMap.put("token_type", "bearer");
                             resMap.put("expires_in", 600);
                             return resMap;
                         } else {
-                            exchange.setStatusCode(StatusCodes.UNAUTHORIZED);
-                            Map<String, Object> result = new HashMap<String, Object> ();
-                            result.put("error", "Unauthorized_client");
-                            return result;
+                            throw new ApiException(new Status(UNAUTHORIZED_CLIENT));
                         }
 
                     }
                 } else {
-                    exchange.setStatusCode(StatusCodes.UNAUTHORIZED);
-                    Map<String, Object> result = new HashMap<String, Object> ();
-                    result.put("error", "Invalid basic credentials");
-                    return result;
+                    throw new ApiException(new Status(INVALID_BASIC_CREDENTIALS, credentials));
                 }
             } else {
-                exchange.setStatusCode(StatusCodes.UNAUTHORIZED);
-                Map<String, Object> result = new HashMap<String, Object> ();
-                result.put("error", "Invalid authorization header");
-                return result;
+                throw new ApiException(new Status(INVALID_AUTHORIZATION_HEADER, auth));
             }
 
         }
     }
 
-    private Map<String, Object> handleAuthorizationCode(HttpServerExchange exchange, String code) throws Exception {
+    private Map<String, Object> handleAuthorizationCode(HttpServerExchange exchange, String code) throws ApiException {
         // get Authorization header.
         String auth = exchange.getRequestHeaders().getFirst("Authorization");
         if(auth == null || auth.trim().length() == 0) {
-            exchange.setStatusCode(StatusCodes.UNAUTHORIZED);
-            Map<String, Object> result = new HashMap<String, Object> ();
-            result.put("error", "Missing authorization header");
-            return result;
+            throw new ApiException(new Status(MISSING_AUTHORIZATION_HEADER));
         } else {
             String basic = auth.substring(0, 5);
             if("BASIC".equalsIgnoreCase(basic)) {
@@ -150,10 +152,7 @@ public class TokenHandler implements HttpHandler {
                     clientSecret = credentials.substring(pos + 1);
                     Map<String, Object> cs = (Map<String, Object>)clients.get(clientId);
                     if(cs == null) {
-                        exchange.setStatusCode(StatusCodes.NOT_FOUND);
-                        Map<String, Object> result = new HashMap<String, Object> ();
-                        result.put("error", "Invalid client-id");
-                        return result;
+                        throw new ApiException(new Status(CLIENT_ID_NOTFOUND, clientId));
                     } else {
                         String secret = (String)cs.get("client_secret");
                         if(secret.equals(clientSecret)) {
@@ -161,35 +160,29 @@ public class TokenHandler implements HttpHandler {
                             if(userId != null) {
                                 Map<String, Object> user = (Map<String, Object>)users.get(userId);
                                 String scope = (String)cs.get("scope");
+                                String jwt = null;
+                                try {
+                                    jwt = JwtHelper.getJwt(mockAcClaims(clientId, scope, userId, (String)user.get("userType")));
+                                } catch (Exception e) {
+                                    throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
+                                }
                                 Map<String, Object> resMap = new HashMap<String, Object>();
-                                resMap.put("access_token", JwtHelper.getJwt(mockAcClaims(clientId, scope, userId, (String)user.get("userType"))));
+                                resMap.put("access_token", jwt);
                                 resMap.put("token_type", "bearer");
                                 resMap.put("expires_in", 600);
                                 return resMap;
                             } else {
-                                exchange.setStatusCode(StatusCodes.UNAUTHORIZED);
-                                Map<String, Object> result = new HashMap<String, Object> ();
-                                result.put("error", "Invalid authorization code");
-                                return result;
+                                throw new ApiException(new Status(INVALID_AUTHORIZATION_CODE, code));
                             }
                         } else {
-                            exchange.setStatusCode(StatusCodes.UNAUTHORIZED);
-                            Map<String, Object> result = new HashMap<String, Object> ();
-                            result.put("error", "Unauthorized_client");
-                            return result;
+                            throw new ApiException(new Status(UNAUTHORIZED_CLIENT));
                         }
                     }
                 } else {
-                    exchange.setStatusCode(StatusCodes.UNAUTHORIZED);
-                    Map<String, Object> result = new HashMap<String, Object> ();
-                    result.put("error", "Invalid basic credentials");
-                    return result;
+                    throw new ApiException(new Status(INVALID_BASIC_CREDENTIALS, credentials));
                 }
             } else {
-                exchange.setStatusCode(StatusCodes.UNAUTHORIZED);
-                Map<String, Object> result = new HashMap<String, Object> ();
-                result.put("error", "Invalid authorization header");
-                return result;
+                throw new ApiException(new Status(INVALID_AUTHORIZATION_HEADER, auth));
             }
         }
     }
