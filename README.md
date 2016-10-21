@@ -1,5 +1,5 @@
-# undertow-server-oauth2
-An OAuth2 service provider based on undertow-server and embedded json data for clients and users. This server is
+# light-oauth2
+An OAuth2 service provider based on [light-java](https://github.com/networknt/light-java) and embedded json data for clients and users. This server is
 designed for development only and it cannot be used on production.
 
 
@@ -15,8 +15,8 @@ keytool -export -alias selfsigned -keystore primary.jks -rfc -file primary.crt
 
 # Long live JWT token for testing
 
-The undertow-server-oauth2 contains two testing key pairs for testing only. Both private keys and public key certificates
-can be found in resources/config/oauth folder. The same public key certificates are included in undertow-server so that
+The light-oauth2 contains two testing key pairs for testing only. Both private keys and public key certificates
+can be found in resources/config/oauth folder. The same public key certificates are included in light-java so that
 the server can verify any token issued by this oauth server.
 
 Important note:
@@ -36,8 +36,8 @@ Bearer eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHdvcmtudDpv
 Given you have JDK8 and Maven 3 installed.
 
 ```
-git clone https://github.com/networknt/undertow-server-oauth2.git
-cd undertow-server-oauth2
+git clone https://github.com/networknt/light-oauth2.git
+cd light-oauth2
 mvn install exec:exec
 
 ```
@@ -97,7 +97,7 @@ container instance.
 
 # Further info
 
-[Wiki - OAuth2 Introduction](https://github.com/networknt/undertow-server-oauth2/wiki/OAuth2-Introduction)
+[Wiki - OAuth2 Introduction](https://github.com/networknt/light-oauth2/wiki/OAuth2-Introduction)
 
 
 How to start the oauth2 server as standalone Java application

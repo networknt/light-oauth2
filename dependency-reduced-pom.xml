@@ -4,7 +4,7 @@
   <groupId>com.networknt</groupId>
   <artifactId>oauth2</artifactId>
   <name>oauth2</name>
-  <version>0.1.2-SNAPSHOT</version>
+  <version>0.1.2</version>
   <build>
     <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>
@@ -60,6 +60,22 @@
         <exclusion>
           <artifactId>hamcrest-core</artifactId>
           <groupId>org.hamcrest</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.2</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>httpcore</artifactId>
+          <groupId>org.apache.httpcomponents</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
         </exclusion>
       </exclusions>
     </dependency>
