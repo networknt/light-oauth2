@@ -28,6 +28,10 @@
     "client_secret":"tcahI1dvT1OsxXxg-IB_-w",
     "scope": "api_d.r api_d.w",
     "redirect_uri": "http://localhost:8080/oauth"
+  },
+  "87188ad0-a761-11e6-80f5-76304dec7eb7": {
+    "client_secret":"H1biFvHASYWs6mSQ6uaASQ",
+    "scope": "party.r party.w",
+    "redirect_uri": "http://localhost:8080/oauth"
   }
-
 }
