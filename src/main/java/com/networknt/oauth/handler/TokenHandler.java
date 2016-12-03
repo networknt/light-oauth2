@@ -57,7 +57,7 @@ public class TokenHandler implements HttpHandler {
             while(it.hasNext()) {
                 String fd = it.next();
                 for (FormData.FormValue val : data.get(fd)) {
-                    logger.debug("fd = " + fd + " value = " + val.getValue());
+                    //logger.debug("fd = " + fd + " value = " + val.getValue());
                     formMap.put(fd, val.getValue());
                 }
             }
