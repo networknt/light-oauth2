@@ -45,7 +45,7 @@ public class CodeHandler implements HttpHandler {
                 params.put(pname, pvalues.next());
             }
         }
-        logger.debug("params", params);
+        //logger.debug("params", params);
         String responseType = params.get("response_type");
         String clientId = params.get("client_id");
         if(responseType == null || clientId == null) {
