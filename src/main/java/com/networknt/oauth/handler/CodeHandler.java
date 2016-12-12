@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CodeHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(CodeHandler.class);
@@ -23,7 +24,7 @@ public class CodeHandler implements HttpHandler {
 
     // this singleton map contains all the auth codes generated. if the code is
     // used in TokenHandler, then it is removed.
-    public static Map<String, Object> codes = new HashMap<String, Object>();
+    public static Map<String, Object> codes = new ConcurrentHashMap<String, Object>();
 
     private final ObjectMapper objectMapper;
 
