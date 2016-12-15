@@ -31,7 +31,7 @@
   },
   "87188ad0-a761-11e6-80f5-76304dec7eb7": {
     "client_secret":"H1biFvHASYWs6mSQ6uaASQ",
-    "scope": "party.r party.w",
+    "scope": "party.r party.w party.core party.address party.phonelist party.emaillist party.productlist party.otvc party.mcr",
     "redirect_uri": "http://localhost:8080/oauth"
   }
 }
