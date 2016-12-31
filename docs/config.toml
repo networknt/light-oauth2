@@ -1,6 +1,6 @@
 baseurl = "https://networknt.github.io/light-oauth2/"
 languageCode = "en-us"
-title = "Light OAuth2 - The fastest OAuth2 Serivces based on Light Java API Framework"
+title = "Light OAuth2 - OAuth2 Serivces based on Light Java"
 theme = "hugo-material-docs"
 metadataformat = "yaml"
 canonifyurls = true
