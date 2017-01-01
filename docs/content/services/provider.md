@@ -1,6 +1,6 @@
 ---
-date: 2016-12-31T21:37:25-05:00
+date: 2017-01-01T09:37:43-05:00
 title: Provider Edition
 ---
 
-## 
+To be implemented.

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://networknt.github.io/light-oauth2/services/</loc>
+    <lastmod>2016-12-31T21:53:50-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://networknt.github.io/light-oauth2/services/provider/</loc>
+    <lastmod>2016-12-31T21:37:25-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://networknt.github.io/light-oauth2/services/enterprise/</loc>
+    <lastmod>2016-12-31T21:37:10-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://networknt.github.io/light-oauth2/services/development/</loc>
+    <lastmod>2016-12-31T21:36:59-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://networknt.github.io/light-oauth2/getting-started/</loc>
+    <lastmod>2016-12-31T21:20:22-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://networknt.github.io/light-oauth2/architecture/</loc>
+    <lastmod>2016-12-31T21:16:50-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://networknt.github.io/light-oauth2/</loc>
+    <lastmod>2016-12-31T20:29:38-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://networknt.github.io/light-oauth2/architecture/</loc>
+    <lastmod>2016-12-31T21:16:50-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://networknt.github.io/light-oauth2/getting-started/</loc>
+    <lastmod>2016-12-31T21:20:22-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://networknt.github.io/light-oauth2/</loc>
+    <lastmod>2016-12-31T21:53:50-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://networknt.github.io/light-oauth2/services/</loc>
+    <lastmod>2016-12-31T21:53:50-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>

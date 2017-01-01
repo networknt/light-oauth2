@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Architectures on Light OAuth2 - OAuth2 Serivces based on Light Java</title>
+    <link>https://networknt.github.io/light-oauth2/architecture/index.xml</link>
+    <description>Recent content in Architectures on Light OAuth2 - OAuth2 Serivces based on Light Java</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Released under the MIT license</copyright>
+    <lastBuildDate>Sat, 31 Dec 2016 21:16:50 -0500</lastBuildDate>
+    <atom:link href="https://networknt.github.io/light-oauth2/architecture/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Architecture</title>
+      <link>https://networknt.github.io/light-oauth2/architecture/</link>
+      <pubDate>Sat, 31 Dec 2016 21:16:50 -0500</pubDate>
+      
+      <guid>https://networknt.github.io/light-oauth2/architecture/</guid>
+      <description>
+
+&lt;h2 id=&#34;microservices&#34;&gt;Microservices&lt;/h2&gt;
+
+&lt;h2 id=&#34;in-memory-data-grid&#34;&gt;In-Memory Data Grid&lt;/h2&gt;
+
+&lt;h2 id=&#34;built-in-security&#34;&gt;Built-in Security&lt;/h2&gt;
+
+&lt;h2 id=&#34;easy-to-customize-and-integrate&#34;&gt;Easy to customize and integrate&lt;/h2&gt;
+
+&lt;h2 id=&#34;three-editions-to-choose-from&#34;&gt;Three Editions to choose from&lt;/h2&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
