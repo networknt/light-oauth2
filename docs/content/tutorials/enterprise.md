@@ -43,7 +43,8 @@ There are two endpoints: /oauth2/code@get and /oauth2/code@post
 The GET endpoint uses Basic Authorization and POST endpoint uses Form Authorization.
 
 In most of the cases, you should use GET endpoint as it provides popup window on
-the browser to ask username and password. 
+the browser to ask username and password. And there is no need to create a login page
+and error page.
 
 POST endpoint is usually used with existing web server that provides login form and
 post the user credentials to this endpoint to get authorization code indirectly. It
@@ -51,12 +52,12 @@ requires customization most of the time.
 
 There is only one admin user after the system is installed and the default password
 is "123456". The password needs to be reset immediately with User Service for
-production.
+production.  
 
 To get authorization code put the following url into your browser.
 
 ```
-http://localhost:6881/oauth2/code?response_type=code&client_id=f7d42348-c647-4efb-a52d-4c5787421e72&redirect_uri=http://localhost:8080/authorization
+http://localhost:6881/oauth2/code?response_type=code&client_id=f7d42348-c647-4efb-a52d-4c5787421e72&redirect_url=http://localhost:8080/authorization
 ```
 
 If this is the first time on this browser, you will have a popup window for user
@@ -69,6 +70,18 @@ browser. Something like the following.
 ```
 http://localhost:8080/authorization?code=pVk10fdsTiiJ1HdUlV4y1g
 ```
+
+If you want to call the get endpoint from your command line or script, you can put
+the user credentials into the header in above command. Just make sure you have 
+a server listening to the redirect url you have specified. 
+
+Here is a sample curl command.
+
+```
+curl -H "Authorization: Basic admin:123456" http://localhost:6881/oauth2/code?response_type=code&client_id=f7d42348-c647-4efb-a52d-4c5787421e72&redirect_url=http://localhost:8080/authorization
+``` 
+If you want to try the above command line, you have to make sure that redirect_url is alive. Otherwise,
+you have an error that doesn't make any sense.
 
 ### Token
 
