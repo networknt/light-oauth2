@@ -3,40 +3,51 @@ date: 2017-01-01T15:14:13-05:00
 title: Enterprise Edition Tutorial
 ---
 
-Note: the following steps use Oracle database as an example. MySQL and Postgres should be the same.
+Note: the following steps use Oracle database as an example. MySQL and Postgres should be the same
+by choosing docker-compose-mysql.yml or docker-compose-postgres.yml when starting docker-compose.
 
 # Start Services
 
-To start services and test them in development mode. 
+In production mode, all services will have docker images downloaded from hub.docker.com or private
+docker hub within your organization. And Kubernetes or other docker orchestration tools will be
+used to manage containers. 
+
+To help use to understand how each service work and enable user to modify services, the first section
+of this tutorial will focus on development mode which will build these services and dockerize them. 
+And start them as a docker compose. 
+
+The following will check out the repo, build and start services with Oracle XE database.   
 
 ```
 git clone git@github.com:networknt/light-oauth2.git
 cd light-oauth2
-git checkout oracle
+git checkout enterprise
 mvn clean install -DskipTests
-docker-compose up
+docker-compose -f docker-compose-oracle.yml up
 ```
 
-It will take about 30 seconds to have all services and database up and running. 
+It will take about 30 seconds to have all services and database up and running. If Oracle XE image
+doesn't exist on your host, it will take longer to download it.
 
 If you have modified source code, please follow the steps to restart services. 
 ```
-docker-compose down
+docker-compose -f docker-compose-oracle.yml down
 mvn clean install
 ./cleanup.sh
-docker-compose up
+docker-compose -f docker-compose-oracle.yml up
 ```
 
 
 # Test Services
 
-By default, the security is partially disabled on these services so that users
-can easily test these services to learn how to use them. 
+By default, the security is partially disabled on these services out of the box so that users
+can easily test these services to learn how to use them. In later sections, there are steps to enable
+all security with config files.
 
 ### Code
 
-This is the service that takes user's credentials and redirect back authorization
-code to webserver. 
+This is part of authorization flow that takes user's credentials and redirect back authorization
+code to the webserver. 
 
 There are two endpoints: /oauth2/code@get and /oauth2/code@post
 
@@ -46,9 +57,14 @@ In most of the cases, you should use GET endpoint as it provides popup window on
 the browser to ask username and password. And there is no need to create a login page
 and error page.
 
-POST endpoint is usually used with existing web server that provides login form and
-post the user credentials to this endpoint to get authorization code indirectly. It
-requires customization most of the time.
+POST endpoint is usually used when you want to have customized login page and error page to make 
+sure users have the same experience as they browser other part of your web server. Browser will have 
+a login form to collect user credentials and posts it to the OAuth2 server endpoint. Once the user
+is authenticated, a authorization code is redirected back to the browser with a redirect URL passed
+in from the request or the default redirect URL for the client will be used from client registration.
+As you might guess, this endpoint requires customization most of the time on login page and error page.
+Default login page and error page are provided as a starting points to make your customized pages.
+
 
 There is only one admin user after the system is installed and the default password
 is "123456". The password needs to be reset immediately with User Service for
@@ -60,7 +76,7 @@ To get authorization code put the following url into your browser.
 http://localhost:6881/oauth2/code?response_type=code&client_id=f7d42348-c647-4efb-a52d-4c5787421e72&redirect_url=http://localhost:8080/authorization
 ```
 
-If this is the first time on this browser, you will have a popup window for user
+If this is the first time you hit this url on the browser, you will have a popup window for user
 credentials. Now let's use admin/123456 to login given you haven't reset the password
 yet for admin user.
 
@@ -81,7 +97,7 @@ Here is a sample curl command.
 curl -H "Authorization: Basic admin:123456" http://localhost:6881/oauth2/code?response_type=code&client_id=f7d42348-c647-4efb-a52d-4c5787421e72&redirect_url=http://localhost:8080/authorization
 ``` 
 If you want to try the above command line, you have to make sure that redirect_url is alive. Otherwise,
-you have an error that doesn't make any sense.
+you will have an error that doesn't make any sense.
 
 ### Token
 

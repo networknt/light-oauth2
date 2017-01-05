@@ -18,7 +18,9 @@ instance and each service can be scaled individually if necessary.
 ## In-Memory Data Grid
 
 Hazelcast is used as Data Grid across multiple services and majority of operations
-won't hit database server for best performance.
+won't hit database server for best performance. This also makes database as plugin
+so that persistence layer can be anything from SQL to NoSQL.
+
 
 ## Built-in Security
 
@@ -29,7 +31,7 @@ flexibility.
 ## Multiple Database Support
 
 Currently, Oralce, MySQL and Postgres are supported, but other databases(sql or nosql) can be easily supported
-by implementing a MapStore of Hazelcast and create a initial db script.
+by implementing a MapStore of Hazelcast and create a initial db script. 
 
 ## Easy to customize and integrate
 
