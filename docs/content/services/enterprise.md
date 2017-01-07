@@ -6,7 +6,11 @@ title: Enterprise Edition
 There are six standard services that cover standard OAuth2 grant flows and extended features like 
 service on-boarding, client on-boarding, user management and public key certificate distribution.
 
-## Code
+This document only describe the features and processes of each service. Please refer to [tutorial](/tutorial/enterprise/)
+on how to access these services. 
+
+
+# Code
 
 This is a service that accepts user credentials and redirects back authorization code with redirect
 URL defined in the client registration or overwritten it by passing in a redirect URL in the request.
@@ -119,21 +123,1049 @@ paths:
 
 ```
 
-### /oauth2/code@get
+## /oauth2/code@get
 
-The get is the most used endpoint as it is very simple and supported by all browsers. 
+The get endpoint is the most used as it is very simple and supported by all browsers
+without any customization. When request is received by the service, the following
+validations or processes are done before issuing a authorization code redirect.
 
-### /oauth2/code@post
+* Make sure that user credentials are passed in. Otherwise, it will redirect the
+browser to display popup window to collect userId and password. The username and
+password will be passed in as Basic Authorization header. The passed in userId
+and password will be matched with cached password(which is hashed and salted). If
+userId and password combination is not valid, then a brand new popup window will
+be shown. Depending on browsers, an error message will be shown up after several
+times of retries.
+
+* If password is incorrect, then the following error will return.
+
+```
+  "ERR12016": {
+    "statusCode": 401,
+    "code": "ERR12016",
+    "message": "INCORRECT_PASSWORD",
+    "description": "Incorrect password."
+  }
+```
+
+* Make sure that response_type and client_id are passed in as parameters. If not, 
+the following error will be returned.
+
+```
+  "ERR11000": {
+    "statusCode": 400,
+    "code": "ERR11000",
+    "message": "VALIDATOR_REQUEST_PARAMETER_QUERY_MISSING",
+    "description": "Query parameter '%s' is required on path '%s' but not found in request."
+  }
+```
+
+* If response_type doesn't equal "code" then the following error will return
+
+```
+  "ERR11002": {
+    "statusCode": 400,
+    "code": "ERR11002",
+    "message": "VALIDATOR_REQUEST_PARAMETER_ENUM_INVALID",
+    "description": "Value '%s' for parameter '%s' is not allowed. Allowed values are <%s>."
+  }
+```
+
+* Make sure client_id passed in is valid again in memory client cache. If not, 
+then the following error will be returned.
+
+```
+  "ERR12014": {
+    "statusCode": 404,
+    "code": "ERR12014",
+    "message": "CLIENT_NOT_FOUND",
+    "description": "Client %s is not found."
+  }
+```
+
+* As you can see from the specification, there is an optional parameter called 
+redirect_url. If this parameter is passed in, it will be used to redirect the
+authorization code. Otherwise, the default redirect_url from client_id will be
+used. This is retrieved from in memory client cache. The url is populated when
+client is registered during on-boarding process.
+
+
+
+## /oauth2/code@post
 
 To be completed later
 
-## Token
+# Token
 
-## Client
+This is a post endpoint to get JSON web tokens. Currently, it support two different
+access tokens: authorization code token(which has user_id and user_type) and client
+credentials token which doesn't have user info in the claim.
 
-## Service
+There is only one post endpoint for this service and the default port is 6882.
+
+Here is the specification.
+
+```
+swagger: '2.0'
+
+info:
+  version: "1.0.0"
+  title: OAuth2 Service Token Service
+  description: OAuth2 Service that issues access tokens. 
+  contact:
+    email: stevehu@gmail.com
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: oauth2.networknt.com
+schemes:
+  - http
+  - https
+
+consumes:
+  - application/x-www-form-urlencoded   
+produces:
+  - application/json
+
+paths:
+  /oauth2/token:
+    post:
+      description: JSON object that contains access token
+      operationId: postToken
+      parameters:
+      - name: authorization
+        in: header
+        type: string
+        required: true      
+      - name: grant_type
+        type: string
+        required: true
+        in: formData
+      - name: code
+        type: string
+        in: formData
+      responses:
+        200:
+          description: "Successful Operation"
+
+```
+
+## /oauth2/token
+
+When a post request is received, the following validations and processes will be performed.
+
+* The handler expects a x-www-form-urlencoded form and if it doesn't exist, the following
+error will be returned.
+
+```
+  "ERR12000": {
+    "statusCode": 400,
+    "code": "ERR12000",
+    "message": "UNABLE_TO_PARSE_FORM_DATA",
+    "description": "Unable to parse x-www-form-urlencoded form data."
+  }
+```
+
+* The parameter grant type should only allowed client_credentials and authorization_code. If
+other grant_type is passed in, the following error will be returned.
+
+```
+  "ERR12001": {
+    "statusCode": 400,
+    "code": "ERR12001",
+    "message": "UNSUPPORTED_GRANT_TYPE",
+    "description": "Unsupported grant type %s. Only authorization_code and client_credentials are supported."
+  }
+```
+
+* When this endpoint is called, the client_id and client_secret must be base64 encoded and put
+into Authorization header. If there is no Authorization header available in the request, the
+following error will be returned.
+
+```
+  "ERR11017": {
+    "statusCode": 400,
+    "code": "ERR11017",
+    "message": "VALIDATOR_REQUEST_PARAMETER_HEADER_MISSING",
+    "description": "Header parameter '%s' is required on path '%s' but not found in request."
+  }
+```
+
+* When validating client_id and client_secret, the first thing is to check the client_id in
+the client cache in memory. If client_id doesn't exist, the following error will be returned.
+
+```
+  "ERR12014": {
+    "statusCode": 404,
+    "code": "ERR12014",
+    "message": "CLIENT_NOT_FOUND",
+    "description": "Client %s is not found."
+  }
+```
+
+* The encoded client_id:client_secret combination will be decoded and then client secret will
+be checked with hashed and salted in memory client secret to make sure it is correct. If the
+client secret is not correct, the following error will be returned.
+
+```
+  "ERR12007": {
+    "statusCode": 401,
+    "code": "ERR12007",
+    "message": "UNAUTHORIZED_CLIENT",
+    "description": "Unauthorized client with wrong client secret."
+  }
+```
+
+* If the basic client_id:client_secret cannot be decoded and parsed correctly, the following
+error will be returned.
+
+```
+  "ERR12004": {
+    "statusCode": 401,
+    "code": "ERR12004",
+    "message": "INVALID_BASIC_CREDENTIALS",
+    "description": "Invalid Basic credentials %s."
+  }
+```
+
+* If there is no Basic authorization header passed in, i.e. a bearer token is passed in, the
+following error will be returned.
+
+```
+  "ERR12003": {
+    "statusCode": 401,
+    "code": "ERR12003",
+    "message": "INVALID_AUTHORIZATION_HEADER",
+    "description": "Invalid authorization header %s. Basic authentication with credentials is required."
+  }
+```
+
+If all validation is passed, a JWT token will be generated and returned in a JSON object.
+
+# Service
+
+Every micro service or API needs to register itself to OAuth2 server in order to control who
+can access it. During the registration/on-boarding, a list of scopes defined in the OpenAPI
+specification should be populated as well. This list of scopes will be used for client to
+register scopes in order to access this particular service or API.
+
+This service has several endpoints and listening to port 6883.
+
+Here is the specification.
+
+```
+
+```
+
+
+## /oauth2/service@get
+
+## /oauth2/service@post
+
+## /oauth2/service@put
+
+## /oauth2/service/{serviceId}@delete
+
+## /oauth2/service/{serviceId}@get
+
+
+# Client
+
+Before initiating the protocol, the client registers with the authorization server. The 
+means through which the client registers with the authorization server are not defined
+in OAuth 2.0 specification. 
+
+As an extension, we have implemented client registration/on-boarding as a micro service
+that exposes several endpoints. 
+
+Before digging into the details of implementation, let's clarify some concepts about
+client. 
+
+## Client Type
+
+OAuth defines two client types, based on their ability to authenticate securely with 
+the authorization server (i.e., ability to maintain the confidentiality of their 
+client credentials):
+
+* confidential
+
+Clients capable of maintaining the confidentiality of their credentials (e.g., client 
+implemented on a secure server with restricted access to the client credentials), or 
+capable of secure client authentication using other means.
+
+* public
+
+Clients incapable of maintaining the confidentiality of their credentials (e.g., 
+clients executing on the device used by the resource owner, such as an installed 
+native application or a web browser-based application), and incapable of secure 
+client authentication via any other means.
+
+Above are standard client types defined in the specification and we have added
+another one to control which client can issue resource owner password credentials
+grant request. 
+
+* trusted
+
+These clients are marked as trusted and they are the only clients that can issue
+resource owner password credentials grant type. For API management team, please
+make sure that trusted client is also confidential and the client and resource
+must be deployed and managed by the same organization as this flow is not as
+secure as authorization code and client credentials flows.
+
+
+The client type designation is based on the authorization server's definition of 
+secure authentication and its acceptable exposure levels of client credentials.  
+The authorization server does not make assumptions about the client type.
+
+A client may be implemented as a distributed set of components or services, each
+with a different client type and security context (e.g., a distributed client with 
+both a confidential server-based component and a public browser-based component).  
+In this case, the client should register each component or service as a separate 
+client.
+
+In a microservices architecture, a service might call other services to fulfill
+its request, in this case, it should register itself as a service and a client.
+That means the owner needs to follow both service on-boarding and client on-boarding
+processes.
+
+## Client Profile
+
+This specification has been designed around the following client profiles:
+
+* web application (web server)
+
+A web application is a confidential client running on a web server. Resource owners 
+access the client via an HTML user interface rendered in a user-agent on the device 
+used by the resource owner. The client credentials as well as any access token issued 
+to the client are stored on the web server and are not exposed to or accessible by 
+the resource owner.
+
+* user-agent-based application (browser)
+      
+A user-agent-based application is a public client in which the client code is 
+downloaded from a web server and executes within a user-agent (e.g., web browser) on 
+the device used by the resource owner. Protocol data and credentials are easily 
+accessible (and often visible) to the resource owner. Since such applications
+reside within the user-agent, they can make seamless use of the user-agent 
+capabilities when requesting authorization.
+
+* native application (mobile)
+
+A native application is a public client installed and executed on the device used by 
+the resource owner. Protocol data and credentials are accessible to the resource owner.  
+It is assumed that any client authentication credentials included in the application can 
+be extracted. On the other hand, dynamically issued credentials such as access tokens or 
+refresh tokens can receive an acceptable level of protection. At a minimum, these 
+credentials are protected from hostile servers with which the application may interact.  
+On some platforms, these credentials might be protected from other applications residing 
+on the same device.
+
+The specification only mentioned above client profiles and the following two profiles
+are added in our OAuth 2.0 implementation.
+
+* batch application (batch)
+
+Batch jobs are very similar with web application but they are managed by enterprise
+scheduler and executed in a projected environment. It is considered as confidential
+client.
+
+* service (service)
+
+Services are usually protected as resources but in a microservices architecture, a
+service can also be a client to call other services or resources. These services
+normally running within light-weight containers in a secured environment. And they
+are considered as confidential clients.
+
+## Client Identifier
+
+The authorization server issues the registered client a client identifier - a unique 
+string representing the registration information provided by the client. The client 
+identifier is not a secret; it is exposed to the resource owner and MUST NOT be used
+alone for client authentication. The client identifier is unique to the authorization 
+server. In our implementation, it is a UUID generated on the server. Here is an example:
+
+```
+f7d42348-c647-4efb-a52d-4c5787421e72
+```
+   
+## Client Secret
+
+Clients in possession of a client secret MAY use the HTTP Basic authentication scheme 
+as defined in [RFC2617] to authenticate with the authorization server. The client 
+identifier is encoded using the "application/x-www-form-urlencoded" encoding algorithm 
+, and the encoded value is used as the username; the client secret is encoded using 
+the same algorithm and used as the password. The authorization server supports the HTTP 
+Basic authentication scheme for authenticating clients that were issued a client secret.
+
+For example (with extra line breaks for display purposes only):
+
+```
+     Authorization: Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3
+```
+
+   
+## Other Authentication Methods
+   
+Currently we don't support other authentication method but we are open to support others
+if there are request from our users.
+
+## Unregistered Clients
+
+Due to security reasons, all client must be registered before authenticated on the server.
+Unregistered clients are not supported on this implementation.
+
+## Client Micro Service
+
+This service has several endpoints and listening to port 6884.
+
+Here is the specification.
+
+```
+swagger: '2.0'
+
+info:
+  version: "1.0.0"
+  title: OAuth2 Client Registration
+  description: OAuth2 Client Registration microservices endpoints. 
+  contact:
+    email: stevehu@gmail.com
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: oauth2.networknt.com
+schemes:
+  - http
+  - https
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /oauth2/client:
+    post:
+      description: Return a client object
+      operationId: createClient
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Client object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/Client"      
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/Client"          
+      security:
+      - client_auth:
+        - "oauth.client.w"
+    put:
+      description: Return the updated client
+      operationId: updateClient
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Client object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/Client"      
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/Client"          
+      security:
+      - client_auth:
+        - "oauth.client.w"
+    get:
+      description: Return all clients
+      operationId: getAllClient
+      parameters:
+      - name: "page"
+        in: "query"
+        description: "Page number"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "pageSize"
+        in: "query"
+        description: "Pag size"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "clientName"
+        in: "query"
+        description: "Partial clientName for filter"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Client"
+      security:
+      - client_auth:
+        - "oauth.client.r"
+          
+  /oauth2/client/{clientId}:
+    delete:
+      description: Delete a client by Id
+      operationId: deleteClient
+      parameters:
+      - name: "clientId"
+        in: "path"
+        description: "Client Id"
+        required: true
+        type: "string"
+      responses:
+        400:
+          description: "Invalid clientId supplied"
+        404:
+          description: "Client not found"
+      security:
+        - client_auth:
+          - oauth.client.w
+    get:
+      description: Get a client by Id
+      operationId: getClient
+      parameters:
+      - name: "clientId"
+        in: "path"
+        description: "Client Id"
+        required: true
+        type: "string"
+      responses:
+        200: 
+          description: Successful response
+          schema:
+            $ref: "#/definitions/Client"          
+        400:
+          description: "Invalid clientId supplied"
+        404:
+          description: "Client not found"
+      security:
+        - client_auth:
+          - oauth.client.r
+          - oauth.client.w
+
+securityDefinitions:
+  client_auth:
+    type: "oauth2"
+    authorizationUrl: "http://localhost:8888/oauth2/code"
+    flow: "implicit"
+    scopes:
+      oauth.client.w: "write oauth client"
+      oauth.client.r: "read oauth client"
+definitions:
+  Client:
+    type: "object"
+    required:
+    - clientType
+    - clientName
+    - clientDesc
+    - ownerId
+    - scope
+    properties:
+      clientId:
+        type: "string"
+        description: "a unique client id"
+      clientSecret:
+        type: "string"
+        description: "client secret"
+      clientType:
+        type: "string"
+        description: "client type"
+        enum:
+        - server
+        - mobile
+        - service
+        - standalone
+        - browser
+      clientName:
+        type: "string"
+        description: "client name"
+      clientDesc:
+        type: "string"
+        description: "client description"
+      ownerId:
+        type: "string"
+        description: "client owner id"
+      scope:
+        type: "string"
+        description: "client scope separated by space"
+      redirectUrl:
+        type: "string"
+        description: "redirect url"
+      createDt:
+        type: "string"
+        format: "date-time"
+        description: "create date time"
+      updateDt:
+        type: "string"
+        format: "date-time"
+        description: "update date time"
+
+```
+
+### /oauth2/client/{clientId}@delete
+
+This endpoint is used to delete existing client. The following validation will be
+performed in the service.
+
+* If clientId cannot be found in the in-memory grid, then the following error will
+be returned.
+
+```
+  "ERR12014": {
+    "statusCode": 404,
+    "code": "ERR12014",
+    "message": "CLIENT_NOT_FOUND",
+    "description": "Client %s is not found."
+  }
+```
+
+### /oauth2/client/{clientId}@get
+
+This endpoint is used to get a particular client with clientId. The following
+validation will be performed in the service.
+
+* If clientId cannot be found in the in-memory grid, then the following error will
+be returned.
+
+```
+  "ERR12014": {
+    "statusCode": 404,
+    "code": "ERR12014",
+    "message": "CLIENT_NOT_FOUND",
+    "description": "Client %s is not found."
+  }
+```
+
+
+### /oauth2/client@get
+
+This endpoint get all the clients from client service with filter and sorted on 
+clientName. A page query parameter is mandatory and pageSize and clientName filter
+are optional.
+
+* page 
+
+Page number which must be specified. It starts with 1 and an empty list will
+be returned if the page is greater than the last page.
+
+* pageSize
+
+Default pageSize is 10 and you can overwrite it with another number. Please don't
+use a big number due to performance reason. 
+
+* clientName
+
+This is the only filter available and it supports filter by start with a few characters.
+For example, "clientName=abc" means any clientName start with "abc". The result is also
+sorted by clientName in the pagination. 
+
+
+The following validation will be performed in the service.
+
+* If page is missing from the query parameter, an error will be returned.
+
+```
+  "ERR11000": {
+    "statusCode": 400,
+    "code": "ERR11000",
+    "message": "VALIDATOR_REQUEST_PARAMETER_QUERY_MISSING",
+    "description": "Query parameter '%s' is required on path '%s' but not found in request."
+  }
+```
+
+
+### /oauth2/client@post
+
+This endpoint is used to create a new client. This usually will be called from light-portal
+and the following validations will be performed before a new client is added.
+
+* Verify that clientId exist in the cache. The clientId is generated as a UUID so this
+cannot be triggered. It is implemented this way just want to be in sync with other
+services.
+
+```
+  "ERR12019": {
+    "statusCode": 400,
+    "code": "ERR12019",
+    "message": "CLIENT_ID_EXISTS",
+    "description": "Client id %s exists."
+  }
+```
+
+* Verify that ownerId is in user cache in memory. If it doesn't exist, the following
+error will be returned.
+
+```
+  "ERR12013": {
+    "statusCode": 404,
+    "code": "ERR12013",
+    "message": "USER_NOT_FOUND",
+    "description": "User %s is not found."
+  }
+```
+
+* Make sure the clientType is from a list of valid values. If not, an error message
+will be returned.
+
+```
+  "ERR11004": {
+    "statusCode": 400,
+    "code": "ERR11004",
+    "message": "VALIDATOR_SCHEMA",
+    "description": "Schema Validation Error - %s"
+  }
+```
+
+* Make sure that clientProfile is from a list of valid values. If not, an error
+message will be returned.
+
+```
+  "ERR11004": {
+    "statusCode": 400,
+    "code": "ERR11004",
+    "message": "VALIDATOR_SCHEMA",
+    "description": "Schema Validation Error - %s"
+  }
+```
+
+
+### /oauth2/client@put
+
+This endpoint is used to update an existing client. This usually will be called from 
+light-portal and the following validations will be performed before a client is updated.
+
+* Verify that clientId exist in the cache. If clientId doesn't existing the cache, an
+error message will be returned.
+
+```
+  "ERR12014": {
+    "statusCode": 404,
+    "code": "ERR12014",
+    "message": "CLIENT_NOT_FOUND",
+    "description": "Client %s is not found."
+  }
+```
+
+* Verify that ownerId is in user cache in memory. If it doesn't exist, the following
+error will be returned.
+
+```
+  "ERR12013": {
+    "statusCode": 404,
+    "code": "ERR12013",
+    "message": "USER_NOT_FOUND",
+    "description": "User %s is not found."
+  }
+```
+
+* Make sure the clientType is from a list of valid values. If not, an error message
+will be returned.
+
+```
+  "ERR11004": {
+    "statusCode": 400,
+    "code": "ERR11004",
+    "message": "VALIDATOR_SCHEMA",
+    "description": "Schema Validation Error - %s"
+  }
+```
+
+* Make sure that clientProfile is from a list of valid values. If not, an error
+message will be returned.
+
+```
+  "ERR11004": {
+    "statusCode": 400,
+    "code": "ERR11004",
+    "message": "VALIDATOR_SCHEMA",
+    "description": "Schema Validation Error - %s"
+  }
+```
+
 
 ## User
+
+This is a service for user registration and management. The OAuth server supports
+integration with other user management system like active directory or LDAP.
+However, for most enterprise customers, their customer information normally will
+be in database. This service provides a database table for user management and
+several endpoints to manage users. 
+
+In OAuth 2.0 specification, user is normally called resource owner. 
+
+### User Type
+
+Currently there are three user types to support. 
+
+* customer
+* partner
+* employee
+
+### User Id
+
+User id must be unique within the system.
+
+### Password
+
+Password is provided when registering and it is hashed and salted in persistence
+layer. 
+
+### User Micro Service
+
+This service has several endpoints and listening to port 6885.
+
+Here is the specification.
+
+```
+swagger: '2.0'
+
+info:
+  version: "1.0.0"
+  title: OAuth2 User Service
+  description: OAuth2 User Service microservices endpoints. 
+  contact:
+    email: stevehu@gmail.com
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: oauth2.networknt.com
+schemes:
+  - http
+  - https
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /oauth2/user:
+    get:
+      description: Return all users
+      operationId: getAllUsers
+      parameters:
+      - name: "page"
+        in: "query"
+        description: "Page number"
+        required: true
+        type: "integer"
+        format: "int32"
+      - name: "pageSize"
+        in: "query"
+        description: "Pag size"
+        required: false
+        type: "integer"
+        format: "int32"
+      - name: "userId"
+        in: "query"
+        description: "Partial userId for filter"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+      security:
+      - user_auth:
+        - "oauth.user.r"
+    post:
+      description: Return a user object
+      operationId: createUser
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/User"      
+      responses:
+        200:
+          description: Successful response
+      security:
+      - user_auth:
+        - "oauth.user.w"
+    put:
+      description: Return the updated user
+      operationId: updateUser
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/User"      
+      responses:
+        200:
+          description: Successful response
+      security:
+      - user_auth:
+        - "oauth.user.w"
+          
+  /oauth2/user/{userId}:
+    delete:
+      description: Delete a user by Id
+      operationId: deleteUser
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "User Id"
+        required: true
+        type: "string"
+      responses:
+        400:
+          description: "Invalid userId supplied"
+        404:
+          description: "User not found"
+      security:
+        - user_auth:
+          - oauth.user.w
+    get:
+      description: Get a user by Id
+      operationId: getUser
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "User Id"
+        required: true
+        type: "string"
+      responses:
+        200: 
+          description: Successful response
+          schema:
+            $ref: "#/definitions/User"          
+        400:
+          description: "Invalid userId supplied"
+        404:
+          description: "User not found"
+      security:
+        - user_auth:
+          - oauth.user.r
+          - oauth.user.w
+  /oauth2/password/{userId}:
+    post:
+      description: Reset Password
+      operationId: resetPassword
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Password object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/Password"      
+      - name: "userId"
+        in: "path"
+        description: "User Id"
+        required: true
+        type: "string"
+      responses:
+        404:
+          description: "User not found"
+      security:
+      - user_auth:
+        - "oauth.user.w"
+          
+securityDefinitions:
+  user_auth:
+    type: "oauth2"
+    authorizationUrl: "http://localhost:8888/oauth2/code"
+    flow: "implicit"
+    scopes:
+      oauth.user.w: "write user"
+      oauth.user.r: "read user"
+definitions:
+  User:
+    type: "object"
+    required:
+    - "userId"
+    - "userType"
+    - "firstName"
+    - "lastName"
+    - "email"
+    properties:
+      userId:
+        type: "string"
+        description: "a unique id"
+      userType:
+        type: "string"
+        description: "user type"
+        enum:
+        - "admin"
+        - "employee"
+        - "customer"
+        - "partner"
+      firstName:
+        type: "string"
+        description: "first name"
+      lastName:
+        type: "string"
+        description: "last name"
+      email:
+        type: "string"
+        description: "email address"
+      password:
+        type: "string"
+        format: "password"
+        description: "password"
+      passwordConfirm:
+        type: "string"
+        format: "password"
+        description: "password confirm"
+      createDt:
+        type: "string"
+        format: "date-time"
+        description: "create date time"
+      updateDt:
+        type: "string"
+        format: "date-time"
+        description: "update date time"
+  Password:
+    type: "object"
+    required:
+    - "password"
+    - "newPassword"
+    - "newPasswordConfirm"
+    properties:
+      password:
+        type: "string"
+        format: "password"
+        description: "existing password"
+      newPassword:
+        type: "string"
+        format: "password"
+        description: "new password"
+      newPasswordConfirm:
+        type: "string"
+        format: "password"
+        description: "new password confirm"
+
+```
+
+### /oauth2/password/{userId}@post
+
+### /oauth2/user@get
+
+### /oauth2/user@post
+
+### /oauth2/user@put
+
+### /oauth2/user/{userId}@delete
+
+### /oauth2/user/{userId}get
+
+
 
 ## Key
 
