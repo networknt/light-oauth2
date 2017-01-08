@@ -13,7 +13,7 @@ on how to access these services.
 # Code
 
 This is a service that accepts user credentials and redirects back authorization code with redirect
-URL defined in the client registration or overwritten it by passing in a redirect URL in the request.
+URL defined in the client registration or overwritten it by passing in a redirect URI in the request.
 
 There are two endpoints and the service default listening port is 6881. 
 
@@ -63,7 +63,7 @@ paths:
         description: "The client id for authorization code"
         required: true
         type: "string"
-      - name: "redirect_url"
+      - name: "redirect_uri"
         in: "query"
         description: "The redirect uri for authorization code"
         required: false
@@ -112,9 +112,9 @@ paths:
         description: "Client Id"
         required: true
         type: "string"
-      - name: "redirect_url"
+      - name: "redirect_uri"
         in: "formData"
-        description: "Redirect Url"
+        description: "Redirect Uri"
         required: false
         type: "string"
       responses:
@@ -184,8 +184,8 @@ then the following error will be returned.
 ```
 
 * As you can see from the specification, there is an optional parameter called 
-redirect_url. If this parameter is passed in, it will be used to redirect the
-authorization code. Otherwise, the default redirect_url from client_id will be
+redirect_uri. If this parameter is passed in, it will be used to redirect the
+authorization code. Otherwise, the default redirect_uri from client_id will be
 used. This is retrieved from in memory client cache. The url is populated when
 client is registered during on-boarding process.
 
@@ -992,9 +992,9 @@ definitions:
       scope:
         type: "string"
         description: "client scope separated by space"
-      redirectUrl:
+      redirectUri:
         type: "string"
-        description: "redirect url"
+        description: "redirect uri"
       createDt:
         type: "string"
         format: "date-time"
