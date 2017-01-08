@@ -1,4 +1,13 @@
-# light-oauth2
+The fastest, lightest and cloud/container ready OAuth 2.0 Authorization Server based on microservices 
+architecture built on top of Light Java framework. 
+
+[Developer Chat](https://gitter.im/networknt/light-oauth2) |
+[Documentation](https://networknt.github.io/light-oauth2) |
+[Contribution Guide](CONTRIBUTING.md) |
+
+[![Build Status](https://travis-ci.org/networknt/light-oauth2.svg?branch=master)](https://travis-ci.org/networknt/light-oauth2)
+
+## Why this OAuth 2.0 Authorization Server
 
 An OAuth2 service provider based on [light-java](https://github.com/networknt/light-java)
 
