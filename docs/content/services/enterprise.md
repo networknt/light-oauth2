@@ -48,6 +48,7 @@ paths:
       operationId: getAuthCode
       parameters:
       - name: "Authorization"
+        description: "encoded username:password mandatory if Basic Authentication is used"
         in: "header"
         required: false
         type: "string"
@@ -76,6 +77,11 @@ paths:
       - name: "password"
         in: "query"
         description: "The password for authorization code in clear text"
+        required: false
+        type: "string"
+      - name: "state"
+        in: "query"
+        description: "to prevent cross-site request forgery"
         required: false
         type: "string"
       responses:
@@ -117,10 +123,14 @@ paths:
         description: "Redirect Uri"
         required: false
         type: "string"
+      - name: "state"
+        in: "formData"
+        description: "to prevent cross-site request forgery"
+        required: false
+        type: "string"
       responses:
         302:
           description: "Successful Operation"
-
 ```
 
 ## /oauth2/code@get
@@ -234,20 +244,41 @@ paths:
       operationId: postToken
       parameters:
       - name: authorization
+        description: "encoded client_id and client_secret pair"
         in: header
         type: string
         required: true      
       - name: grant_type
         type: string
+        enum: 
+        - authorization_code
+        - client_credentials
+        - password
         required: true
         in: formData
       - name: code
+        description: "used in authorization_code to specify the code" 
+        type: string
+        in: formData
+      - name: username
+        description: "mandatory in password grant type"
+        type: string
+        in: formData
+      - name: password
+        description: "mandatory in password grant type"
+        type: string
+        in: formData
+      - name: scope
+        description: "used by all flows to specify scope in the access token"
+        type: string
+        in: formData
+      - name: redirect_uri
+        description: "used in authorization code if code endpoint with rediret_uri"
         type: string
         in: formData
       responses:
         200:
           description: "Successful Operation"
-
 ```
 
 ## /oauth2/token
@@ -960,6 +991,7 @@ definitions:
     type: "object"
     required:
     - clientType
+    - clientProfile
     - clientName
     - clientDesc
     - ownerId
@@ -975,11 +1007,18 @@ definitions:
         type: "string"
         description: "client type"
         enum:
-        - server
+        - confidential
+        - public
+        - trusted
+      clientProfile:
+        type: "string"
+        description: "client profile"
+        enum:
+        - webserver
+        - browser
         - mobile
         - service
-        - standalone
-        - browser
+        - batch
       clientName:
         type: "string"
         description: "client name"
