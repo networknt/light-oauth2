@@ -14,8 +14,8 @@ architecture built on top of Light Java framework.
 The Development Edition can support 60000 user login and get authorization code redirect
 and can generate 700 access tokens per second on my laptop. 
 
-The Enterprise Edition has 6 microservices connected with in-memory data grid 
-and each service can be scaled individually.
+It has 7 microservices connected with in-memory data grid and each service can be
+scaled individually.
 
 
 ### More secure than other implementations
@@ -35,11 +35,16 @@ client can issue resource owner password credentials grant type.
 * Support user management from Light-Portal
 * Open sourced OpenAPI specifications for all microserivces
 
-### Development Edition for API or Service development and integration
+### Easy to integrate with your APIs or services
 
-It has no dependency and everything is in memory with externalized configuration 
-for users and clients. Seamlessly move to enterprise edition or provider edition
-for production.
+The OAuth2 services can be started in a docker compose and for your local devolopment
+and can managed by Kubernetes on official environment.
+
+### Support mutilple databases and can be extended and customized easily
+
+Out of the box, it supports Mysql, Postgres and Oracle XE and H2 for unit tests. Other
+databases can be easily added with configuration change in service.json.
+
 
 ### Public key certificate distribution
 

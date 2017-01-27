@@ -5,15 +5,12 @@ title: Architecture
 
 ## Microservices
 
-All three editions are built on top of Light-Java framework as microservices. 
-
-Development edition has only one service with two endpoints for code and token. 
-
-Enterprise edition has six microservices and each serivce has several endpoints to support user login, 
-access token retrieval, user registration, service registration, client registration and public 
-key certificate distribution. It can support millions users and thousands of clients 
-and services with scopes. It should be easily handle thousands of concurrent users per
-instance and each service can be scaled individually if necessary.
+It is built on top of Light-Java framework as 7 microservices and each serivce has several
+endpoints to support user login, access token retrieval, user registration, service 
+registration, client registration and public key certificate distribution. It can support 
+millions users and thousands of clients and services with scopes. It should be easily handle 
+thousands of concurrent users per instance and each service can be scaled individually if 
+necessary.
 
 ## In-Memory Data Grid
 
@@ -24,22 +21,23 @@ so that persistence layer can be anything from SQL to NoSQL.
 
 ## Built-in Security
 
-Except code, token and key services, other services are protected by OAuth2 itself and additional security
-as well. These sevices can be deployed at different locations within your network for maximum security and
-flexibility. 
+Except code, token and key services, other services are protected by OAuth2 itself and 
+additional security as well. These sevices can be deployed at different locations within 
+your network for maximum security and flexibility. 
 
 ## Multiple Database Support
 
-Currently, Oralce, MySQL and Postgres are supported, but other databases(sql or nosql) can be easily supported
-by implementing a MapStore of Hazelcast and create a initial db script. 
+Currently, Oralce, MySQL and Postgres are supported, but other databases(sql or nosql) 
+can be easily supported by implementing a MapStore of Hazelcast and create a initial 
+db script. 
 
 ## Easy to customize and integrate
 
-Each service can be easily customized and won't impact other services. Also, it is very easy to extend in order
-to integrate with other existing services within your organization.
+Each service can be easily customized and won't impact other services. Also, it is very 
+easy to extend in order to integrate with other existing services within your organization.
 
-## Three Editions to choose from
+## Cloud and Docker friendly
 
-Given your development phase and production requirement, you can choose development edition, 
-enterprise edition and provider edition for your deployment. 
+Designed as native cloud services on top of light weight Java framework to lower the cost of
+VM provisioning.
 
