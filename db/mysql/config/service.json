@@ -1,0 +1,23 @@
+{
+  "description": "singleton service factory configuration",
+  "singletons": [
+    {
+      "javax.sql.DataSource": [
+        {
+          "com.zaxxer.hikari.HikariDataSource":
+          {
+            "jdbcUrl": "jdbc:mysql://mysqldb:3306/oauth2?useSSL=false",
+            "username": "root",
+            "password": "my-secret-pw",
+            "maximumPoolSize": 15,
+            "useServerPrepStmts": true,
+            "cachePrepStmts": true,
+            "cacheCallableStmts": true,
+            "prepStmtCacheSize": 4096,
+            "prepStmtCacheSqlLimit": 2048
+          }
+        }
+      ]
+    }
+  ]
+}

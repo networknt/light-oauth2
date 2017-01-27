@@ -1,6 +1,0 @@
-# This file is generated and should not be changed unless you want to plug in more handlers into the handler chain
-# for cross cutting concerns. In most cases, you should replace some of the default handlers with your own implementation
-# Please note: the sequence of these handlers are very important.
-
-#Exception
-com.networknt.exception.ExceptionHandler

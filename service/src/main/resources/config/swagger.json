@@ -1,0 +1,264 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "OAuth2 Service Registration",
+        "description": "OAuth2 Service Registration microservices endpoints.",
+        "contact": {
+            "email": "stevehu@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "host": "oauth2.networknt.com",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/oauth2/service": {
+            "post": {
+                "description": "Return a service object",
+                "operationId": "createService",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Service object that needs to be added",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Service"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/Service"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "service_auth": [
+                            "oauth.service.w"
+                        ]
+                    }
+                ]
+            },
+            "put": {
+                "description": "Return the updated service",
+                "operationId": "updateService",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Service object that needs to be added",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Service"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/Service"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "service_auth": [
+                            "oauth.service.w"
+                        ]
+                    }
+                ]
+            },
+            "get": {
+                "description": "Return all services",
+                "operationId": "getAllService",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "Pag size",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name": "serviceId",
+                        "in": "query",
+                        "description": "Partial serviceId for filter",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Service"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "service_auth": [
+                            "oauth.service.r"
+                        ]
+                    }
+                ]
+            }
+        },
+        "/oauth2/service/{serviceId}": {
+            "delete": {
+                "description": "Delete a service by Id",
+                "operationId": "deleteService",
+                "parameters": [
+                    {
+                        "name": "serviceId",
+                        "in": "path",
+                        "description": "Service Id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Invalid serviceId supplied"
+                    },
+                    "404": {
+                        "description": "Service not found"
+                    }
+                },
+                "security": [
+                    {
+                        "service_auth": [
+                            "oauth.service.w"
+                        ]
+                    }
+                ]
+            },
+            "get": {
+                "description": "Get a service by Id",
+                "operationId": "getService",
+                "parameters": [
+                    {
+                        "name": "serviceId",
+                        "in": "path",
+                        "description": "Service Id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/Service"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid serviceId supplied"
+                    },
+                    "404": {
+                        "description": "Service not found"
+                    }
+                },
+                "security": [
+                    {
+                        "service_auth": [
+                            "oauth.service.r",
+                            "oauth.service.w"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "securityDefinitions": {
+        "service_auth": {
+            "type": "oauth2",
+            "authorizationUrl": "http://localhost:8888/oauth2/code",
+            "flow": "implicit",
+            "scopes": {
+                "oauth.service.w": "write oauth service",
+                "oauth.service.r": "read oauth service"
+            }
+        }
+    },
+    "definitions": {
+        "Service": {
+            "type": "object",
+            "required": [
+                "serviceId",
+                "serviceName",
+                "serviceType",
+                "scope"
+            ],
+            "properties": {
+                "serviceId": {
+                    "type": "string",
+                    "description": "a unique service id"
+                },
+                "serviceType": {
+                    "type": "string",
+                    "description": "service type",
+                    "enum": [
+                        "ms",
+                        "api"
+                    ]
+                },
+                "serviceName": {
+                    "type": "string",
+                    "description": "service name"
+                },
+                "serviceDesc": {
+                    "type": "string",
+                    "description": "service description"
+                },
+                "ownerId": {
+                    "type": "string",
+                    "description": "service owner userId"
+                },
+                "scope": {
+                    "type": "string",
+                    "description": "service scopes separated by space"
+                },
+                "createDt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "create date time"
+                },
+                "updateDt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "update date time"
+                }
+            }
+        }
+    }
+}

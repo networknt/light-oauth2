@@ -1,0 +1,169 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "OAuth2 Service Authorization Code",
+        "description": "OAuth2 Service that logs in user and provide authorization code.",
+        "contact": {
+            "email": "stevehu@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "host": "oauth2.networknt.com",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/oauth2/code": {
+            "get": {
+                "description": "Return 302 redirect with authorization code",
+                "operationId": "getAuthCode",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "encoded username:password mandatory if Basic Authentication is used",
+                        "in": "header",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "response_type",
+                        "in": "query",
+                        "description": "The response type for authorization code",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "code"
+                        ]
+                    },
+                    {
+                        "name": "client_id",
+                        "in": "query",
+                        "description": "The client id for authorization code",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "redirect_uri",
+                        "in": "query",
+                        "description": "The redirect uri for authorization code",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "description": "The user name for authorization code",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "description": "The password for authorization code in clear text",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "state",
+                        "in": "query",
+                        "description": "to prevent cross-site request forgery",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "scope",
+                        "in": "query",
+                        "description": "scope of the request",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Successful Operation"
+                    }
+                }
+            },
+            "post": {
+                "description": "Return 302 redirect with authorization code",
+                "operationId": "postAuthCode",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "j_username",
+                        "in": "formData",
+                        "description": "User name",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "j_password",
+                        "in": "formData",
+                        "description": "Password",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "response_type",
+                        "in": "formData",
+                        "description": "Response type",
+                        "required": true,
+                        "type": "string",
+                        "enum": [
+                            "code"
+                        ]
+                    },
+                    {
+                        "name": "client_id",
+                        "in": "formData",
+                        "description": "Client Id",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "redirect_uri",
+                        "in": "formData",
+                        "description": "Redirect Uri",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "state",
+                        "in": "formData",
+                        "description": "to prevent cross-site request forgery",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "scope",
+                        "in": "query",
+                        "description": "scope of the request",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Successful Operation"
+                    }
+                }
+            }
+        }
+    }
+}

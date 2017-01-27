@@ -1,0 +1,126 @@
+  version: '2'
+  services:
+    oracledb:
+      image: wnameless/oracle-xe-11g
+      volumes:
+        - ./db/oracle:/docker-entrypoint-initdb.d
+      ports:
+        - "1521:1521"
+      networks:
+        - light
+    oauth2-code:
+      build: code/
+      ports:
+        - "6881:6881"
+      volumes:
+        - ./db/oracle/config:/config
+      networks:
+        - light
+      depends_on:
+        - oracledb
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-code"
+      #    env: "dev"
+    oauth2-token:
+      build: token/
+      ports:
+        - "6882:6882"
+      volumes:
+        - ./db/oracle/config:/config
+      networks:
+        - light
+      depends_on:
+        - oracledb
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-token"
+      #    env: "dev"
+    oauth2-service:
+      build: service/
+      ports:
+        - "6883:6883"
+      volumes:
+        - ./db/oracle/config:/config
+      networks:
+        - light
+      depends_on:
+        - oracledb
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-service"
+      #    env: "dev"
+    oauth2-client:
+      build: client/
+      ports:
+        - "6884:6884"
+      volumes:
+        - ./db/oracle/config:/config
+      networks:
+        - light
+      depends_on:
+        - oracledb
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-client"
+      #    env: "dev"
+    oauth2-user:
+      build: user/
+      ports:
+        - "6885:6885"
+      volumes:
+        - ./db/oracle/config:/config
+      networks:
+        - light
+      depends_on:
+        - oracledb
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-user"
+      #    env: "dev"
+    oauth2-key:
+      build: key/
+      ports:
+        - "6886:6886"
+      volumes:
+        - ./db/oracle/config:/config
+      networks:
+        - light
+      depends_on:
+        - oracledb
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-key"
+      #    env: "dev"
+    oauth2-refresh-token:
+      build: refresh-token/
+      ports:
+        - "6887:6887"
+      volumes:
+        - ./db/oracle/config:/config
+      networks:
+        - light
+      depends_on:
+        - oracledb
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-refresh-token"
+      #    env: "dev"
+
+  networks:
+    light:
+      driver: bridge
