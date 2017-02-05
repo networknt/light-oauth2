@@ -1,5 +1,16 @@
 {
   "description": "server config",
   "ip": "0.0.0.0",
-  "port": 6884
+  "httpPort": 6884,
+  "enableHttp": true,
+  "httpsPort": 6884,
+  "enableHttps": false,
+  "keystoreName": "tls/server.keystore",
+  "keystorePass": "secret",
+  "keyPass": "secret",
+  "enableTwoWayTls": false,
+  "truststoreName": "tls/server.truststore",
+  "truststorePass": "password",
+  "serviceId": "com.networknt.oauth2-client-1.0.0",
+  "enableRegistry": false
 }

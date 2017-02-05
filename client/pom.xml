@@ -44,10 +44,6 @@
         </dependency>
         <dependency>
             <groupId>com.networknt</groupId>
-            <artifactId>validator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.networknt</groupId>
             <artifactId>status</artifactId>
         </dependency>
         <dependency>
@@ -61,10 +57,6 @@
         <dependency>
             <groupId>com.networknt</groupId>
             <artifactId>mask</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.networknt</groupId>
-            <artifactId>swagger</artifactId>
         </dependency>
         <dependency>
             <groupId>com.networknt</groupId>
@@ -92,7 +84,36 @@
         </dependency>
         <dependency>
             <groupId>com.networknt</groupId>
+            <artifactId>registry</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>balance</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>cluster</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>consul</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
             <artifactId>server</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>swagger-meta</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>swagger-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>swagger-validator</artifactId>
         </dependency>
 
         <dependency>
@@ -122,10 +143,6 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.lukehutch</groupId>
-            <artifactId>fast-classpath-scanner</artifactId>
         </dependency>
         <dependency>
             <groupId>com.hazelcast</groupId>
