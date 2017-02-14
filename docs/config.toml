@@ -82,6 +82,11 @@ googleAnalytics = ""
 	weight = 50
 
 [[menu.main]]
+	name   = "References"
+	url    = "reference/"
+	weight = 55
+
+[[menu.main]]
 	name   = "Issues & Help"
 	url    = "https://github.com/networknt/light-oauth2/issues"
 	weight = 60
