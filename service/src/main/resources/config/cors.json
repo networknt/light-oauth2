@@ -1,0 +1,13 @@
+{
+  "description": "Cors Http Handler",
+  "enabled": true,
+  "allowedOrigins": [
+    "http://localhost"
+  ],
+  "allowedMethods": [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE"
+  ]
+}

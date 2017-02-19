@@ -98,6 +98,10 @@
         </dependency>
         <dependency>
             <groupId>com.networknt</groupId>
+            <artifactId>cors</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
             <artifactId>server</artifactId>
         </dependency>
 

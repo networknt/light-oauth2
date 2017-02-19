@@ -14,6 +14,8 @@ com.networknt.body.BodyHandler
 com.networknt.security.JwtVerifyHandler
 #Swagger Parsing swagger specification based on request uri and method.
 com.networknt.swagger.SwaggerHandler
+#Cors handler to handler post/put pre-flight
+com.networknt.cors.CorsHttpHandler
 #Correlation Create correlationId if it doesn't exist in the request header and put it into the request header
 com.networknt.correlation.CorrelationHandler
 #Traceability Put traceabilityId into response header from request header if it exists
