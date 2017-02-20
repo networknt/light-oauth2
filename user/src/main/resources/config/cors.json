@@ -2,7 +2,7 @@
   "description": "Cors Http Handler",
   "enabled": true,
   "allowedOrigins": [
-    "http://localhost"
+    "http://localhost:8080"
   ],
   "allowedMethods": [
     "GET",
