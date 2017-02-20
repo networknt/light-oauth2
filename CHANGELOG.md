@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.0.0 - 2017-02-19
+### Added
+
+### Changed
+- Remove development edition and replace it with seven microservices for enterprise edition
+- Upgrade to framework 1.2.4
+
 
 ## 0.1.2 - 2016-10-10
 ### Added
