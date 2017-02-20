@@ -12,6 +12,7 @@ import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Date;
 import java.util.Map;
 
 public class Oauth2ClientPutHandler implements HttpHandler {
@@ -43,6 +44,8 @@ public class Oauth2ClientPutHandler implements HttpHandler {
                     exchange.getResponseSender().send(status.toString());
                 }
             }
+            // set updateDt here.
+            client.setUpdateDt(new Date(System.currentTimeMillis()));
             clients.set(clientId, client);
         }
     }

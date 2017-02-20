@@ -2,14 +2,12 @@ package com.networknt.oauth.cache;
 
 import com.hazelcast.core.MapStore;
 import com.networknt.oauth.cache.model.Client;
-import com.networknt.oauth.cache.model.User;
 import com.networknt.service.SingletonServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.sql.Date;
 import java.util.*;
 
 /**
@@ -49,7 +47,7 @@ public class ClientMapStore implements MapStore<String, Client> {
                 stmt.setString(7, client.getScope());
                 stmt.setString(8, client.getRedirectUri());
                 stmt.setString(9, client.getOwnerId());
-                stmt.setDate(10, new Date(System.currentTimeMillis()));
+                stmt.setDate(10, client.getCreateDt());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logger.error("Exception:", e);
@@ -64,7 +62,7 @@ public class ClientMapStore implements MapStore<String, Client> {
                 stmt.setString(5, client.getScope());
                 stmt.setString(6, client.getRedirectUri());
                 stmt.setString(7, client.getOwnerId());
-                stmt.setDate(8, new Date(System.currentTimeMillis()));
+                stmt.setDate(8, client.getUpdateDt());
                 stmt.setString(9, client.getClientId());
                 stmt.executeUpdate();
             } catch (SQLException e) {

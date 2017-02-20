@@ -11,6 +11,7 @@ import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Date;
 import java.util.Map;
 
 public class Oauth2UserPutHandler implements HttpHandler {
@@ -31,6 +32,7 @@ public class Oauth2UserPutHandler implements HttpHandler {
         } else {
             // as password is not in the return value, chances are password is not in the user object
             user.setPassword(u.getPassword());
+            user.setUpdateDt(new Date(System.currentTimeMillis()));
             users.set(userId, user);
         }
     }

@@ -4,7 +4,6 @@ import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
-import com.networknt.oauth.cache.model.Client;
 import com.networknt.oauth.cache.model.Service;
 import com.networknt.oauth.cache.model.User;
 import com.networknt.status.Status;
@@ -13,6 +12,7 @@ import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Date;
 import java.util.Map;
 
 public class Oauth2ServicePostHandler implements HttpHandler {
@@ -39,6 +39,8 @@ public class Oauth2ServicePostHandler implements HttpHandler {
                     exchange.getResponseSender().send(status.toString());
                 }
             }
+            // set date here otherwise database will have the date populated but the cache without date
+            service.setCreateDt(new Date(System.currentTimeMillis()));
             services.set(serviceId, service);
         } else {
             Status status = new Status(SERVICE_ID_EXISTS, serviceId);

@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.sql.Date;
 import java.util.*;
 
 /**
@@ -45,7 +44,7 @@ public class UserMapStore implements MapStore<String, User> {
                 stmt.setString(4, user.getLastName());
                 stmt.setString(5, user.getEmail());
                 stmt.setString(6, user.getPassword());
-                stmt.setDate(7, new Date(System.currentTimeMillis()));
+                stmt.setDate(7, user.getCreateDt());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logger.error("Exception:", e);
@@ -58,7 +57,7 @@ public class UserMapStore implements MapStore<String, User> {
                 stmt.setString(3, user.getLastName());
                 stmt.setString(4, user.getEmail());
                 stmt.setString(5, user.getPassword());
-                stmt.setDate(6, new Date(System.currentTimeMillis()));
+                stmt.setDate(6, user.getUpdateDt());
                 stmt.setString(7, user.getUserId());
                 stmt.executeUpdate();
             } catch (SQLException e) {

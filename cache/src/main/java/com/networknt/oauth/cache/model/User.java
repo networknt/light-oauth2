@@ -10,9 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.Date;
+import java.sql.Date;
 
 
 public class User implements IdentifiedDataSerializable {
