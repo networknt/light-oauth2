@@ -8,8 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 ### Changed
+- Update Dockerfile to reflect the version change. Thanks @gonzalovazquez
+- Fixes #24 createDt and updateDt not populated in in-memory data grid
+- Fixes #23 default allowed origin in CORS to http://localhost:8080 for market place development. 
 
-## 1.0.0 - 2017-02-19
+## 1.2.4 - 2017-02-19
 ### Added
 
 ### Changed
