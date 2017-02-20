@@ -1,4 +1,4 @@
 FROM insideo/jre8
 EXPOSE 8080
-ADD /target/swagger-light-java-1.0.0.jar server.jar
+ADD /target/oauth2-refresh-token-1.2.4.jar server.jar
 CMD ["/bin/sh","-c","java -Dlight-java-config-dir=/config -jar /server.jar"]
