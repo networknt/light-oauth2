@@ -34,8 +34,7 @@ public class Oauth2ClientPostHandler implements HttpHandler {
         String clientId = UUID.randomUUID().toString();
         client.setClientId(clientId);
         String clientSecret = Util.getUUID();
-        clientSecret = HashUtil.generateStorngPasswordHash(clientSecret);
-        client.setClientSecret(clientSecret);
+        client.setClientSecret(HashUtil.generateStorngPasswordHash(clientSecret));
         client.setCreateDt(new Date(System.currentTimeMillis()));
 
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
@@ -52,7 +51,9 @@ public class Oauth2ClientPostHandler implements HttpHandler {
             }
             clients.set(clientId, client);
             // send the client back with client_id and client_secret
-            exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(client));
+            Client c = Client.copyClient(client);
+            c.setClientSecret(clientSecret);
+            exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(c));
         } else {
             Status status = new Status(CLIENT_ID_EXISTS, clientId);
             exchange.setStatusCode(status.getStatusCode());

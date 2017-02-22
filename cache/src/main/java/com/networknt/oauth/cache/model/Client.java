@@ -376,5 +376,21 @@ public class Client implements IdentifiedDataSerializable {
   }
 
 
+  public static Client copyClient (Client c){
+    Client n = new Client();
+    //for all properties in client
+    n.setClientId(c.getClientId());
+    n.setClientSecret(c.getClientSecret());
+    n.setClientType(c.getClientType());
+    n.setClientProfile(c.getClientProfile());
+    n.setClientName(c.getClientName());
+    n.setClientDesc(c.getClientDesc());
+    n.setOwnerId(c.getOwnerId());
+    n.setScope(c.getScope());
+    n.setRedirectUri(c.getRedirectUri());
+    n.setCreateDt(c.getCreateDt());
+    n.setUpdateDt(c.getUpdateDt());
+    return n;
+  }
 }
 
