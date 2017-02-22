@@ -33,10 +33,13 @@ public class Oauth2ClientGetHandler implements HttpHandler {
         pagingPredicate.setPage(page);
         Collection<Client> values = clients.values(pagingPredicate);
 
+        List results = new ArrayList();
         for (Client value : values) {
-            value.setClientSecret(null);
+            Client c = Client.copyClient(value);
+            c.setClientSecret(null);
+            results.add(c);
         }
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
-        exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(values));
+        exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(results));
     }
 }

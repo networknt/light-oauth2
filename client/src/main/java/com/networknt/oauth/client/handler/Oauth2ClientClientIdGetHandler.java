@@ -31,7 +31,9 @@ public class Oauth2ClientClientIdGetHandler implements HttpHandler {
             exchange.getResponseSender().send(status.toString());
             return;
         }
+        Client c = Client.copyClient(client);
+        c.setClientSecret(null);
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
-        exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(client));
+        exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(c));
     }
 }

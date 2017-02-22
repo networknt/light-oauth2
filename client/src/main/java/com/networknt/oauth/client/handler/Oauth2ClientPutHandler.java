@@ -29,7 +29,8 @@ public class Oauth2ClientPutHandler implements HttpHandler {
         String clientId = client.getClientId();
 
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
-        if(clients.get(clientId) == null) {
+        Client originalClient = clients.get(clientId);
+        if(originalClient == null) {
             Status status = new Status(CLIENT_NOT_FOUND, clientId);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
@@ -46,6 +47,8 @@ public class Oauth2ClientPutHandler implements HttpHandler {
             }
             // set updateDt here.
             client.setUpdateDt(new Date(System.currentTimeMillis()));
+            // set client secret as it is not returned by query.
+            client.setClientSecret(originalClient.getClientSecret());
             clients.set(clientId, client);
         }
     }
