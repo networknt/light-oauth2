@@ -9,6 +9,7 @@ import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.oauth.cache.model.RefreshToken;
 import com.networknt.oauth.cache.model.User;
+import com.networknt.oauth.token.helper.HttpAuth;
 import com.networknt.security.JwtHelper;
 import com.networknt.status.Status;
 import com.networknt.utility.HashUtil;
@@ -26,8 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class Oauth2TokenPostHandler implements HttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2TokenPostHandler.class);
@@ -77,13 +76,13 @@ public class Oauth2TokenPostHandler implements HttpHandler {
         }
         try {
             if("client_credentials".equals(formMap.get("grant_type"))) {
-                exchange.getResponseSender().send(mapper.writeValueAsString(handleClientCredentials(exchange, (String)formMap.get("scope"))));
+                exchange.getResponseSender().send(mapper.writeValueAsString(handleClientCredentials(exchange, (String)formMap.get("scope"), formMap)));
             } else if("authorization_code".equals(formMap.get("grant_type"))) {
-                exchange.getResponseSender().send(mapper.writeValueAsString(handleAuthorizationCode(exchange, (String)formMap.get("code"), (String)formMap.get("redirect_uri"))));
+                exchange.getResponseSender().send(mapper.writeValueAsString(handleAuthorizationCode(exchange, (String)formMap.get("code"), (String)formMap.get("redirect_uri"), formMap)));
             } else if("password".equals(formMap.get("grant_type"))) {
-                exchange.getResponseSender().send(mapper.writeValueAsString(handlePassword(exchange, (String)formMap.get("username"), (String)formMap.get("password"), (String)formMap.get("scope"))));
+                exchange.getResponseSender().send(mapper.writeValueAsString(handlePassword(exchange, (String)formMap.get("username"), (String)formMap.get("password"), (String)formMap.get("scope"), formMap)));
             } else if("refresh_token".equals(formMap.get("grant_type"))) {
-                exchange.getResponseSender().send(mapper.writeValueAsString(handleRefreshToken(exchange, (String)formMap.get("refresh_token"), (String)formMap.get("scope"))));
+                exchange.getResponseSender().send(mapper.writeValueAsString(handleRefreshToken(exchange, (String)formMap.get("refresh_token"), (String)formMap.get("scope"), formMap)));
             } else {
                 Status status = new Status(UNSUPPORTED_GRANT_TYPE, formMap.get("grant_type"));
                 exchange.setStatusCode(status.getStatusCode());
@@ -100,9 +99,9 @@ public class Oauth2TokenPostHandler implements HttpHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handleClientCredentials(HttpServerExchange exchange, String scope) throws ApiException {
+    private Map<String, Object> handleClientCredentials(HttpServerExchange exchange, String scope, Map<String, Object> formMap) throws ApiException {
         if(logger.isDebugEnabled()) logger.debug("scope = " + scope);
-        Client client = authenticateClient(exchange);
+        Client client = authenticateClient(exchange, formMap);
         if(client != null) {
             if(scope == null) {
                 scope = client.getScope();
@@ -129,9 +128,9 @@ public class Oauth2TokenPostHandler implements HttpHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handleAuthorizationCode(HttpServerExchange exchange, String code, String redirectUri) throws ApiException {
+    private Map<String, Object> handleAuthorizationCode(HttpServerExchange exchange, String code, String redirectUri, Map<String, Object> formMap) throws ApiException {
         if(logger.isDebugEnabled()) logger.debug("code = " + code + " redirectUri = " + redirectUri);
-        Client client = authenticateClient(exchange);
+        Client client = authenticateClient(exchange, formMap);
         if(client != null) {
             Map<String, String> codeMap = (Map<String, String>)CacheStartupHookProvider.hz.getMap("codes").remove(code);
             String userId = codeMap.get("userId");
@@ -187,9 +186,9 @@ public class Oauth2TokenPostHandler implements HttpHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handlePassword(HttpServerExchange exchange, String userId, String password, String scope) throws ApiException {
+    private Map<String, Object> handlePassword(HttpServerExchange exchange, String userId, String password, String scope, Map<String, Object> formMap) throws ApiException {
         if(logger.isDebugEnabled()) logger.debug("userId = " + userId + " scope = " + scope);
-        Client client = authenticateClient(exchange);
+        Client client = authenticateClient(exchange, formMap);
         if(client != null) {
             // authenticate user with credentials
             if(userId != null) {
@@ -248,9 +247,9 @@ public class Oauth2TokenPostHandler implements HttpHandler {
 
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handleRefreshToken(HttpServerExchange exchange, String refreshToken, String scope) throws ApiException {
+    private Map<String, Object> handleRefreshToken(HttpServerExchange exchange, String refreshToken, String scope, Map<String, Object> formMap) throws ApiException {
         if(logger.isDebugEnabled()) logger.debug("refreshToken = " + refreshToken + " scope = " + scope);
-        Client client = authenticateClient(exchange);
+        Client client = authenticateClient(exchange, formMap);
         if(client != null) {
             // make sure that the refresh token can be found and client_id matches.
             IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
@@ -303,45 +302,48 @@ public class Oauth2TokenPostHandler implements HttpHandler {
         return new HashMap<>(); // return an empty hash map. this is actually not reachable at all.
     }
 
-    private Client authenticateClient(HttpServerExchange exchange) throws ApiException {
-        String auth = exchange.getRequestHeaders().getFirst("Authorization");
-        if(auth == null || auth.trim().length() == 0) {
-            throw new ApiException(new Status(MISSING_AUTHORIZATION_HEADER));
+
+    private Client authenticateClient(HttpServerExchange exchange, Map<String, Object> formMap) throws ApiException {
+        HttpAuth httpAuth = new HttpAuth(exchange);
+
+        String clientId;
+        String clientSecret;
+        if(!httpAuth.isHeaderAvailable()) {
+            clientId = (String)formMap.get("client_id");
+            clientSecret = (String)formMap.get("client_secret");
         } else {
-            String basic = auth.substring(0, 5);
-            if("BASIC".equalsIgnoreCase(basic)) {
-                String credentials = auth.substring(6);
-                String clientId;
-                String clientSecret;
-                int pos = credentials.indexOf(':');
-                if(pos == -1) {
-                    credentials = decodeCredentials(credentials);
-                }
-                pos = credentials.indexOf(':');
-                if(pos != -1) {
-                    clientId = credentials.substring(0, pos);
-                    clientSecret = credentials.substring(pos + 1);
-                    IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
-                    Client client = clients.get(clientId);
-                    if(client == null) {
-                        throw new ApiException(new Status(CLIENT_NOT_FOUND, clientId));
-                    } else {
-                        try {
-                            if(HashUtil.validatePassword(clientSecret, client.getClientSecret())) {
-                                return client;
-                            } else {
-                                throw new ApiException(new Status(UNAUTHORIZED_CLIENT));
-                            }
-                        } catch ( NoSuchAlgorithmException | InvalidKeySpecException e) {
-                            logger.error("Exception:", e);
-                            throw new ApiException(new Status(RUNTIME_EXCEPTION));
-                        }
-                    }
-                } else {
-                    throw new ApiException(new Status(INVALID_BASIC_CREDENTIALS, credentials));
-                }
+            clientId = httpAuth.getClientId();
+            clientSecret = httpAuth.getClientSecret();
+        }
+
+        if(clientId == null || clientId.trim().isEmpty() || clientSecret == null || clientSecret.trim().isEmpty()) {
+            if(!httpAuth.isHeaderAvailable()) {
+                throw new ApiException(new Status(MISSING_AUTHORIZATION_HEADER));
+            } else if(httpAuth.isInvalidCredentials()) {
+                throw new ApiException(new Status(INVALID_BASIC_CREDENTIALS, httpAuth.getCredentials()));
             } else {
-                throw new ApiException(new Status(INVALID_AUTHORIZATION_HEADER, auth));
+                throw new ApiException(new Status(INVALID_AUTHORIZATION_HEADER, httpAuth.getAuth()));
+            }
+        }
+
+        return validateClientSecret(clientId, clientSecret);
+    }
+
+    private Client validateClientSecret(String clientId, String clientSecret) throws ApiException {
+        IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
+        Client client = clients.get(clientId);
+        if(client == null) {
+            throw new ApiException(new Status(CLIENT_NOT_FOUND, clientId));
+        } else {
+            try {
+                if(HashUtil.validatePassword(clientSecret, client.getClientSecret())) {
+                    return client;
+                } else {
+                    throw new ApiException(new Status(UNAUTHORIZED_CLIENT));
+                }
+            } catch ( NoSuchAlgorithmException | InvalidKeySpecException e) {
+                logger.error("Exception:", e);
+                throw new ApiException(new Status(RUNTIME_EXCEPTION));
             }
         }
     }
@@ -364,9 +366,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
         return claims;
     }
 
-    private static String decodeCredentials(String cred) {
-        return new String(org.apache.commons.codec.binary.Base64.decodeBase64(cred), UTF_8);
-    }
+
 
     private static boolean matchScope(String s1, String s2) {
         boolean matched = true;

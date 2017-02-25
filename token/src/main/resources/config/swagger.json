@@ -34,7 +34,7 @@
                         "description": "encoded client_id and client_secret pair",
                         "in": "header",
                         "type": "string",
-                        "required": true
+                        "required": false
                     },
                     {
                         "name": "grant_type",
@@ -46,6 +46,18 @@
                             "refresh_token"
                         ],
                         "required": true,
+                        "in": "formData"
+                    },
+                    {
+                        "name": "client_id",
+                        "description": "used as alternative to authentication header for client authentication",
+                        "type": "string",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "client_secret",
+                        "description": "used as alternative to authentication header for client authentication",
+                        "type": "string",
                         "in": "formData"
                     },
                     {
