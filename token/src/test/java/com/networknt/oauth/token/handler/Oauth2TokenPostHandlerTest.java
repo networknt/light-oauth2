@@ -1,7 +1,6 @@
 package com.networknt.oauth.token.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.hazelcast.core.IMap;
 import com.networknt.config.Config;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.RefreshToken;
@@ -71,6 +70,24 @@ public class Oauth2TokenPostHandlerTest {
     }
 
     @Test
+    public void testClientCredentialsTokenByFormData() throws Exception {
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "client_credentials"));
+        urlParameters.add(new BasicNameValuePair("client_id", "f7d42348-c647-4efb-a52d-4c5787421e72"));
+        urlParameters.add(new BasicNameValuePair("client_secret", "f6h1FTI8Q3-7UScPZDzfXA"));
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        HttpResponse response = client.execute(httpPost);
+        Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+        String body = EntityUtils.toString(response.getEntity());
+        logger.debug("response body = " + body);
+        Assert.assertTrue(body.indexOf("access_token") > 0);
+    }
+
+    @Test
     public void testTokenInvalidForm() throws Exception {
         String url = "http://localhost:6882/oauth2/token";
         CloseableHttpClient client = HttpClients.createDefault();
@@ -110,11 +127,10 @@ public class Oauth2TokenPostHandlerTest {
         urlParameters.add(new BasicNameValuePair("grant_type", "client_credentials"));
         httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
         HttpResponse response = client.execute(httpPost);
-        //String body = EntityUtils.toString(response.getEntity());
-        Assert.assertEquals(400, response.getStatusLine().getStatusCode());
+        Assert.assertEquals(401, response.getStatusLine().getStatusCode());
         Status status = Config.getInstance().getMapper().readValue(response.getEntity().getContent(), Status.class);
         Assert.assertNotNull(status);
-        Assert.assertEquals("ERR11017", status.getCode());
+        Assert.assertEquals("ERR12002", status.getCode());
     }
 
     @Test
