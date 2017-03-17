@@ -35,3 +35,15 @@ Codebase can be accessed from kafka branch and it is in planning phase.
 
 Provider edition is used by service providers and it is yet to be implemented.
 
+
+## Build the server from source code
+
+Note: as Oracle client is not available in public maven repo, you have to install it manually by
+following this [link](https://dimitrisli.wordpress.com/2012/08/09/maven-install-ojdbc6/) to install
+it before building the source code.
+
+```
+git clone git@github.com:networknt/light-oauth2.git
+cd light-oauth2
+mvn clean install
+```
