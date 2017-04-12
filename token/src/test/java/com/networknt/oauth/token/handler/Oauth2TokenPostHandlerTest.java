@@ -251,6 +251,31 @@ public class Oauth2TokenPostHandlerTest {
     }
 
     @Test
+    public void testOneMismatchScope() throws Exception {
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "password"));
+        urlParameters.add(new BasicNameValuePair("username", "admin"));
+        urlParameters.add(new BasicNameValuePair("password", "123456"));
+        urlParameters.add(new BasicNameValuePair("scope", "petstore.r"));
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+
+        try {
+            HttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = EntityUtils.toString(response.getEntity());
+            Assert.assertEquals(200, statusCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
     public void testPasswordGrantEmptyUsername() throws Exception {
         String url = "http://localhost:6882/oauth2/token";
         CloseableHttpClient client = HttpClients.createDefault();
