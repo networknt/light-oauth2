@@ -1,286 +1,314 @@
 {
-    "swagger": "2.0",
-    "info": {
-        "version": "1.0.0",
-        "title": "OAuth2 Client Registration",
-        "description": "OAuth2 Client Registration microservices endpoints.",
-        "contact": {
-            "email": "stevehu@gmail.com"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        }
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "OAuth2 Client Registration",
+    "description": "OAuth2 Client Registration microservices endpoints.",
+    "contact": {
+      "email": "stevehu@gmail.com"
     },
-    "host": "oauth2.networknt.com",
-    "schemes": [
-        "http",
-        "https"
-    ],
-    "consumes": [
-        "application/json"
-    ],
-    "produces": [
-        "application/json"
-    ],
-    "paths": {
-        "/oauth2/client": {
-            "post": {
-                "description": "Return a client object",
-                "operationId": "createClient",
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "Client object that needs to be added",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/Client"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "schema": {
-                            "$ref": "#/definitions/Client"
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "client_auth": [
-                            "oauth.client.w"
-                        ]
-                    }
-                ]
-            },
-            "put": {
-                "description": "Return the updated client",
-                "operationId": "updateClient",
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "Client object that needs to be added",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/Client"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "schema": {
-                            "$ref": "#/definitions/Client"
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "client_auth": [
-                            "oauth.client.w"
-                        ]
-                    }
-                ]
-            },
-            "get": {
-                "description": "Return all clients",
-                "operationId": "getAllClient",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "required": true,
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    {
-                        "name": "pageSize",
-                        "in": "query",
-                        "description": "Pag size",
-                        "required": false,
-                        "type": "integer",
-                        "format": "int32"
-                    },
-                    {
-                        "name": "clientName",
-                        "in": "query",
-                        "description": "Partial clientName for filter",
-                        "required": false,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "successful operation",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/Client"
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "client_auth": [
-                            "oauth.client.r"
-                        ]
-                    }
-                ]
-            }
-        },
-        "/oauth2/client/{clientId}": {
-            "delete": {
-                "description": "Delete a client by Id",
-                "operationId": "deleteClient",
-                "parameters": [
-                    {
-                        "name": "clientId",
-                        "in": "path",
-                        "description": "Client Id",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "400": {
-                        "description": "Invalid clientId supplied"
-                    },
-                    "404": {
-                        "description": "Client not found"
-                    }
-                },
-                "security": [
-                    {
-                        "client_auth": [
-                            "oauth.client.w"
-                        ]
-                    }
-                ]
-            },
-            "get": {
-                "description": "Get a client by Id",
-                "operationId": "getClient",
-                "parameters": [
-                    {
-                        "name": "clientId",
-                        "in": "path",
-                        "description": "Client Id",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "schema": {
-                            "$ref": "#/definitions/Client"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid clientId supplied"
-                    },
-                    "404": {
-                        "description": "Client not found"
-                    }
-                },
-                "security": [
-                    {
-                        "client_auth": [
-                            "oauth.client.r",
-                            "oauth.client.w"
-                        ]
-                    }
-                ]
-            }
-        }
-    },
-    "securityDefinitions": {
-        "client_auth": {
-            "type": "oauth2",
-            "authorizationUrl": "http://localhost:8888/oauth2/code",
-            "flow": "implicit",
-            "scopes": {
-                "oauth.client.w": "write oauth client",
-                "oauth.client.r": "read oauth client"
-            }
-        }
-    },
-    "definitions": {
-        "Client": {
-            "type": "object",
-            "required": [
-                "clientType",
-                "clientProfile",
-                "clientName",
-                "clientDesc",
-                "ownerId",
-                "scope"
-            ],
-            "properties": {
-                "clientId": {
-                    "type": "string",
-                    "description": "a unique client id"
-                },
-                "clientSecret": {
-                    "type": "string",
-                    "description": "client secret"
-                },
-                "clientType": {
-                    "type": "string",
-                    "description": "client type",
-                    "enum": [
-                        "confidential",
-                        "public",
-                        "trusted"
-                    ]
-                },
-                "clientProfile": {
-                    "type": "string",
-                    "description": "client profile",
-                    "enum": [
-                        "webserver",
-                        "browser",
-                        "mobile",
-                        "service",
-                        "batch"
-                    ]
-                },
-                "clientName": {
-                    "type": "string",
-                    "description": "client name"
-                },
-                "clientDesc": {
-                    "type": "string",
-                    "description": "client description"
-                },
-                "ownerId": {
-                    "type": "string",
-                    "description": "client owner id"
-                },
-                "scope": {
-                    "type": "string",
-                    "description": "client scope separated by space"
-                },
-                "redirectUri": {
-                    "type": "string",
-                    "description": "redirect uri"
-                },
-                "createDt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "create date time"
-                },
-                "updateDt": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "update date time"
-                }
-            }
-        }
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
+  },
+  "host": "oauth2.networknt.com",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/oauth2/client": {
+      "post": {
+        "description": "Return a client object",
+        "operationId": "createClient",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Client object that needs to be added",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Client"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Client"
+            }
+          }
+        },
+        "security": [
+          {
+            "client_auth": [
+              "oauth.client.w"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "description": "Return the updated client",
+        "operationId": "updateClient",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Client object that needs to be added",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Client"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Client"
+            }
+          }
+        },
+        "security": [
+          {
+            "client_auth": [
+              "oauth.client.w"
+            ]
+          }
+        ]
+      },
+      "get": {
+        "description": "Return all clients",
+        "operationId": "getAllClient",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Pag size",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "clientName",
+            "in": "query",
+            "description": "Partial clientName for filter",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Client"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "client_auth": [
+              "oauth.client.r"
+            ]
+          }
+        ]
+      }
+    },
+    "/oauth2/client/{clientId}": {
+      "delete": {
+        "description": "Delete a client by Id",
+        "operationId": "deleteClient",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client Id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid clientId supplied"
+          },
+          "404": {
+            "description": "Client not found"
+          }
+        },
+        "security": [
+          {
+            "client_auth": [
+              "oauth.client.w"
+            ]
+          }
+        ]
+      },
+      "get": {
+        "description": "Get a client by Id",
+        "operationId": "getClient",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client Id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "$ref": "#/definitions/Client"
+            }
+          },
+          "400": {
+            "description": "Invalid clientId supplied"
+          },
+          "404": {
+            "description": "Client not found"
+          }
+        },
+        "security": [
+          {
+            "client_auth": [
+              "oauth.client.r",
+              "oauth.client.w"
+            ]
+          }
+        ]
+      }
+    },
+    "/server/info": {
+      "get": {
+        "security": [
+          {
+            "client_auth": [
+              "server.info.r"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/health": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        },
+        "parameters": []
+      }
+    }
+  },
+  "securityDefinitions": {
+    "client_auth": {
+      "type": "oauth2",
+      "authorizationUrl": "http://localhost:8888/oauth2/code",
+      "flow": "implicit",
+      "scopes": {
+        "oauth.client.w": "write oauth client",
+        "oauth.client.r": "read oauth client",
+        "server.info.r": "read server info"
+      }
+    }
+  },
+  "definitions": {
+    "Client": {
+      "type": "object",
+      "required": [
+        "clientType",
+        "clientProfile",
+        "clientName",
+        "clientDesc",
+        "ownerId",
+        "scope"
+      ],
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "a unique client id"
+        },
+        "clientSecret": {
+          "type": "string",
+          "description": "client secret"
+        },
+        "clientType": {
+          "type": "string",
+          "description": "client type",
+          "enum": [
+            "confidential",
+            "public",
+            "trusted"
+          ]
+        },
+        "clientProfile": {
+          "type": "string",
+          "description": "client profile",
+          "enum": [
+            "webserver",
+            "browser",
+            "mobile",
+            "service",
+            "batch"
+          ]
+        },
+        "clientName": {
+          "type": "string",
+          "description": "client name"
+        },
+        "clientDesc": {
+          "type": "string",
+          "description": "client description"
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "client owner id"
+        },
+        "scope": {
+          "type": "string",
+          "description": "client scope separated by space"
+        },
+        "redirectUri": {
+          "type": "string",
+          "description": "redirect uri"
+        },
+        "createDt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "create date time"
+        },
+        "updateDt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "update date time"
+        }
+      }
+    }
+  }
 }

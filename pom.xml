@@ -157,6 +157,11 @@
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
+                <artifactId>health</artifactId>
+                <version>${version.light-4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
                 <artifactId>body</artifactId>
                 <version>${version.light-4j}</version>
             </dependency>

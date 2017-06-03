@@ -1,5 +1,7 @@
 package com.networknt.oauth.user;
 
+import com.networknt.health.HealthGetHandler;
+import com.networknt.info.ServerInfoGetHandler;
 import com.networknt.oauth.user.handler.*;
 import com.networknt.server.HandlerProvider;
 import io.undertow.Handlers;
@@ -10,6 +12,8 @@ public class PathHandlerProvider implements HandlerProvider {
     @Override
     public HttpHandler getHandler() {
         HttpHandler handler = Handlers.routing()
+            .add(Methods.GET, "/v2/health", new HealthGetHandler())
+            .add(Methods.GET, "/v2/server/info", new ServerInfoGetHandler())
             .add(Methods.POST, "/oauth2/password/{userId}", new Oauth2PasswordUserIdPostHandler())
             .add(Methods.GET, "/oauth2/user", new Oauth2UserGetHandler())
             .add(Methods.POST, "/oauth2/user", new Oauth2UserPostHandler())

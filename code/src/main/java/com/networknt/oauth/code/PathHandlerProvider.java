@@ -1,6 +1,8 @@
 package com.networknt.oauth.code;
 
 import com.hazelcast.core.IMap;
+import com.networknt.health.HealthGetHandler;
+import com.networknt.info.ServerInfoGetHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.User;
 import com.networknt.oauth.code.handler.MapIdentityManager;
@@ -35,6 +37,8 @@ public class PathHandlerProvider implements HandlerProvider {
         final IdentityManager identityManager = new MapIdentityManager(users);
 
         HttpHandler handler = Handlers.routing()
+            .add(Methods.GET, "/v2/health", new HealthGetHandler())
+            .add(Methods.GET, "/v2/server/info", new ServerInfoGetHandler())
             .add(Methods.GET, "/oauth2/code", addBasicSecurity(new Oauth2CodeGetHandler(), identityManager))
             .add(Methods.POST, "/oauth2/code", addFormSecurity(new Oauth2CodePostHandler(), identityManager))
         ;
