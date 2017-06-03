@@ -1,4 +1,4 @@
-FROM insideo/jre8
+FROM openjdk:8-jre-alpine
 EXPOSE 6884
-ADD /target/oauth2-client-1.2.4.jar server.jar
-CMD ["/bin/sh","-c","java -Dlight-java-config-dir=/config -jar /server.jar"]
+ADD /target/oauth2-client-1.3.1.jar server.jar
+CMD ["/bin/sh","-c","java -Dlight-4j-config-dir=/config -jar /server.jar"]
