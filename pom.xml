@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.networknt</groupId>
     <artifactId>light-oauth2</artifactId>
-    <version>1.2.4</version>
+    <version>1.3.1</version>
     <packaging>pom</packaging>
     <name>Parent POM</name>
     <description>OAuth2 provider microservices based on Light-Java and SQL</description>
@@ -52,8 +52,8 @@
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.light-java>1.2.7</version.light-java>
-        <version.light-java-rest>1.2.7</version.light-java-rest>
+        <version.light-4j>1.3.1</version.light-4j>
+        <version.light-rest-4j>1.3.1</version.light-rest-4j>
         <version.jackson>2.8.7</version.jackson>
         <version.slf4j>1.7.25</version.slf4j>
         <version.jose4j>0.5.5</version.jose4j>
@@ -143,128 +143,128 @@
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>config</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>client</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>info</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>body</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>mask</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>metrics</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>handler</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>sanitizer</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>traceability</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>correlation</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>service</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>utility</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>security</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>audit</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>status</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>exception</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>registry</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>balance</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>cluster</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>consul</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>cors</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>server</artifactId>
-                <version>${version.light-java}</version>
+                <version>${version.light-4j}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>swagger-meta</artifactId>
-                <version>${version.light-java-rest}</version>
+                <version>${version.light-rest-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>swagger-security</artifactId>
-                <version>${version.light-java-rest}</version>
+                <version>${version.light-rest-4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>swagger-validator</artifactId>
-                <version>${version.light-java-rest}</version>
+                <version>${version.light-rest-4j}</version>
             </dependency>
 
             <dependency>

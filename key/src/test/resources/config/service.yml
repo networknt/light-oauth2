@@ -1,5 +1,4 @@
 ---
-description: singleton service factory configuration
 singletons:
 - javax.sql.DataSource:
   - com.zaxxer.hikari.HikariDataSource:
