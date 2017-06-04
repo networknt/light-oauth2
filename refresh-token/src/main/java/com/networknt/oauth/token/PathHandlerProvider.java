@@ -14,8 +14,8 @@ public class PathHandlerProvider implements HandlerProvider {
     @Override
     public HttpHandler getHandler() {
         return Handlers.routing()
-            .add(Methods.GET, "/v2/health", new HealthGetHandler())
-            .add(Methods.GET, "/v2/server/info", new ServerInfoGetHandler())
+            .add(Methods.GET, "/health", new HealthGetHandler())
+            .add(Methods.GET, "/server/info", new ServerInfoGetHandler())
             .add(Methods.GET, "/oauth2/refresh_token", new Oauth2RefreshTokenGetHandler())
             .add(Methods.DELETE, "/oauth2/refresh_token/{refreshToken}", new Oauth2RefreshTokenRefreshTokenDeleteHandler())
             .add(Methods.GET, "/oauth2/refresh_token/{refreshToken}", new Oauth2RefreshTokenRefreshTokenGetHandler())
