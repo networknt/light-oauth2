@@ -201,7 +201,7 @@ And here is the result with client_id and client_secret.
 To query all clients.
 
 ```
-curl http://localhost:6884/oauth2/client
+curl http://localhost:6884/oauth2/client?page=1
 
 ```
 And here is the result.
