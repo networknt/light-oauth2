@@ -10,6 +10,7 @@ import com.networknt.oauth.cache.model.Client;
 import com.networknt.oauth.cache.model.RefreshToken;
 import com.networknt.oauth.cache.model.User;
 import com.networknt.oauth.token.helper.HttpAuth;
+import com.networknt.security.JwtConfig;
 import com.networknt.security.JwtHelper;
 import com.networknt.status.Status;
 import com.networknt.utility.HashUtil;
@@ -51,6 +52,10 @@ public class Oauth2TokenPostHandler implements HttpHandler {
     private static final String MISMATCH_SCOPE = "ERR12027";
     private static final String MISMATCH_CLIENT_ID = "ERR12028";
     private static final String REFRESH_TOKEN_NOT_FOUND = "ERR12029";
+    private static final String USER_ID_REQUIRED_FOR_CLIENT_AUTHENTICATED_USER_GRANT_TYPE = "ERR12031";
+    private static final String USER_TYPE_REQUIRED_FOR_CLIENT_AUTHENTICATED_USER_GRANT_TYPE = "ERR12032";
+
+    static JwtConfig config = (JwtConfig)Config.getInstance().getJsonObjectConfig("jwt", JwtConfig.class);
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
@@ -75,16 +80,19 @@ public class Oauth2TokenPostHandler implements HttpHandler {
             return;
         }
         try {
-            if("client_credentials".equals(formMap.get("grant_type"))) {
+            String grantType = (String)formMap.remove("grant_type");
+            if("client_credentials".equals(grantType)) {
                 exchange.getResponseSender().send(mapper.writeValueAsString(handleClientCredentials(exchange, (String)formMap.get("scope"), formMap)));
-            } else if("authorization_code".equals(formMap.get("grant_type"))) {
+            } else if("authorization_code".equals(grantType)) {
                 exchange.getResponseSender().send(mapper.writeValueAsString(handleAuthorizationCode(exchange, (String)formMap.get("code"), (String)formMap.get("redirect_uri"), formMap)));
-            } else if("password".equals(formMap.get("grant_type"))) {
+            } else if("password".equals(grantType)) {
                 exchange.getResponseSender().send(mapper.writeValueAsString(handlePassword(exchange, (String)formMap.get("username"), (String)formMap.get("password"), (String)formMap.get("scope"), formMap)));
-            } else if("refresh_token".equals(formMap.get("grant_type"))) {
-                exchange.getResponseSender().send(mapper.writeValueAsString(handleRefreshToken(exchange, (String)formMap.get("refresh_token"), (String)formMap.get("scope"), formMap)));
+            } else if("refresh_token".equals(grantType)) {
+                exchange.getResponseSender().send(mapper.writeValueAsString(handleRefreshToken(exchange, (String) formMap.get("refresh_token"), (String) formMap.get("scope"), formMap)));
+            } else if("client_authenticated_user".equals(grantType)) {
+                exchange.getResponseSender().send(mapper.writeValueAsString(handleClientAuthenticatedUser(exchange, formMap)));
             } else {
-                Status status = new Status(UNSUPPORTED_GRANT_TYPE, formMap.get("grant_type"));
+                Status status = new Status(UNSUPPORTED_GRANT_TYPE, grantType);
                 exchange.setStatusCode(status.getStatusCode());
                 exchange.getResponseSender().send(status.toString());
             }
@@ -113,14 +121,14 @@ public class Oauth2TokenPostHandler implements HttpHandler {
             }
             String jwt;
             try {
-                jwt = JwtHelper.getJwt(mockCcClaims(client.getClientId(), scope));
+                jwt = JwtHelper.getJwt(mockCcClaims(client.getClientId(), scope, null));
             } catch (Exception e) {
                 throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
             }
             Map<String, Object> resMap = new HashMap<>();
             resMap.put("access_token", jwt);
             resMap.put("token_type", "bearer");
-            resMap.put("expires_in", 600);
+            resMap.put("expires_in", config.getExpiredInMinutes()*60);
             return resMap;
 
         }
@@ -159,7 +167,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                 }
                 String jwt;
                 try {
-                    jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString()));
+                    jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), null));
                 } catch (Exception e) {
                     throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                 }
@@ -175,7 +183,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                 Map<String, Object> resMap = new HashMap<>();
                 resMap.put("access_token", jwt);
                 resMap.put("token_type", "bearer");
-                resMap.put("expires_in", 600);
+                resMap.put("expires_in", config.getExpiredInMinutes()*60);
                 resMap.put("refresh_token", refreshToken);
                 return resMap;
             } else {
@@ -208,7 +216,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                                         throw new ApiException(new Status(MISMATCH_SCOPE, scope, client.getScope()));
                                     }
                                 }
-                                String jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString()));
+                                String jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), null));
 
                                 // generate a refresh token and associate it with userId and clientId
                                 String refreshToken = UUID.randomUUID().toString();
@@ -223,7 +231,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                                 Map<String, Object> resMap = new HashMap<>();
                                 resMap.put("access_token", jwt);
                                 resMap.put("token_type", "bearer");
-                                resMap.put("expires_in", 600);
+                                resMap.put("expires_in", config.getExpiredInMinutes()*60);
                                 resMap.put("refresh_token", refreshToken);
                                 return resMap;
                             } else {
@@ -271,7 +279,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                     }
                     String jwt;
                     try {
-                        jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString()));
+                        jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), null));
                     } catch (Exception e) {
                         throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                     }
@@ -286,7 +294,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                     Map<String, Object> resMap = new HashMap<>();
                     resMap.put("access_token", jwt);
                     resMap.put("token_type", "bearer");
-                    resMap.put("expires_in", 600);
+                    resMap.put("expires_in", config.getExpiredInMinutes()*60);
                     resMap.put("refresh_token", newRefreshToken);
                     return resMap;
 
@@ -302,6 +310,75 @@ public class Oauth2TokenPostHandler implements HttpHandler {
         return new HashMap<>(); // return an empty hash map. this is actually not reachable at all.
     }
 
+    /**
+     * This grant type is custom grant type that assume client has already authenticated the user and only send the user info
+     * to the authorization server to get the access token. The token is similar with authorization code token. All extra info
+     * from the formMap will be put into the token as custom claim.
+     *
+     * Also, only
+     *
+     * @param exchange
+     * @param formMap
+     * @return
+     * @throws ApiException
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> handleClientAuthenticatedUser(HttpServerExchange exchange, Map<String, Object> formMap) throws ApiException {
+        if(logger.isDebugEnabled()) logger.debug("client authenticated user grant formMap = " + formMap);
+        Client client = authenticateClient(exchange, formMap);
+        if(client != null) {
+            // make sure that client is trusted
+            if(Client.ClientTypeEnum.TRUSTED == client.getClientType()) {
+                String scope = (String)formMap.remove("scope");
+                if(scope == null) {
+                    scope = client.getScope(); // use the default scope defined in client if scope is not passed in
+                } else {
+                    // make sure scope is in scope defined in client.
+                    if(!matchScope(scope, client.getScope())) {
+                        throw new ApiException(new Status(MISMATCH_SCOPE, scope, client.getScope()));
+                    }
+                }
+                // make sure that userId and userType are passed in the formMap.
+                String userId = (String)formMap.remove("userId");
+                if(userId == null) {
+                    throw new ApiException(new Status(USER_ID_REQUIRED_FOR_CLIENT_AUTHENTICATED_USER_GRANT_TYPE));
+                }
+
+                String userType = (String)formMap.remove("userType");
+                if(userType == null) {
+                    throw new ApiException(new Status(USER_TYPE_REQUIRED_FOR_CLIENT_AUTHENTICATED_USER_GRANT_TYPE));
+
+                }
+                String jwt;
+                try {
+                    jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, userType, formMap));
+                } catch (Exception e) {
+                    throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
+                }
+
+                // generate a refresh token and associate it with userId and clientId
+                String refreshToken = UUID.randomUUID().toString();
+                RefreshToken token = new RefreshToken();
+                token.setRefreshToken(refreshToken);
+                token.setUserId(userId);
+                token.setClientId(client.getClientId());
+                token.setScope(scope);
+                IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
+                tokens.set(refreshToken, token);
+
+                Map<String, Object> resMap = new HashMap<>();
+                resMap.put("access_token", jwt);
+                resMap.put("token_type", "bearer");
+                resMap.put("expires_in", config.getExpiredInMinutes()*60);
+                resMap.put("refresh_token", refreshToken);
+                return resMap;
+            } else {
+                // not trusted client, this is not allowed.
+                throw new ApiException(new Status(NOT_TRUSTED_CLIENT));
+            }
+        }
+        return new HashMap<>(); // return an empty hash map. this is actually not reachable at all.
+    }
 
     private Client authenticateClient(HttpServerExchange exchange, Map<String, Object> formMap) throws ApiException {
         HttpAuth httpAuth = new HttpAuth(exchange);
@@ -309,8 +386,8 @@ public class Oauth2TokenPostHandler implements HttpHandler {
         String clientId;
         String clientSecret;
         if(!httpAuth.isHeaderAvailable()) {
-            clientId = (String)formMap.get("client_id");
-            clientSecret = (String)formMap.get("client_secret");
+            clientId = (String)formMap.remove("client_id");
+            clientSecret = (String)formMap.remove("client_secret");
         } else {
             clientId = httpAuth.getClientId();
             clientSecret = httpAuth.getClientSecret();
@@ -348,21 +425,31 @@ public class Oauth2TokenPostHandler implements HttpHandler {
         }
     }
 
-    private JwtClaims mockCcClaims(String clientId, String scopeString) {
+    private JwtClaims mockCcClaims(String clientId, String scopeString, Map<String, Object> formMap) {
         JwtClaims claims = JwtHelper.getDefaultJwtClaims();
         claims.setClaim("client_id", clientId);
         List<String> scope = Arrays.asList(scopeString.split("\\s+"));
         claims.setStringListClaim("scope", scope); // multi-valued claims work too and will end up as a JSON array
+        if(formMap != null) {
+            for(Map.Entry<String, Object> entry : formMap.entrySet()) {
+                claims.setClaim(entry.getKey(), entry.getValue());
+            }
+        }
         return claims;
     }
 
-    private JwtClaims mockAcClaims(String clientId, String scopeString, String userId, String userType) {
+    private JwtClaims mockAcClaims(String clientId, String scopeString, String userId, String userType, Map<String, Object> formMap) {
         JwtClaims claims = JwtHelper.getDefaultJwtClaims();
         claims.setClaim("user_id", userId);
         claims.setClaim("user_type", userType);
         claims.setClaim("client_id", clientId);
         List<String> scope = Arrays.asList(scopeString.split("\\s+"));
         claims.setStringListClaim("scope", scope); // multi-valued claims work too and will end up as a JSON array
+        if(formMap != null) {
+            for(Map.Entry<String, Object> entry : formMap.entrySet()) {
+                claims.setClaim(entry.getKey(), entry.getValue());
+            }
+        }
         return claims;
     }
 

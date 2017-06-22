@@ -466,4 +466,111 @@ public class Oauth2TokenPostHandlerTest {
         }
     }
 
+    @Test
+    public void testNotTrustedClientForClientAuthenticatedUser() throws Exception {
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "client_authenticated_user"));
+        urlParameters.add(new BasicNameValuePair("userId", "admin"));
+        urlParameters.add(new BasicNameValuePair("userType", "Employee"));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12024", status.getCode());
+                Assert.assertEquals("NOT_TRUSTED_CLIENT", status.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testClientAuthenticatedUserWithoutUserId() throws Exception {
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "client_authenticated_user"));
+        urlParameters.add(new BasicNameValuePair("username", "admin"));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12031", status.getCode());
+                Assert.assertEquals("USER_ID_REQUIRED_FOR_CLIENT_AUTHENTICATED_USER_GRANT_TYPE", status.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testClientAuthenticatedUserWithoutUserType() throws Exception {
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "client_authenticated_user"));
+        urlParameters.add(new BasicNameValuePair("userId", "admin"));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12032", status.getCode());
+                Assert.assertEquals("USER_TYPE_REQUIRED_FOR_CLIENT_AUTHENTICATED_USER_GRANT_TYPE", status.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testClientAuthenticatedUserTokenWithCustomClaims() throws Exception {
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "client_authenticated_user"));
+        urlParameters.add(new BasicNameValuePair("userId", "admin"));
+        urlParameters.add(new BasicNameValuePair("userType", "Employee"));
+        urlParameters.add(new BasicNameValuePair("transit", "12345")); // This is the custom claim that need to be shown in JWT token.
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        HttpResponse response = client.execute(httpPost);
+        int statusCode = response.getStatusLine().getStatusCode();
+        String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+        Assert.assertEquals(200, statusCode);
+        logger.debug("response body = " + body); // here we can get the access token and verify if transit in the payload in jwt.io.
+        Assert.assertTrue(body.indexOf("access_token") > 0);
+    }
+
 }
