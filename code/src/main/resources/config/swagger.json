@@ -87,6 +87,20 @@
                         "description": "scope of the request",
                         "required": false,
                         "type": "string"
+                    },
+                    {
+                        "name": "code_challenge",
+                        "in": "query",
+                        "description": "PKCE code challenge",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "code_challenge_method",
+                        "in": "query",
+                        "description": "PKCE code challenge method",
+                        "required": false,
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -152,8 +166,22 @@
                     },
                     {
                         "name": "scope",
-                        "in": "query",
+                        "in": "formData",
                         "description": "scope of the request",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "code_challenge",
+                        "in": "formData",
+                        "description": "PKCE code challenge",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "code_challenge_method",
+                        "in": "formData",
+                        "description": "PKCE code challenge method",
                         "required": false,
                         "type": "string"
                     }
@@ -163,16 +191,6 @@
                         "description": "Successful Operation"
                     }
                 }
-            }
-        },
-        "/health": {
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "successful operation"
-                    }
-                },
-                "parameters": []
             }
         }
     }

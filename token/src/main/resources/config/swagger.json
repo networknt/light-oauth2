@@ -43,7 +43,8 @@
                             "authorization_code",
                             "client_credentials",
                             "password",
-                            "refresh_token"
+                            "refresh_token",
+                            "client_authenticated_user"
                         ],
                         "required": true,
                         "in": "formData"
@@ -93,6 +94,12 @@
                     {
                         "name": "refresh_token",
                         "description": "refresh token used to get another access token",
+                        "type": "string",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "code_verifier",
+                        "description": "PKCE code verifier",
                         "type": "string",
                         "in": "formData"
                     }

@@ -53,6 +53,15 @@ the user-agent back to the client. The parameter SHOULD be used for preventing
 cross-site request forgery.
 
 
+* code_challenge
+
+OPTIONAL. PKCE Code challenge. Required for Mobile Native App
+ 
+* code_challenge_method 
+
+OPTIONAL. S256 or plain if platform doesn't support S256.
+ 
+
 ## Authorization Response
 
 If the resource owner grants the access request, the authorization server issues 
@@ -386,6 +395,11 @@ request, and their values MUST be identical.
          
 REQUIRED, as BASIC authorization header with encoded client_id:client_secret 
 to authenticate with the authorization server.
+
+
+* code_verifier
+
+OPTIONAL, PKCE code verifier that used by Mobile Native App
 
 ### Response
 
