@@ -161,4 +161,14 @@ ERR12041:
 
 ```
 
+## References
+
+[tools.ietf.org/html/rfc6749](https://tools.ietf.org/html/rfc6749)
+
+[tools.ietf.org/html/rfc7636](https://tools.ietf.org/html/rfc7636)
+
+[enhancing-oauth-security-for-mobile-applications-with-pkse](http://openid.net/2015/05/26/enhancing-oauth-security-for-mobile-applications-with-pkse/)
+
+
+
 
