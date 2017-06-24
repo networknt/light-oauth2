@@ -14,3 +14,8 @@ The following links documented services and endpoints served by each service for
 
 [Provider edition](provider/)
 
+[Custom grant type](custom/)
+
+[PKCE](pkce/)
+
+[OpenID Connect](openid/)
