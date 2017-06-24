@@ -573,4 +573,315 @@ public class Oauth2TokenPostHandlerTest {
         Assert.assertTrue(body.indexOf("access_token") > 0);
     }
 
+
+    @Test
+    public void testAuthorizationCode() throws Exception {
+        // setup codes map for userId but not redirectUri
+        Map<String, String> codeMap = new HashMap<>();
+        codeMap.put("userId", "admin");
+        codeMap.put("redirectUri", "http://localhost:8080/authorization");
+        CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+        urlParameters.add(new BasicNameValuePair("code", "code1"));
+        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(200, statusCode);
+            logger.debug("response body = " + body);
+            Assert.assertTrue(body.indexOf("access_token") > 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testAuthorizationCodePKCE() throws Exception {
+        Map<String, String> codeMap = new HashMap<>();
+        codeMap.put("userId", "admin");
+        codeMap.put("redirectUri", "http://localhost:8080/authorization");
+        codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
+        codeMap.put("code_challenge_method", "S256");
+        CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+        urlParameters.add(new BasicNameValuePair("code", "code1"));
+        urlParameters.add(new BasicNameValuePair("code_verifier", "xzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA"));
+        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(200, statusCode);
+            logger.debug("response body = " + body);
+            Assert.assertTrue(body.indexOf("access_token") > 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testCodeChallengeMethodPlainPKCE() throws Exception {
+        Map<String, String> codeMap = new HashMap<>();
+        codeMap.put("userId", "admin");
+        codeMap.put("redirectUri", "http://localhost:8080/authorization");
+        codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
+        codeMap.put("code_challenge_method", "plain");
+        CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+        urlParameters.add(new BasicNameValuePair("code", "code1"));
+        urlParameters.add(new BasicNameValuePair("code_verifier", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s"));
+        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(200, statusCode);
+            logger.debug("response body = " + body);
+            Assert.assertTrue(body.indexOf("access_token") > 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testInvalidCodeVerifierFormatPKCE() throws Exception {
+        Map<String, String> codeMap = new HashMap<>();
+        codeMap.put("userId", "admin");
+        codeMap.put("redirectUri", "http://localhost:8080/authorization");
+        codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
+        codeMap.put("code_challenge_method", "S256");
+        CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+        urlParameters.add(new BasicNameValuePair("code", "code1"));
+        urlParameters.add(new BasicNameValuePair("code_verifier", "x$zmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA"));
+        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12037", status.getCode());
+                Assert.assertEquals("INVALID_CODE_VERIFIER_FORMAT", status.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testInvalidCodeChallengeMethodPKCE() throws Exception {
+        Map<String, String> codeMap = new HashMap<>();
+        codeMap.put("userId", "admin");
+        codeMap.put("redirectUri", "http://localhost:8080/authorization");
+        codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
+        codeMap.put("code_challenge_method", "ABC");
+        CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+        urlParameters.add(new BasicNameValuePair("code", "code1"));
+        urlParameters.add(new BasicNameValuePair("code_verifier", "xzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA"));
+        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12033", status.getCode());
+                Assert.assertEquals("INVALID_CODE_CHALLENGE_METHOD", status.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Test
+    public void testCodeVerifierTooShortPKCE() throws Exception {
+        Map<String, String> codeMap = new HashMap<>();
+        codeMap.put("userId", "admin");
+        codeMap.put("redirectUri", "http://localhost:8080/authorization");
+        codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
+        codeMap.put("code_challenge_method", "S256");
+        CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+        urlParameters.add(new BasicNameValuePair("code", "code1"));
+        urlParameters.add(new BasicNameValuePair("code_verifier", "xzmujl"));
+        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12038", status.getCode());
+                Assert.assertEquals("CODE_VERIFIER_TOO_SHORT", status.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testCodeVerifierTooLongPKCE() throws Exception {
+        Map<String, String> codeMap = new HashMap<>();
+        codeMap.put("userId", "admin");
+        codeMap.put("redirectUri", "http://localhost:8080/authorization");
+        codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
+        codeMap.put("code_challenge_method", "S256");
+        CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+        urlParameters.add(new BasicNameValuePair("code", "code1"));
+        urlParameters.add(new BasicNameValuePair("code_verifier", "xzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUAxzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUAxzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA"));
+        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12039", status.getCode());
+                Assert.assertEquals("CODE_VERIFIER_TOO_LONG", status.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testCodeVerifierMissingPKCE() throws Exception {
+        Map<String, String> codeMap = new HashMap<>();
+        codeMap.put("userId", "admin");
+        codeMap.put("redirectUri", "http://localhost:8080/authorization");
+        codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
+        codeMap.put("code_challenge_method", "S256");
+        CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+        urlParameters.add(new BasicNameValuePair("code", "code1"));
+        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12040", status.getCode());
+                Assert.assertEquals("CODE_VERIFIER_MISSING", status.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testCodeVerificationFailedPKCE() throws Exception {
+        Map<String, String> codeMap = new HashMap<>();
+        codeMap.put("userId", "admin");
+        codeMap.put("redirectUri", "http://localhost:8080/authorization");
+        codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
+        codeMap.put("code_challenge_method", "S256");
+        CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
+        String url = "http://localhost:6882/oauth2/token";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+
+        List<NameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+        urlParameters.add(new BasicNameValuePair("code", "code1"));
+        urlParameters.add(new BasicNameValuePair("code_verifier", "1xzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA"));
+        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+
+        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        try {
+            CloseableHttpResponse response = client.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12041", status.getCode());
+                Assert.assertEquals("CODE_VERIFIER_FAILED", status.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

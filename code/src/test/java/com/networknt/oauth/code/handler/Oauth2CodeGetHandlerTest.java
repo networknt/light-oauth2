@@ -127,6 +127,7 @@ public class Oauth2CodeGetHandlerTest {
             e.printStackTrace();
         }
     }
+
     @Test
     public void testCodeClientNotFound() throws Exception {
         String url = "http://localhost:6881/oauth2/code?response_type=code&client_id=fake&redirect_uri=http://localhost:8888/authorization";
@@ -143,6 +144,110 @@ public class Oauth2CodeGetHandlerTest {
                 Assert.assertNotNull(status);
                 Assert.assertEquals("ERR12014", status.getCode());
                 Assert.assertEquals("CLIENT_NOT_FOUND", status.getMessage()); // client not found
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test(expected = ConnectException.class)
+    public void testAuthorizationCodePKCE() throws Exception {
+        String url = "http://localhost:6881/oauth2/code?response_type=code&client_id=59f347a0-c92d-11e6-9d9d-cec0c932ce01&code_challenge=GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s&code_challenge_method=S256&redirect_uri=http://localhost:8080/authorization";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(url);
+        // add authentication header
+        httpGet.setHeader("Authorization", "Basic " + encodeCredentials("admin", "123456"));
+        CloseableHttpResponse response = client.execute(httpGet);
+        int statusCode = response.getStatusLine().getStatusCode();
+        String body  = IOUtils.toString(response.getEntity().getContent(), "utf8");
+        Assert.assertEquals(statusCode, 302);
+
+        // at this moment, an exception will help as it is redirected to localhost:8080 and it is not up.
+    }
+
+    @Test
+    public void testCodePKCECodeChallengeMethodInvalid() throws Exception {
+        String url = "http://localhost:6881/oauth2/code?response_type=code&client_id=59f347a0-c92d-11e6-9d9d-cec0c932ce01&code_challenge=GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s&code_challenge_method=ABC&redirect_uri=http://localhost:8888/authorization";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader("Authorization", "Basic " + encodeCredentials("admin", "123456"));
+        try {
+            CloseableHttpResponse response = client.execute(httpGet);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body  = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12033", status.getCode());
+                Assert.assertEquals("INVALID_CODE_CHALLENGE_METHOD", status.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Test
+    public void testCodePKCECodeChallengeTooShort() throws Exception {
+        String url = "http://localhost:6881/oauth2/code?response_type=code&client_id=59f347a0-c92d-11e6-9d9d-cec0c932ce01&code_challenge=xzmujl&code_challenge_method=S256&redirect_uri=http://localhost:8888/authorization";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader("Authorization", "Basic " + encodeCredentials("admin", "123456"));
+        try {
+            CloseableHttpResponse response = client.execute(httpGet);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body  = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12034", status.getCode());
+                Assert.assertEquals("CODE_CHALLENGE_TOO_SHORT", status.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testCodePKCECodeChallengeTooLong() throws Exception {
+        String url = "http://localhost:6881/oauth2/code?response_type=code&client_id=59f347a0-c92d-11e6-9d9d-cec0c932ce01&code_challenge=xzmujlxzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUAxzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA&code_challenge_method=S256&redirect_uri=http://localhost:8888/authorization";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader("Authorization", "Basic " + encodeCredentials("admin", "123456"));
+        try {
+            CloseableHttpResponse response = client.execute(httpGet);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body  = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12035", status.getCode());
+                Assert.assertEquals("CODE_CHALLENGE_TOO_LONG", status.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testCodePKCECodeChallengeInvalidFormat() throws Exception {
+        String url = "http://localhost:6881/oauth2/code?response_type=code&client_id=59f347a0-c92d-11e6-9d9d-cec0c932ce01&code_challenge=G$IiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s&code_challenge_method=S256&redirect_uri=http://localhost:8888/authorization";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader("Authorization", "Basic " + encodeCredentials("admin", "123456"));
+        try {
+            CloseableHttpResponse response = client.execute(httpGet);
+            int statusCode = response.getStatusLine().getStatusCode();
+            String body  = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            Assert.assertEquals(400, statusCode);
+            if(statusCode == 400) {
+                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+                Assert.assertNotNull(status);
+                Assert.assertEquals("ERR12036", status.getCode());
+                Assert.assertEquals("INVALID_CODE_CHALLENGE_FORMAT", status.getMessage());
             }
         } catch (Exception e) {
             e.printStackTrace();

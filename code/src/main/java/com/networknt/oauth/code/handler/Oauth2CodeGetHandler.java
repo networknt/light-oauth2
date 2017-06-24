@@ -2,8 +2,10 @@ package com.networknt.oauth.code.handler;
 
 import com.hazelcast.core.IMap;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
+import com.networknt.oauth.cache.OAuth2Constants;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.status.Status;
+import com.networknt.utility.CodeVerifierUtil;
 import com.networknt.utility.Util;
 import io.undertow.security.api.SecurityContext;
 import io.undertow.server.HttpHandler;
@@ -17,6 +19,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * This handler is for get request, the credentials might in header or just query parameters.
@@ -28,6 +31,11 @@ import java.util.Map;
 public class Oauth2CodeGetHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2CodeGetHandler.class);
     static final String CLIENT_NOT_FOUND = "ERR12014";
+    static final String INVALID_CODE_CHALLENGE_METHOD = "ERR12033";
+    static final String CODE_CHALLENGE_TOO_SHORT = "ERR12034";
+    static final String CODE_CHALLENGE_TOO_LONG = "ERR12035";
+    static final String INVALID_CODE_CHALLENGE_FORMAT = "ERR12036";
+
     @SuppressWarnings("unchecked")
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
@@ -66,6 +74,54 @@ public class Oauth2CodeGetHandler implements HttpHandler {
             } else {
                 codeMap.put("redirectUri", redirectUri);
             }
+            // https://tools.ietf.org/html/rfc7636#section-4 PKCE
+            String codeChallenge = params.get(OAuth2Constants.CODE_CHALLENGE);
+            String codeChallengeMethod = params.get(OAuth2Constants.CODE_CHALLENGE_METHOD);
+            if (codeChallenge == null) {
+                // PKCE is not used by this client.
+                // Do we need to force native client to use PKCE?
+            } else {
+                if(codeChallengeMethod != null) {
+                    // https://tools.ietf.org/html/rfc7636#section-4.2
+                    // plain or S256
+                    if (!codeChallengeMethod.equals(CodeVerifierUtil.CODE_CHALLENGE_METHOD_S256) &&
+                            !codeChallengeMethod.equals(CodeVerifierUtil.CODE_CHALLENGE_METHOD_PLAIN)) {
+                        Status status = new Status(INVALID_CODE_CHALLENGE_METHOD, codeChallengeMethod);
+                        exchange.setStatusCode(status.getStatusCode());
+                        exchange.getResponseSender().send(status.toString());
+                        return;
+                    }
+                } else {
+                    // https://tools.ietf.org/html/rfc7636#section-4.3
+                    // default code_challenge_method is plain
+                    codeChallengeMethod = CodeVerifierUtil.CODE_CHALLENGE_METHOD_PLAIN;
+                }
+                // validate codeChallenge.
+                if(codeChallenge.length() < CodeVerifierUtil.MIN_CODE_VERIFIER_LENGTH) {
+                    Status status = new Status(CODE_CHALLENGE_TOO_SHORT, codeChallenge);
+                    exchange.setStatusCode(status.getStatusCode());
+                    exchange.getResponseSender().send(status.toString());
+                    return;
+                }
+                if(codeChallenge.length() > CodeVerifierUtil.MAX_CODE_VERIFIER_LENGTH) {
+                    Status status = new Status(CODE_CHALLENGE_TOO_LONG, codeChallenge);
+                    exchange.setStatusCode(status.getStatusCode());
+                    exchange.getResponseSender().send(status.toString());
+                    return;
+                }
+                // check the format
+                Matcher m = CodeVerifierUtil.VALID_CODE_CHALLENGE_PATTERN.matcher(codeChallenge);
+                if(!m.matches()) {
+                    Status status = new Status(INVALID_CODE_CHALLENGE_FORMAT, codeChallenge);
+                    exchange.setStatusCode(status.getStatusCode());
+                    exchange.getResponseSender().send(status.toString());
+                    return;
+                }
+                // put the code challenge and method into the codes map.
+                codeMap.put(OAuth2Constants.CODE_CHALLENGE, codeChallenge);
+                codeMap.put(OAuth2Constants.CODE_CHALLENGE_METHOD, codeChallengeMethod);
+            }
+
             CacheStartupHookProvider.hz.getMap("codes").set(code, codeMap);
             redirectUri = redirectUri + "?code=" + code;
             String state = params.get("state");

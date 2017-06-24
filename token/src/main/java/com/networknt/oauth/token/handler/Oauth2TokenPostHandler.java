@@ -6,6 +6,7 @@ import com.hazelcast.core.IMap;
 import com.networknt.config.Config;
 import com.networknt.exception.ApiException;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
+import com.networknt.oauth.cache.OAuth2Constants;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.oauth.cache.model.RefreshToken;
 import com.networknt.oauth.cache.model.User;
@@ -13,6 +14,7 @@ import com.networknt.oauth.token.helper.HttpAuth;
 import com.networknt.security.JwtConfig;
 import com.networknt.security.JwtHelper;
 import com.networknt.status.Status;
+import com.networknt.utility.CodeVerifierUtil;
 import com.networknt.utility.HashUtil;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -20,6 +22,7 @@ import io.undertow.server.handlers.form.FormData;
 import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.server.handlers.form.FormParserFactory;
 import io.undertow.util.Headers;
+import org.apache.zookeeper.KeeperException;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
@@ -28,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
+import java.util.regex.Matcher;
 
 public class Oauth2TokenPostHandler implements HttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2TokenPostHandler.class);
@@ -54,6 +58,12 @@ public class Oauth2TokenPostHandler implements HttpHandler {
     private static final String REFRESH_TOKEN_NOT_FOUND = "ERR12029";
     private static final String USER_ID_REQUIRED_FOR_CLIENT_AUTHENTICATED_USER_GRANT_TYPE = "ERR12031";
     private static final String USER_TYPE_REQUIRED_FOR_CLIENT_AUTHENTICATED_USER_GRANT_TYPE = "ERR12032";
+    private static final String INVALID_CODE_VERIFIER = "ERR12037";
+    private static final String CODE_VERIFIER_TOO_SHORT = "ERR12038";
+    private static final String CODE_VERIFIER_TOO_LONG = "ERR12039";
+    private static final String CODE_VERIFIER_MISSING = "ERR12040";
+    private static final String CODE_VERIFIER_FAILED = "ERR12041";
+    private static final String INVALID_CODE_CHALLENGE_METHOD = "ERR12033";
 
     static JwtConfig config = (JwtConfig)Config.getInstance().getJsonObjectConfig("jwt", JwtConfig.class);
 
@@ -144,6 +154,11 @@ public class Oauth2TokenPostHandler implements HttpHandler {
             String userId = codeMap.get("userId");
             String uri = codeMap.get("redirectUri");
             String scope = codeMap.get("scope");
+            // PKCE
+            String codeChallenge = codeMap.get(OAuth2Constants.CODE_CHALLENGE);
+            String codeChallengeMethod = codeMap.get(OAuth2Constants.CODE_CHALLENGE_METHOD);
+            String codeVerifier = (String)formMap.get(OAuth2Constants.CODE_VERIFIER);
+
             if(userId != null) {
                 // if uri is not null, redirectUri must not be null and must be identical.
                 if(uri != null) {
@@ -165,6 +180,41 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                         throw new ApiException(new Status(MISMATCH_SCOPE, scope, client.getScope()));
                     }
                 }
+                // PKCE code verifier check against code challenge
+                if (codeChallenge != null && codeChallengeMethod != null) {
+                    // based on whether code_challenge has been stored at corresponding authorization code request previously
+                    // decide whether this client(RP) supports PKCE
+                    if(codeVerifier == null || codeVerifier.trim().length() == 0) {
+                        throw new ApiException(new Status(CODE_VERIFIER_MISSING));
+                    }
+                    if(codeVerifier.length() < CodeVerifierUtil.MIN_CODE_VERIFIER_LENGTH) {
+                        throw new ApiException(new Status(CODE_VERIFIER_TOO_SHORT, codeVerifier));
+                    }
+                    if(codeVerifier.length() > CodeVerifierUtil.MAX_CODE_VERIFIER_LENGTH) {
+                        throw new ApiException(new Status(CODE_VERIFIER_TOO_LONG, codeVerifier));
+                    }
+
+                    Matcher m = CodeVerifierUtil.VALID_CODE_CHALLENGE_PATTERN.matcher(codeVerifier);
+                    if(!m.matches()) {
+                        throw new ApiException(new Status(INVALID_CODE_VERIFIER, codeVerifier));
+                    }
+
+                    // https://tools.ietf.org/html/rfc7636#section-4.2
+                    // plain or S256
+                    if (codeChallengeMethod.equals(CodeVerifierUtil.CODE_CHALLENGE_METHOD_S256)) {
+                        String s = CodeVerifierUtil.deriveCodeVerifierChallenge(codeVerifier);
+                        if(!codeChallenge.equals(s)) {
+                            throw new ApiException(new Status(CODE_VERIFIER_FAILED));
+                        }
+                    } else if(codeChallengeMethod.equals(CodeVerifierUtil.CODE_CHALLENGE_METHOD_PLAIN)){
+                        if(!codeChallenge.equals(codeVerifier)) {
+                            throw new ApiException(new Status(CODE_VERIFIER_FAILED));
+                        }
+                    } else {
+                        throw new ApiException(new Status(INVALID_CODE_CHALLENGE_METHOD, codeChallengeMethod));
+                    }
+                }
+
                 String jwt;
                 try {
                     jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), null));
