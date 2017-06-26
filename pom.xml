@@ -78,9 +78,10 @@
         <argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
     </properties>
  
-     <modules>
+    <modules>
         <module>cache</module>
         <module>code</module>
+        <module>authorize</module>
         <module>token</module>
         <module>client</module>
         <module>service</module>
@@ -107,6 +108,11 @@
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>oauth2-code</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>oauth2-authorize</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
