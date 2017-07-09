@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.3.4 - 2017-07-08
+### Added
+
+### Changed
+- fixes #36 inject /server/info and /health into swagger
+- fixes #37 pass externalized logback.xml in Dockerfile for all services
+- fixes #39 implement custom grant type client_authenticated_user
+- fixes #29 implement PKCE extension for authorization code grant type
+- Upgrade to light-4j 1.3.4
+
 ## 1.3.1 - 2017-06-03
 ### Added
 
