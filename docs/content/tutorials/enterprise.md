@@ -147,7 +147,7 @@ curl -H "Content-Type: application/json" -X POST -d '{"serviceId":"AACT0003","se
 To query all services.
 
 ```
-curl http://localhost:6883/oauth2/service
+curl http://localhost:6883/oauth2/service?page=1
 
 ```
 And here is the result.
