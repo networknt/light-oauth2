@@ -24,7 +24,10 @@ public class Oauth2PasswordUserIdPostHandler implements HttpHandler {
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         Map<String, Object> body = (Map)exchange.getAttachment(BodyHandler.REQUEST_BODY);
         String userId = exchange.getQueryParameters().get("userId").getFirst();
-        String password = (String)body.get("password");
+        char[] password = null;
+        if(body.get("password") != null) {
+            password = ((String)body.get("password")).toCharArray();
+        }
         String newPassword = (String)body.get("newPassword");
         String newPasswordConfirm = (String)body.get("newPasswordConfirm");
 

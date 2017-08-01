@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +57,8 @@ public class MapIdentityManager implements IdentityManager {
             User user = users.get(account.getPrincipal().getName());
             String expectedPassword = user.getPassword();
             try {
-                match = HashUtil.validatePassword(String.valueOf(password), expectedPassword);
+                match = HashUtil.validatePassword(password, expectedPassword);
+                Arrays.fill(password, ' ');
             } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                 logger.error("Exception:", e);
             }

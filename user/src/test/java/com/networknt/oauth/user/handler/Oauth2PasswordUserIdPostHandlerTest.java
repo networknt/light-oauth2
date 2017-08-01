@@ -83,7 +83,7 @@ public class Oauth2PasswordUserIdPostHandlerTest {
             logger.debug("Response body = " + body);
             Map<String, User> users = CacheStartupHookProvider.hz.getMap("users");
             User user = users.get("admin");
-            boolean match = HashUtil.validatePassword("stevehu", user.getPassword());
+            boolean match = HashUtil.validatePassword("stevehu".toCharArray(), user.getPassword());
             Assert.assertTrue(match);
         } catch (Exception e) {
             e.printStackTrace();

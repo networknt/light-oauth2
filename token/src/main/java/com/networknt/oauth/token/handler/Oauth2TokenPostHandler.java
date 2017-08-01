@@ -96,7 +96,11 @@ public class Oauth2TokenPostHandler implements HttpHandler {
             } else if("authorization_code".equals(grantType)) {
                 exchange.getResponseSender().send(mapper.writeValueAsString(handleAuthorizationCode(exchange, (String)formMap.get("code"), (String)formMap.get("redirect_uri"), formMap)));
             } else if("password".equals(grantType)) {
-                exchange.getResponseSender().send(mapper.writeValueAsString(handlePassword(exchange, (String)formMap.get("username"), (String)formMap.get("password"), (String)formMap.get("scope"), formMap)));
+                char[] password = null;
+                if(formMap.get("password") != null) {
+                    password = ((String)formMap.get("password")).toCharArray();
+                }
+                exchange.getResponseSender().send(mapper.writeValueAsString(handlePassword(exchange, (String)formMap.get("username"), password, (String)formMap.get("scope"), formMap)));
             } else if("refresh_token".equals(grantType)) {
                 exchange.getResponseSender().send(mapper.writeValueAsString(handleRefreshToken(exchange, (String) formMap.get("refresh_token"), (String) formMap.get("scope"), formMap)));
             } else if("client_authenticated_user".equals(grantType)) {
@@ -244,7 +248,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handlePassword(HttpServerExchange exchange, String userId, String password, String scope, Map<String, Object> formMap) throws ApiException {
+    private Map<String, Object> handlePassword(HttpServerExchange exchange, String userId, char[] password, String scope, Map<String, Object> formMap) throws ApiException {
         if(logger.isDebugEnabled()) logger.debug("userId = " + userId + " scope = " + scope);
         Client client = authenticateClient(exchange, formMap);
         if(client != null) {
@@ -256,6 +260,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                     // match password
                     try {
                         if(HashUtil.validatePassword(password, user.getPassword())) {
+                            Arrays.fill(password, ' ');
                             // make sure that client is trusted
                             if(client.getClientType() == Client.ClientTypeEnum.TRUSTED) {
                                 if(scope == null) {
@@ -463,7 +468,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
             throw new ApiException(new Status(CLIENT_NOT_FOUND, clientId));
         } else {
             try {
-                if(HashUtil.validatePassword(clientSecret, client.getClientSecret())) {
+                if(HashUtil.validatePassword(clientSecret.toCharArray(), client.getClientSecret())) {
                     return client;
                 } else {
                     throw new ApiException(new Status(UNAUTHORIZED_CLIENT));

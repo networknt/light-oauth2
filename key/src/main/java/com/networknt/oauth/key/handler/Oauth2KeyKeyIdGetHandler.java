@@ -122,7 +122,7 @@ public class Oauth2KeyKeyIdGetHandler implements HttpHandler {
                     if(client == null) {
                         throw new ApiException(new Status(CLIENT_NOT_FOUND, clientId));
                     }
-                    if(!HashUtil.validatePassword(clientSecret, client.getClientSecret())) {
+                    if(!HashUtil.validatePassword(clientSecret.toCharArray(), client.getClientSecret())) {
                         throw new ApiException(new Status(UNAUTHORIZED_CLIENT));
                     }
                     result = clientId;
