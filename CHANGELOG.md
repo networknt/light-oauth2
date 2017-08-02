@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.3.5 - 2017-08-02
+### Added
+
+### Changed
+- fixes #41 Update password match from String to char[] to prevent reveal of password in dump
+- fixes #40 add build.sh to automatically build, tag and push to docker
+- Upgrade to light-4j 1.3.5
+
 ## 1.3.4 - 2017-07-08
 ### Added
 
