@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.ConnectException;
 
-import static com.networknt.client.oauth.TokenHelper.encodeCredentials;
+import static com.networknt.client.oauth.OauthHelper.encodeCredentials;
 
 
 /**
