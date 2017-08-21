@@ -1,10 +1,17 @@
 package com.networknt.oauth.token.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
+import com.networknt.exception.ClientException;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.RefreshToken;
 import com.networknt.status.Status;
+import io.undertow.client.ClientConnection;
+import io.undertow.client.ClientRequest;
+import io.undertow.client.ClientResponse;
+import io.undertow.util.Headers;
+import io.undertow.util.Methods;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -22,11 +29,17 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnio.IoUtils;
+import org.xnio.OptionMap;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -54,189 +67,467 @@ public class Oauth2TokenPostHandlerTest {
 
     @Test
     public void testClientCredentialsToken() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_credentials");
+        String s = Http2Client.getFormDataString(params);
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "client_credentials"));
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-        HttpResponse response = client.execute(httpPost);
-        Assert.assertEquals(200, response.getStatusLine().getStatusCode());
-        String body = EntityUtils.toString(response.getEntity());
-        logger.debug("response body = " + body);
-        Assert.assertTrue(body.indexOf("access_token") > 0);
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(200, statusCode);
+            logger.debug("response body = " + body);
+            Assert.assertTrue(body.indexOf("access_token") > 0);
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
     }
 
     @Test
     public void testClientCredentialsTokenByFormData() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_credentials");
+        params.put("client_id", "f7d42348-c647-4efb-a52d-4c5787421e72");
+        params.put("client_secret", "f6h1FTI8Q3-7UScPZDzfXA");
+        String s = Http2Client.getFormDataString(params);
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "client_credentials"));
-        urlParameters.add(new BasicNameValuePair("client_id", "f7d42348-c647-4efb-a52d-4c5787421e72"));
-        urlParameters.add(new BasicNameValuePair("client_secret", "f6h1FTI8Q3-7UScPZDzfXA"));
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-        HttpResponse response = client.execute(httpPost);
-        Assert.assertEquals(200, response.getStatusLine().getStatusCode());
-        String body = EntityUtils.toString(response.getEntity());
-        logger.debug("response body = " + body);
-        Assert.assertTrue(body.indexOf("access_token") > 0);
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    //request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(200, statusCode);
+            logger.debug("response body = " + body);
+            Assert.assertTrue(body.indexOf("access_token") > 0);
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
     }
 
     @Test
     public void testTokenInvalidForm() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
-        httpPost.setEntity(new StringEntity("test"));
-        HttpResponse response = client.execute(httpPost);
-        Assert.assertEquals(400, response.getStatusLine().getStatusCode());
-        Status status = Config.getInstance().getMapper().readValue(response.getEntity().getContent(), Status.class);
-        Assert.assertNotNull(status);
-        Assert.assertEquals("ERR12000", status.getCode());
+        String s = "test";
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    //request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(400, statusCode);
+            Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+            Assert.assertNotNull(status);
+            Assert.assertEquals("ERR12000", status.getCode());
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
     }
 
     @Test
     public void testTokenInvalidGrantType() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "fake"));
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-        HttpResponse response = client.execute(httpPost);
-        Assert.assertEquals(400, response.getStatusLine().getStatusCode());
-        Status status = Config.getInstance().getMapper().readValue(response.getEntity().getContent(), Status.class);
-        Assert.assertNotNull(status);
-        Assert.assertEquals("ERR12001", status.getCode());
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "fake");
+        String s = Http2Client.getFormDataString(params);
+
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(400, statusCode);
+            Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+            Assert.assertNotNull(status);
+            Assert.assertEquals("ERR12001", status.getCode());
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
     }
 
     @Test
     public void testTokenMissingAuthHeader() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        //httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "client_credentials"));
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-        HttpResponse response = client.execute(httpPost);
-        Assert.assertEquals(401, response.getStatusLine().getStatusCode());
-        Status status = Config.getInstance().getMapper().readValue(response.getEntity().getContent(), Status.class);
-        Assert.assertNotNull(status);
-        Assert.assertEquals("ERR12002", status.getCode());
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_credentials");
+        String s = Http2Client.getFormDataString(params);
+
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    //request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(401, statusCode);
+            Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+            Assert.assertNotNull(status);
+            Assert.assertEquals("ERR12002", status.getCode());
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
     }
 
     @Test
     public void testTokenClientNotFound() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("fake", "f6h1FTI8Q3-7UScPZDzfXA"));
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "client_credentials"));
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-        HttpResponse response = client.execute(httpPost);
-        //String body = EntityUtils.toString(response.getEntity());
-        Assert.assertEquals(404, response.getStatusLine().getStatusCode());
-        Status status = Config.getInstance().getMapper().readValue(response.getEntity().getContent(), Status.class);
-        Assert.assertNotNull(status);
-        Assert.assertEquals("ERR12014", status.getCode());
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_credentials");
+        String s = Http2Client.getFormDataString(params);
+
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("fake", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(404, statusCode);
+            Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+            Assert.assertNotNull(status);
+            Assert.assertEquals("ERR12014", status.getCode());
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
     }
 
     @Test
     public void testTokenUnAuthedClientId() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "fake"));
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "client_credentials"));
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-        HttpResponse response = client.execute(httpPost);
-        Assert.assertEquals(401, response.getStatusLine().getStatusCode());
-        Status status = Config.getInstance().getMapper().readValue(response.getEntity().getContent(), Status.class);
-        Assert.assertNotNull(status);
-        Assert.assertEquals("ERR12007", status.getCode());
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_credentials");
+        String s = Http2Client.getFormDataString(params);
+
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "fake"));
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(401, statusCode);
+            Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+            Assert.assertNotNull(status);
+            Assert.assertEquals("ERR12007", status.getCode());
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
     }
 
     @Test
     public void testTokenInvalidCredentials() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic abc");
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "client_credentials"));
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-        HttpResponse response = client.execute(httpPost);
-        Assert.assertEquals(401, response.getStatusLine().getStatusCode());
-        Status status = Config.getInstance().getMapper().readValue(response.getEntity().getContent(), Status.class);
-        Assert.assertNotNull(status);
-        Assert.assertEquals("ERR12004", status.getCode());
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_credentials");
+        String s = Http2Client.getFormDataString(params);
+
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic abc");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(401, statusCode);
+            Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+            Assert.assertNotNull(status);
+            Assert.assertEquals("ERR12004", status.getCode());
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
     }
 
     @Test
     public void testTokenInvalidAuthHeader() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Bearer abc");
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "client_credentials"));
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-        HttpResponse response = client.execute(httpPost);
-        Assert.assertEquals(401, response.getStatusLine().getStatusCode());
-        Status status = Config.getInstance().getMapper().readValue(response.getEntity().getContent(), Status.class);
-        Assert.assertNotNull(status);
-        Assert.assertEquals("ERR12003", status.getCode());
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_credentials");
+        String s = Http2Client.getFormDataString(params);
+
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Bearer abc");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(401, statusCode);
+            Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+            Assert.assertNotNull(status);
+            Assert.assertEquals("ERR12003", status.getCode());
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+
+
     }
 
     @Test
     public void testPasswordToken() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "password");
+        params.put("username", "admin");
+        params.put("password", "123456");
+        params.put("scope", "petstore.r");
+        String s = Http2Client.getFormDataString(params);
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "password"));
-        urlParameters.add(new BasicNameValuePair("username", "admin"));
-        urlParameters.add(new BasicNameValuePair("password", "123456"));
-        urlParameters.add(new BasicNameValuePair("scope", "petstore.r"));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-        HttpResponse response = client.execute(httpPost);
-        String body = EntityUtils.toString(response.getEntity());
-        Assert.assertEquals(200, response.getStatusLine().getStatusCode());
-        logger.debug("response body = " + body);
-        Assert.assertTrue(body.indexOf("access_token") > 0);
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(200, statusCode);
+            logger.debug("response body = " + body);
+            Assert.assertTrue(body.indexOf("access_token") > 0);
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
     }
 
     @Test
     public void testPasswordMismatchScope() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "password");
+        params.put("username", "admin");
+        params.put("password", "123456");
+        params.put("scope", "overwrite.r");
+        String s = Http2Client.getFormDataString(params);
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "password"));
-        urlParameters.add(new BasicNameValuePair("username", "admin"));
-        urlParameters.add(new BasicNameValuePair("password", "123456"));
-        urlParameters.add(new BasicNameValuePair("scope", "overwrite.r"));
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
 
         try {
-            HttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = EntityUtils.toString(response.getEntity());
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -245,53 +536,90 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("MISMATCH_SCOPE", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
-
     }
 
     @Test
     public void testOneMismatchScope() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "password");
+        params.put("username", "admin");
+        params.put("password", "123456");
+        params.put("scope", "petstore.r");
+        String s = Http2Client.getFormDataString(params);
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "password"));
-        urlParameters.add(new BasicNameValuePair("username", "admin"));
-        urlParameters.add(new BasicNameValuePair("password", "123456"));
-        urlParameters.add(new BasicNameValuePair("scope", "petstore.r"));
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            HttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = EntityUtils.toString(response.getEntity());
-            Assert.assertEquals(200, statusCode);
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ClientException(e);
         }
 
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(200, statusCode);
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
     }
 
     @Test
     public void testPasswordGrantEmptyUsername() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "password");
+        //params.put("username", "admin");
+        params.put("password", "123456");
+        params.put("scope", "overwrite.r");
+        String s = Http2Client.getFormDataString(params);
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "password"));
-        urlParameters.add(new BasicNameValuePair("password", "123456"));
-        urlParameters.add(new BasicNameValuePair("scope", "overwrite.r"));
-
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -300,28 +628,47 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("USERNAME_REQUIRED", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
-
     }
 
     @Test
     public void testPasswordGrantEmptyPassword() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "password");
+        params.put("username", "admin");
+        //params.put("password", "123456");
+        params.put("scope", "overwrite.r");
+        String s = Http2Client.getFormDataString(params);
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "password"));
-        urlParameters.add(new BasicNameValuePair("username", "admin"));
-        urlParameters.add(new BasicNameValuePair("scope", "overwrite.r"));
-
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -330,27 +677,47 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("PASSWORD_REQUIRED", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
     @Test
     public void testNotTrustedClient() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "password");
+        params.put("username", "admin");
+        params.put("password", "123456");
+        params.put("scope", "overwrite.r");
+        String s = Http2Client.getFormDataString(params);
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "password"));
-        urlParameters.add(new BasicNameValuePair("username", "admin"));
-        urlParameters.add(new BasicNameValuePair("password", "123456"));
-
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -359,7 +726,10 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("NOT_TRUSTED_CLIENT", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
@@ -370,20 +740,37 @@ public class Oauth2TokenPostHandlerTest {
         codeMap.put("userId", "admin");
         codeMap.put("redirectUri", "http://localhost:8080/authorization");
         CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        urlParameters.add(new BasicNameValuePair("code", "code1"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        String s = Http2Client.getFormDataString(params);
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -392,7 +779,10 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("MISSING_REDIRECT_URI", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
@@ -403,21 +793,38 @@ public class Oauth2TokenPostHandlerTest {
         codeMap.put("userId", "admin");
         codeMap.put("redirectUri", "http://localhost:8080/authorization");
         CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        urlParameters.add(new BasicNameValuePair("code", "code1"));
-        urlParameters.add(new BasicNameValuePair("redirect_uri", "https://localhost:8080/authorization"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        params.put("redirect_uri", "https://localhost:8080/authorization");
+        String s = Http2Client.getFormDataString(params);
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -426,7 +833,10 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("MISMATCH_REDIRECT_URI", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
@@ -440,20 +850,36 @@ public class Oauth2TokenPostHandlerTest {
         token.setScope("petstore.r petstore.w");
         CacheStartupHookProvider.hz.getMap("tokens").put("86c0a39f-0789-4b71-9fed-d99fe6dc9281", token);
 
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "refresh_token");
+        params.put("refresh_token", "86c0a39f-0789-4b71-9fed-d99fe6dc9281");
+        String s = Http2Client.getFormDataString(params);
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "refresh_token"));
-        urlParameters.add(new BasicNameValuePair("refresh_token", "86c0a39f-0789-4b71-9fed-d99fe6dc9281"));
-
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(200, statusCode);
             if(statusCode == 200) {
                 logger.debug("body = " + body);
@@ -462,27 +888,46 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertNotEquals("86c0a39f-0789-4b71-9fed-d99fe6dc9281", refreshToken);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
     @Test
     public void testNotTrustedClientForClientAuthenticatedUser() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_authenticated_user");
+        params.put("userId", "admin");
+        params.put("userType", "Employee");
+        String s = Http2Client.getFormDataString(params);
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "client_authenticated_user"));
-        urlParameters.add(new BasicNameValuePair("userId", "admin"));
-        urlParameters.add(new BasicNameValuePair("userType", "Employee"));
-
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -491,26 +936,45 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("NOT_TRUSTED_CLIENT", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
     @Test
     public void testClientAuthenticatedUserWithoutUserId() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_authenticated_user");
+        params.put("username", "admin");
+        String s = Http2Client.getFormDataString(params);
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "client_authenticated_user"));
-        urlParameters.add(new BasicNameValuePair("username", "admin"));
-
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -519,26 +983,45 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("USER_ID_REQUIRED_FOR_CLIENT_AUTHENTICATED_USER_GRANT_TYPE", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
     @Test
     public void testClientAuthenticatedUserWithoutUserType() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_authenticated_user");
+        params.put("userId", "admin");
+        String s = Http2Client.getFormDataString(params);
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "client_authenticated_user"));
-        urlParameters.add(new BasicNameValuePair("userId", "admin"));
-
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -547,30 +1030,56 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("USER_TYPE_REQUIRED_FOR_CLIENT_AUTHENTICATED_USER_GRANT_TYPE", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
     @Test
     public void testClientAuthenticatedUserTokenWithCustomClaims() throws Exception {
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_authenticated_user");
+        params.put("userId", "admin");
+        params.put("userType", "Employee");
+        params.put("transit", "12345"); // This is the custom claim that need to be shown in JWT token.
+        String s = Http2Client.getFormDataString(params);
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "client_authenticated_user"));
-        urlParameters.add(new BasicNameValuePair("userId", "admin"));
-        urlParameters.add(new BasicNameValuePair("userType", "Employee"));
-        urlParameters.add(new BasicNameValuePair("transit", "12345")); // This is the custom claim that need to be shown in JWT token.
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-        HttpResponse response = client.execute(httpPost);
-        int statusCode = response.getStatusLine().getStatusCode();
-        String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
-        Assert.assertEquals(200, statusCode);
-        logger.debug("response body = " + body); // here we can get the access token and verify if transit in the payload in jwt.io.
-        Assert.assertTrue(body.indexOf("access_token") > 0);
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(200, statusCode);
+            logger.debug("response body = " + body); // here we can get the access token and verify if transit in the payload in jwt.io.
+            Assert.assertTrue(body.indexOf("access_token") > 0);
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
     }
 
 
@@ -581,26 +1090,46 @@ public class Oauth2TokenPostHandlerTest {
         codeMap.put("userId", "admin");
         codeMap.put("redirectUri", "http://localhost:8080/authorization");
         CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        urlParameters.add(new BasicNameValuePair("code", "code1"));
-        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
+        String s = Http2Client.getFormDataString(params);
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(200, statusCode);
-            logger.debug("response body = " + body);
+            logger.debug("response body = " + body); // here we can get the access token and verify if transit in the payload in jwt.io.
             Assert.assertTrue(body.indexOf("access_token") > 0);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
@@ -612,27 +1141,47 @@ public class Oauth2TokenPostHandlerTest {
         codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
         codeMap.put("code_challenge_method", "S256");
         CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        urlParameters.add(new BasicNameValuePair("code", "code1"));
-        urlParameters.add(new BasicNameValuePair("code_verifier", "xzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA"));
-        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        params.put("code_verifier", "xzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
+        String s = Http2Client.getFormDataString(params);
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(200, statusCode);
-            logger.debug("response body = " + body);
+            logger.debug("response body = " + body); // here we can get the access token and verify if transit in the payload in jwt.io.
             Assert.assertTrue(body.indexOf("access_token") > 0);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
@@ -644,27 +1193,47 @@ public class Oauth2TokenPostHandlerTest {
         codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
         codeMap.put("code_challenge_method", "plain");
         CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        urlParameters.add(new BasicNameValuePair("code", "code1"));
-        urlParameters.add(new BasicNameValuePair("code_verifier", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s"));
-        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        params.put("code_verifier", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
+        String s = Http2Client.getFormDataString(params);
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(200, statusCode);
-            logger.debug("response body = " + body);
+            logger.debug("response body = " + body); // here we can get the access token and verify if transit in the payload in jwt.io.
             Assert.assertTrue(body.indexOf("access_token") > 0);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
@@ -676,22 +1245,39 @@ public class Oauth2TokenPostHandlerTest {
         codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
         codeMap.put("code_challenge_method", "S256");
         CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        urlParameters.add(new BasicNameValuePair("code", "code1"));
-        urlParameters.add(new BasicNameValuePair("code_verifier", "x$zmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA"));
-        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        params.put("code_verifier", "x$zmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
+        String s = Http2Client.getFormDataString(params);
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -700,7 +1286,10 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("INVALID_CODE_VERIFIER_FORMAT", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
@@ -712,22 +1301,39 @@ public class Oauth2TokenPostHandlerTest {
         codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
         codeMap.put("code_challenge_method", "ABC");
         CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        urlParameters.add(new BasicNameValuePair("code", "code1"));
-        urlParameters.add(new BasicNameValuePair("code_verifier", "xzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA"));
-        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        params.put("code_verifier", "xzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
+        String s = Http2Client.getFormDataString(params);
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -736,7 +1342,10 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("INVALID_CODE_CHALLENGE_METHOD", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
@@ -749,22 +1358,39 @@ public class Oauth2TokenPostHandlerTest {
         codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
         codeMap.put("code_challenge_method", "S256");
         CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        urlParameters.add(new BasicNameValuePair("code", "code1"));
-        urlParameters.add(new BasicNameValuePair("code_verifier", "xzmujl"));
-        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        params.put("code_verifier", "xzmujl");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
+        String s = Http2Client.getFormDataString(params);
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -773,7 +1399,10 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("CODE_VERIFIER_TOO_SHORT", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
@@ -785,22 +1414,39 @@ public class Oauth2TokenPostHandlerTest {
         codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
         codeMap.put("code_challenge_method", "S256");
         CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        urlParameters.add(new BasicNameValuePair("code", "code1"));
-        urlParameters.add(new BasicNameValuePair("code_verifier", "xzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUAxzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUAxzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA"));
-        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        params.put("code_verifier", "xzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUAxzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUAxzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
+        String s = Http2Client.getFormDataString(params);
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -809,7 +1455,10 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("CODE_VERIFIER_TOO_LONG", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
@@ -821,21 +1470,38 @@ public class Oauth2TokenPostHandlerTest {
         codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
         codeMap.put("code_challenge_method", "S256");
         CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        urlParameters.add(new BasicNameValuePair("code", "code1"));
-        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
+        String s = Http2Client.getFormDataString(params);
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -844,7 +1510,10 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("CODE_VERIFIER_MISSING", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 
@@ -856,22 +1525,39 @@ public class Oauth2TokenPostHandlerTest {
         codeMap.put("code_challenge", "GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s");
         codeMap.put("code_challenge_method", "S256");
         CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
-        String url = "http://localhost:6882/oauth2/token";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
 
-        List<NameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
-        urlParameters.add(new BasicNameValuePair("code", "code1"));
-        urlParameters.add(new BasicNameValuePair("code_verifier", "1xzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA"));
-        urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8080/authorization"));
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        params.put("code_verifier", "1xzmujl-tX1OgdSrtB3oVFp4G3VHVvGbv81i8Nd-A62qgcmo0VDvOq_EaYJiSaM4fsx6oEqhHZfzhTcmcU4WjUA");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
+        String s = Http2Client.getFormDataString(params);
 
-        httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
         try {
-            CloseableHttpResponse response = client.execute(httpPost);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String body = IOUtils.toString(response.getEntity().getContent(), "utf8");
+            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
@@ -880,7 +1566,10 @@ public class Oauth2TokenPostHandlerTest {
                 Assert.assertEquals("CODE_VERIFIER_FAILED", status.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
         }
     }
 

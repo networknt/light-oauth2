@@ -1,21 +1,25 @@
 package com.networknt.oauth.code.handler;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
+import com.networknt.client.Http2Client;
+import com.networknt.exception.ClientException;
+import io.undertow.client.ClientConnection;
+import io.undertow.client.ClientRequest;
+import io.undertow.client.ClientResponse;
+import io.undertow.util.Headers;
+import io.undertow.util.Methods;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnio.IoUtils;
+import org.xnio.OptionMap;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -29,24 +33,44 @@ public class Oauth2CodePostHandlerTest {
 
     @Test
     public void testAuthorizationCode() throws Exception {
-        String url = "http://localhost:6881/oauth2/code";
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        BasicNameValuePair[] pairs = new BasicNameValuePair[]{
-            new BasicNameValuePair("j_username", "admin"),
-            new BasicNameValuePair("j_password", "123456"),
-            new BasicNameValuePair("response_type", "code"),
-            new BasicNameValuePair("client_id", "59f347a0-c92d-11e6-9d9d-cec0c932ce01")
-        };
-        final List<NameValuePair> data = new ArrayList<>();
-        data.addAll(Arrays.asList(pairs));
-        httpPost.setEntity(new UrlEncodedFormEntity(data));
-        CloseableHttpResponse response = client.execute(httpPost);
+        Map<String, String> params = new HashMap<>();
+        params.put("j_username", "admin");
+        params.put("j_password", "123456");
+        params.put("response_type", "code");
+        params.put("client_id", "59f347a0-c92d-11e6-9d9d-cec0c932ce01");
 
-        int statusCode = response.getStatusLine().getStatusCode();
-        String body  = IOUtils.toString(response.getEntity().getContent(), "utf8");
-        //Assert.assertEquals(statusCode, 302);
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("http://localhost:6881"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+        String s = Http2Client.getFormDataString(params);
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/code");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/json");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            //Assert.assertEquals(statusCode, 302);
+            // at this moment, an exception will help as it is redirected to localhost:8080 and it is not up.
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
 
-        // at this moment, an exception will help as it is redirected to localhost:8080 and it is not up.
     }
 }
