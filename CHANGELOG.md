@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.4.0 - 2017-08-22
+### Added
+- update build.sh for Docker build and push
+
+### Changed
+- fixes #44 Replace Client with Http2Client 
+- fixes #43 update TokenHelper to OauthHelper
+- fixes #42 Upgrade to Undertow 1.4.18.Final for Http2 and remove JsonPath 
+- Upgrade to light-4j 1.4.0
+
 ## 1.3.5 - 2017-08-02
 ### Added
 
