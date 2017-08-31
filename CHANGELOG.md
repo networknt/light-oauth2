@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 1.4.1 - 2017-08-30
+### Added
+
+### Changed
+- fixes #46 Make all services HTTP2 and HTTPS enabled and disable HTTP
+- fixes #45 Upgrade to newer version of Undertow and Jackson
+- Upgrade to light-rest-4j 1.4.1
+- Upgrade to light-4j 1.4.1
+
 ## 1.4.0 - 2017-08-22
 ### Added
 - update build.sh for Docker build and push
