@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 ### Changed
+- fixes #47 Upgrade all test cases to https and http2
 - fixes #46 Make all services HTTP2 and HTTPS enabled and disable HTTP
 - fixes #45 Upgrade to newer version of Undertow and Jackson
 - Upgrade to light-rest-4j 1.4.1
