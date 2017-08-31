@@ -7,13 +7,16 @@ ip: 0.0.0.0
 httpPort: 6883
 
 # Enable HTTP should be false on official environment.
-enableHttp: true
+enableHttp: false
 
 # Https port if enableHttps is true.
 httpsPort: 6883
 
 # Enable HTTPS should be true on official environment.
-enableHttps: false
+enableHttps: true
+
+# Enable HTTP2 should be true on official environment.
+enableHttp2: true
 
 # Keystore file name in config folder. KeystorePass is in secret.yml to access it.
 keystoreName: tls/server.keystore
