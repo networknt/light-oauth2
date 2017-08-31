@@ -7,6 +7,7 @@ import com.networknt.exception.ClientException;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.RefreshToken;
 import com.networknt.status.Status;
+import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
@@ -75,7 +76,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -118,7 +119,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -157,7 +158,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -200,7 +201,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -243,7 +244,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -286,7 +287,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -329,7 +330,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -372,7 +373,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -415,7 +416,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -463,7 +464,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -508,7 +509,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -557,7 +558,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -600,7 +601,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -649,7 +650,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -698,7 +699,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -751,7 +752,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -805,7 +806,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -860,7 +861,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -908,7 +909,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -955,7 +956,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -1002,7 +1003,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -1051,7 +1052,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -1102,7 +1103,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -1154,7 +1155,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -1206,7 +1207,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -1258,7 +1259,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -1314,7 +1315,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -1371,7 +1372,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -1427,7 +1428,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -1482,7 +1483,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
@@ -1538,7 +1539,7 @@ public class Oauth2TokenPostHandlerTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
         try {
-            connection = client.connect(new URI("http://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
         } catch (Exception e) {
             throw new ClientException(e);
         }
