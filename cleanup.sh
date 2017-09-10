@@ -5,3 +5,6 @@
 
 docker ps -a | awk '{ print }' | grep lightoauth2_oauth2 | awk '{print $1}' | xargs -I {} docker rm {}
 docker images | awk '{ print }' | grep lightoauth2_oauth2 | awk '{print $3}' | xargs -I {} docker rmi {}
+
+docker ps -a | awk '{ print }' | grep oauth2- | awk '{print $1}' | xargs -I {} docker rm {}
+docker images | awk '{ print }' | grep oauth2- | awk '{print $3}' | xargs -I {} docker rmi -f {}
