@@ -10,8 +10,11 @@ to hosts of services is not working. With container orchestration tool like Kube
 old containers can be shutdown and new container can be started at anytime. So the push
 certificates to services has to be changed to pull certificates from OAuth2 server
 instead. This service is designed to pull public key certificate based on keyId that is
-in the JWT token header. It is tighly integrated with Light-Java framework security
-component. 
+in the JWT token header. It is tightly integrated with light-4j framework security
+component.
+
+For more information on how light-4j security module integrates with this service, please
+refer to [key distribution](https://networknt.github.io/light-4j/architecture/key-distribution/) 
 
 This service is listening to port number 6886.
 
