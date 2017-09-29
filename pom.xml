@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.networknt</groupId>
     <artifactId>light-oauth2</artifactId>
-    <version>1.4.3</version>
+    <version>1.4.6</version>
     <packaging>pom</packaging>
     <name>Parent POM</name>
     <description>OAuth2 provider microservices based on Light-Java and SQL</description>
@@ -52,8 +52,8 @@
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.light-4j>1.4.3</version.light-4j>
-        <version.light-rest-4j>1.4.3</version.light-rest-4j>
+        <version.light-4j>1.4.6</version.light-4j>
+        <version.light-rest-4j>1.4.6</version.light-rest-4j>
         <version.json-schema-validator>0.1.7</version.json-schema-validator>
         <version.jackson>2.8.10</version.jackson>
         <version.slf4j>1.7.25</version.slf4j>
@@ -67,6 +67,7 @@
         <version.junit>4.12</version.junit>
         <version.mockito>2.7.21</version.mockito>
         <version.undertow>1.4.19.Final</version.undertow>
+        <version.swagger>1.0.32</version.swagger>
         <version.hikaricp>2.5.1</version.hikaricp>
         <version.h2>1.3.176</version.h2>
         <version.hazelcast>3.6.7</version.hazelcast>
@@ -281,6 +282,11 @@
                 <version>${version.json-schema-validator}</version>
             </dependency>
 
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-parser</artifactId>
+                <version>${version.swagger}</version>
+            </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>

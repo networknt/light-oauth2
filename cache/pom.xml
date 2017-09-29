@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.networknt</groupId>
         <artifactId>light-oauth2</artifactId>
-        <version>1.4.3</version>
+        <version>1.4.6</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -113,6 +113,10 @@
             <artifactId>swagger-validator</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-parser</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
