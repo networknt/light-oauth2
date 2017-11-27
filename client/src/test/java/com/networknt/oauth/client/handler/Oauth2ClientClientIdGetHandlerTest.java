@@ -54,11 +54,8 @@ public class Oauth2ClientClientIdGetHandlerTest {
         } finally {
             IoUtils.safeClose(connection);
         }
-        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% before getting status");
         int statusCode = reference.get().getResponseCode();
-        System.out.println("%%%%%%%%%%%%%%%%%%5%%%%%%%%%%%%%%%%%statusCode = " + statusCode);
         String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
-        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%body = " + body);
         Assert.assertEquals(200, statusCode);
         if(statusCode == 200) {
             Assert.assertNotNull(body);
