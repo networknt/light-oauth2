@@ -2,7 +2,7 @@
 singletons:
 # HandlerProvider implementation
 - com.networknt.server.HandlerProvider:
-  - com.networknt.oauth.user.PathHandlerProvider
+  - com.networknt.oauth.client.PathHandlerProvider
 # StartupHookProvider implementations, there are one to many and they are called in the same sequence defined.
 - com.networknt.server.StartupHookProvider:
   - com.networknt.oauth.cache.CacheStartupHookProvider
@@ -33,9 +33,6 @@ singletons:
   - com.networknt.sanitizer.SanitizerHandler
   # Validator Validate request based on swagger specification (depending on Swagger and Body)
   - com.networknt.validator.ValidatorHandler
-- javax.sql.DataSource:
-  - com.zaxxer.hikari.HikariDataSource:
-      DriverClassName: org.h2.jdbcx.JdbcDataSource
-      jdbcUrl: jdbc:h2:~/test
-      username: sa
-      password: sa
+
+
+

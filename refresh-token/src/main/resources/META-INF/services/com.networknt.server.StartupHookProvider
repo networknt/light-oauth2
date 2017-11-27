@@ -1,4 +1,0 @@
-# This is the place to plugin your startup hooks to initialize Spring application context,
-# set up db connection pools and allocate resources.
-
-com.networknt.oauth.cache.CacheStartupHookProvider

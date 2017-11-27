@@ -1,0 +1,11 @@
+variables:
+  regex: '<version.light[a-z-]+4j>\d\.\d\.\d</version.light[a-z-]+4j>'
+paths:
+- path: pom.xml
+  match: "{{ .regex }}"
+  replace: "{{ .old }}"
+  with: "{{ .new }}"
+  must_include:
+    - modelVersion
+    - groupId
+    - artifactId
