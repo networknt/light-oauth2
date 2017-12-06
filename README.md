@@ -58,6 +58,12 @@ key service with endpoint to retrieve public key certificate from microservices
 during runtime based on the key_id from JWT header. For more details on key service,
 please refer to [key distribution][] 
 
+### Additional documents
+
+Along with the documentation on each [light-oauth2 service][], there are
+[light-oauth2 tutorial][] to help user to get started.  
+
+
 ### OAuth2 server, portal and light Java to form ecosystem
 
 [light-java](https://github.com/networknt/light-java) to build API
@@ -65,10 +71,6 @@ please refer to [key distribution][]
 [light-oauth2](https://github.com/networknt/light-oauth2) to control API access
 
 [light-portal](https://github.com/networknt/light-portal) to manage clients and APIs
-
-
-Along with the documentation on each [light-oauth2 service][], there are
-[light-oauth2 tutorial][] to help user to get started.  
 
 [key distribution]: https://doc.networknt.com/service/oauth/service/key/
 [light-oauth2 service]: https://doc.networknt.com/service/oauth/service/
