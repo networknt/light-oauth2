@@ -13,7 +13,10 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.List;
 
 public class Oauth2ClientGetHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2ClientGetHandler.class);

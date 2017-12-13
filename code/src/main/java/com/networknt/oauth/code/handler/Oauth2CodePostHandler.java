@@ -3,7 +3,6 @@ package com.networknt.oauth.code.handler;
 import com.hazelcast.core.IMap;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
-import com.networknt.oauth.code.auth.Authentication;
 import com.networknt.status.Status;
 import com.networknt.utility.Util;
 import io.undertow.security.api.SecurityContext;

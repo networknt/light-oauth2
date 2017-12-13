@@ -11,8 +11,6 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
 public class Oauth2ServiceServiceIdGetHandler implements HttpHandler {
     static Logger logger = LoggerFactory.getLogger(Oauth2ServiceServiceIdGetHandler.class);
     static final String SERVICE_NOT_FOUND = "ERR12015";

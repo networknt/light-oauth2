@@ -1,14 +1,14 @@
 package com.networknt.oauth.cache.model;
 
-import java.io.IOException;
-import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.io.IOException;
+import java.util.Objects;
 
 public class RefreshToken implements IdentifiedDataSerializable {
   private String refreshToken = null;
