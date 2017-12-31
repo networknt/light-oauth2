@@ -5,21 +5,16 @@ import com.hazelcast.query.PagingPredicate;
 import com.hazelcast.query.impl.predicates.LikePredicate;
 import com.networknt.config.Config;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
-import com.networknt.oauth.cache.model.Client;
-import com.networknt.oauth.cache.model.ClientComparator;
 import com.networknt.oauth.cache.model.RefreshToken;
 import com.networknt.oauth.cache.model.RefreshTokenComparator;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Oauth2RefreshTokenGetHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2RefreshTokenGetHandler.class);

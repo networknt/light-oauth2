@@ -1,17 +1,17 @@
 package com.networknt.oauth.cache.model;
 
-import java.io.IOException;
-import java.util.Objects;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.io.IOException;
 import java.sql.Date;
+import java.util.Objects;
 
 public class Client implements IdentifiedDataSerializable {
   private String clientId = null;
