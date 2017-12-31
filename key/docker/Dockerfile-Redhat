@@ -1,0 +1,28 @@
+FROM registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift
+
+USER root
+
+ENV APP_DIR=/app \
+    GROUP_NAME=networknt \
+    GROUP_ID=1000 \
+    USER_NAME=networknt \
+    USER_UID=1000
+
+RUN groupadd -g ${GROUP_ID} -r ${GROUP_NAME} && \
+    useradd -u ${USER_UID} -g ${GROUP_NAME} -d "${APP_DIR}" -s /sbin/nologin -c "${USER_NAME} user" ${USER_NAME}
+
+# Add the jar file into the container at /app
+ADD target/oauth2-key.jar ${APP_DIR}/server.jar
+
+# change permissions of app directory
+RUN chown -R ${USER_NAME}:${GROUP_NAME} "${APP_DIR}"
+
+# Port available to the world outside of this container
+EXPOSE 6886
+
+USER ${USER_UID}
+
+# Set the working directory to /app
+WORKDIR ${APP_DIR}
+
+CMD ["/bin/sh","-c","java -Dlight-4j-config-dir=/config -Dlogback.configurationFile=/config/logback.xml -jar server.jar"]
