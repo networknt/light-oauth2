@@ -1,0 +1,125 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "OAuth2 Service Token Service",
+        "description": "OAuth2 Service that issues access tokens.",
+        "contact": {
+            "email": "stevehu@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "host": "oauth2.networknt.com",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "consumes": [
+        "application/x-www-form-urlencoded"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/oauth2/token": {
+            "post": {
+                "description": "JSON object that contains access token",
+                "operationId": "postToken",
+                "parameters": [
+                    {
+                        "name": "authorization",
+                        "description": "encoded client_id and client_secret pair",
+                        "in": "header",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "grant_type",
+                        "type": "string",
+                        "enum": [
+                            "authorization_code",
+                            "client_credentials",
+                            "password",
+                            "refresh_token",
+                            "client_authenticated_user"
+                        ],
+                        "required": true,
+                        "in": "formData"
+                    },
+                    {
+                        "name": "client_id",
+                        "description": "used as alternative to authentication header for client authentication",
+                        "type": "string",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "client_secret",
+                        "description": "used as alternative to authentication header for client authentication",
+                        "type": "string",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "code",
+                        "description": "used in authorization_code to specify the code",
+                        "type": "string",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "username",
+                        "description": "mandatory in password grant type",
+                        "type": "string",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "password",
+                        "description": "mandatory in password grant type",
+                        "type": "string",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "scope",
+                        "description": "used by all flows to specify scope in the access token",
+                        "type": "string",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "redirect_uri",
+                        "description": "used in authorization code if code endpoint with rediret_uri",
+                        "type": "string",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "refresh_token",
+                        "description": "refresh token used to get another access token",
+                        "type": "string",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "code_verifier",
+                        "description": "PKCE code verifier",
+                        "type": "string",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                },
+                "parameters": []
+            }
+        }
+    }
+}
