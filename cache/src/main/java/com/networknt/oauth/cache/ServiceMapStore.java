@@ -19,11 +19,11 @@ import java.util.*;
 public class ServiceMapStore implements MapStore<String, Service> {
     private static final Logger logger = LoggerFactory.getLogger(ServiceMapStore.class);
     private static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
-    private static final String insert = "INSERT INTO services (service_id, service_type, service_name, service_desc, scope, owner_id, create_dt) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    private static final String delete = "DELETE FROM services WHERE service_id = ?";
-    private static final String select = "SELECT * FROM services WHERE service_id = ?";
-    private static final String update = "UPDATE services SET service_type = ?, service_name=?, service_desc=?, scope=?, owner_id=?, update_dt=? WHERE service_id=?";
-    private static final String loadall = "SELECT service_id FROM services";
+    private static final String insert = "INSERT INTO service (service_id, service_type, service_name, service_desc, scope, owner_id, create_dt) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String delete = "DELETE FROM service WHERE service_id = ?";
+    private static final String select = "SELECT * FROM service WHERE service_id = ?";
+    private static final String update = "UPDATE service SET service_type = ?, service_name=?, service_desc=?, scope=?, owner_id=?, update_dt=? WHERE service_id=?";
+    private static final String loadall = "SELECT service_id FROM service";
 
     @Override
     public synchronized void delete(String key) {
