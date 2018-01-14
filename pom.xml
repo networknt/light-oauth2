@@ -68,7 +68,7 @@
         <version.h2>1.4.196</version.h2>
         <version.hazelcast>3.6.8</version.hazelcast>
         <version.oracle>11.2.0.3</version.oracle>
-        <version.mysql>6.0.4</version.mysql>
+        <version.mysql>6.0.5</version.mysql>
         <version.postgres>9.4.1211</version.postgres>
         <versions.maven-version>2.4</versions.maven-version>
         <argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>

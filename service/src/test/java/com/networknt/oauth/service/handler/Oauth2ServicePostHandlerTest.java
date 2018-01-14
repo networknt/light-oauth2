@@ -36,7 +36,7 @@ public class Oauth2ServicePostHandlerTest {
 
     @Test
     public void testOauth2ServicePostHandler() throws ClientException, ApiException, UnsupportedEncodingException {
-        String service = "{\"serviceId\":\"AACT0003\",\"serviceType\":\"ms\",\"serviceName\":\"Retail Account\",\"serviceDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\",\"ownerId\":\"admin\"}";
+        String service = "{\"serviceId\":\"AACT0003\",\"serviceType\":\"swagger\",\"serviceName\":\"Retail Account\",\"serviceDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\",\"ownerId\":\"admin\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -75,7 +75,7 @@ public class Oauth2ServicePostHandlerTest {
 
     @Test
     public void testOwnerIdNotFound() throws ClientException, ApiException, UnsupportedEncodingException {
-        String service = "{\"serviceId\":\"AACT0004\",\"serviceType\":\"ms\",\"serviceName\":\"Retail Account\",\"serviceDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\",\"ownerId\":\"fake\"}";
+        String service = "{\"serviceId\":\"AACT0004\",\"serviceType\":\"swagger\",\"serviceName\":\"Retail Account\",\"serviceDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\",\"ownerId\":\"fake\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);

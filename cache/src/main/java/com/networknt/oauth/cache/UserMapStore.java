@@ -17,12 +17,12 @@ import java.util.*;
  * Created by stevehu on 2016-12-27.
  */
 public class UserMapStore implements MapStore<String, User> {
-    static final Logger logger = LoggerFactory.getLogger(ServiceMapStore.class);
+    static final Logger logger = LoggerFactory.getLogger(UserMapStore.class);
     static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
-    private static final String insert = "INSERT INTO user_profile (user_id, user_type, first_name, last_name, email, password, create_dt) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String insert = "INSERT INTO user_profile (user_id, user_type, first_name, last_name, email, password) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String delete = "DELETE FROM user_profile WHERE user_id = ?";
     private static final String select = "SELECT * FROM user_profile WHERE user_id = ?";
-    private static final String update = "UPDATE user_profile SET user_type=?, first_name=?, last_name=?, email=?, password=?, update_dt=? WHERE user_id = ?";
+    private static final String update = "UPDATE user_profile SET user_type=?, first_name=?, last_name=?, email=?, password=? WHERE user_id = ?";
     private static final String loadall = "SELECT user_id FROM user_profile";
 
     @Override
@@ -47,7 +47,6 @@ public class UserMapStore implements MapStore<String, User> {
                 stmt.setString(4, user.getLastName());
                 stmt.setString(5, user.getEmail());
                 stmt.setString(6, user.getPassword());
-                stmt.setDate(7, user.getCreateDt());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logger.error("Exception:", e);
@@ -60,8 +59,7 @@ public class UserMapStore implements MapStore<String, User> {
                 stmt.setString(3, user.getLastName());
                 stmt.setString(4, user.getEmail());
                 stmt.setString(5, user.getPassword());
-                stmt.setDate(6, user.getUpdateDt());
-                stmt.setString(7, user.getUserId());
+                stmt.setString(6, user.getUserId());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logger.error("Exception:", e);
@@ -93,8 +91,6 @@ public class UserMapStore implements MapStore<String, User> {
                     user.setLastName(rs.getString("last_name"));
                     user.setEmail(rs.getString("email"));
                     user.setPassword(rs.getString("password"));
-                    user.setCreateDt(rs.getDate("create_dt"));
-                    user.setUpdateDt(rs.getDate("update_dt"));
                 }
             }
         } catch (SQLException e) {

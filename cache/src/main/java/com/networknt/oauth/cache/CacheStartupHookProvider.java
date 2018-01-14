@@ -3,10 +3,7 @@ package com.networknt.oauth.cache;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import com.networknt.oauth.cache.model.ClientDataSerializableFactory;
-import com.networknt.oauth.cache.model.RefreshTokenDataSerializableFactory;
-import com.networknt.oauth.cache.model.ServiceDataSerializableFactory;
-import com.networknt.oauth.cache.model.UserDataSerializableFactory;
+import com.networknt.oauth.cache.model.*;
 import com.networknt.server.StartupHookProvider;
 
 /**
@@ -25,6 +22,7 @@ public class CacheStartupHookProvider implements StartupHookProvider {
         config.getSerializationConfig().addDataSerializableFactory(2, new ClientDataSerializableFactory());
         config.getSerializationConfig().addDataSerializableFactory(3, new ServiceDataSerializableFactory());
         config.getSerializationConfig().addDataSerializableFactory(4, new RefreshTokenDataSerializableFactory());
+        config.getSerializationConfig().addDataSerializableFactory(5, new ServiceEndpointDataSerializableFactory());
 
         // service map with near cache.
         MapConfig serviceConfig = new MapConfig();
@@ -40,6 +38,21 @@ public class CacheStartupHookProvider implements StartupHookProvider {
                 .setClassName("com.networknt.oauth.cache.ServiceMapStore");
 
         config.addMapConfig(serviceConfig);
+
+        // service endpoint map with near cache.
+        MapConfig serviceEndpointConfig = new MapConfig();
+        serviceEndpointConfig.setName("serviceEndpoints");
+        NearCacheConfig serviceEndpointCacheConfig = new NearCacheConfig();
+        serviceEndpointCacheConfig.setEvictionPolicy("NONE");
+        serviceEndpointCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
+        serviceEndpointCacheConfig.setCacheLocalEntries(true); // this enables the local caching
+        serviceEndpointConfig.setNearCacheConfig(serviceEndpointCacheConfig);
+
+        serviceEndpointConfig.getMapStoreConfig()
+                .setEnabled(true)
+                .setClassName("com.networknt.oauth.cache.ServiceEndpointMapStore");
+
+        config.addMapConfig(serviceEndpointConfig);
 
         // client map with near cache.
         MapConfig clientConfig = new MapConfig();

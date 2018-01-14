@@ -44,8 +44,6 @@ public class Oauth2ServicePutHandler implements HttpHandler {
                     exchange.getResponseSender().send(status.toString());
                 }
             }
-            // set updateDt here
-            service.setUpdateDt(new Date(System.currentTimeMillis()));
             services.set(serviceId, service);
         }
     }
