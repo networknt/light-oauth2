@@ -36,7 +36,7 @@ public class Oauth2ClientPutHandlerTest {
 
     @Test
     public void testOauth2ClientPutHandler() throws ClientException, ApiException, UnsupportedEncodingException {
-        String s = "{\"clientId\":\"f7d42348-c647-4efb-a52d-4c5787421e72\",\"clientType\":\"trusted\",\"clientProfile\":\"webserver\",\"clientName\":\"Retail Account\",\"clientDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\", \"redirectUri\": \"http://localhost:8080/authorization\", \"ownerId\":\"admin\"}";
+        String s = "{\"clientId\":\"59f347a0-c92d-11e6-9d9d-cec0c932ce01\",\"clientType\":\"trusted\",\"clientProfile\":\"webserver\",\"clientName\":\"Retail Account\",\"clientDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\", \"redirectUri\": \"http://localhost:8080/authorization\", \"ownerId\":\"admin\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -75,7 +75,7 @@ public class Oauth2ClientPutHandlerTest {
 
     @Test
     public void testOwnerNotFound() throws ClientException, ApiException, UnsupportedEncodingException {
-        String s = "{\"clientId\":\"f7d42348-c647-4efb-a52d-4c5787421e72\",\"clientType\":\"trusted\",\"clientProfile\":\"webserver\",\"clientName\":\"Retail Account\",\"clientDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\", \"redirectUri\": \"http://localhost:8080/authorization\", \"ownerId\":\"fake\"}";
+        String s = "{\"clientId\":\"59f347a0-c92d-11e6-9d9d-cec0c932ce01\",\"clientType\":\"trusted\",\"clientProfile\":\"webserver\",\"clientName\":\"Retail Account\",\"clientDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\", \"redirectUri\": \"http://localhost:8080/authorization\", \"ownerId\":\"fake\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
