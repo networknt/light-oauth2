@@ -19,7 +19,7 @@ CREATE TABLE client (
   client_secret VARCHAR2(1024) NOT NULL,
   client_name VARCHAR2(32) NOT NULL,
   client_desc VARCHAR2(2048),
-  scope VARCHAR2(4096),
+  scope VARCHAR2(4000),
   redirect_uri VARCHAR2(1024),
   authenticate_class VARCHAR2(256),
   owner_id VARCHAR2(32) NOT NULL,
@@ -51,8 +51,7 @@ CREATE TABLE service_endpoint (
   scope VARCHAR2(64) NOT NULL,
   CONSTRAINT service_endpoint_pk PRIMARY KEY (service_id, endpoint),
   CONSTRAINT service_endpoint_service_fk FOREIGN KEY (service_id) REFERENCES service(service_id)
-)
-ENGINE=INNODB;
+);
 
 DROP TABLE client_service CASCADE CONSTRAINTS;
 CREATE TABLE client_service (
@@ -62,19 +61,18 @@ CREATE TABLE client_service (
   CONSTRAINT client_service_pk PRIMARY KEY (client_id, service_id, endpoint),
   CONSTRAINT client_service_endpoint_fk FOREIGN KEY (service_id, endpoint) REFERENCES service_endpoint(service_id, endpoint),
   CONSTRAINT client_service_client_fk FOREIGN KEY (client_id) REFERENCES client(client_id)
-)
-ENGINE=INNODB;
+);
 
 DROP TABLE audit_log CASCADE CONSTRAINTS;
 create table audit_log (
   log_id INT, -- system milliseonds from 1970.
   service_id VARCHAR2(32) NOT NULL,
   endpoint VARCHAR2(256) NOT NULL,
-  request_header VARCHAR2(4096),
-  request_body VARCHAR2(4096),
+  request_header VARCHAR2(4000),
+  request_body VARCHAR2(4000),
   response_code INT,
-  response_header VARCHAR2(4096),
-  response_body VARCHAR2(4096)
+  response_header VARCHAR2(4000),
+  response_body VARCHAR2(4000)
 );
 
 
@@ -86,5 +84,5 @@ INSERT INTO client (client_id, client_secret, client_type, client_profile, clien
 VALUES('f7d42348-c647-4efb-a52d-4c5787421e72', '1000:5b37332c202d36362c202d36392c203131362c203132362c2036322c2037382c20342c202d37382c202d3131352c202d35332c202d34352c202d342c202d3132322c203130322c2033325d:29ad1fe88d66584c4d279a6f58277858298dbf9270ffc0de4317a4d38ba4b41f35f122e0825c466f2fa14d91e17ba82b1a2f2a37877a2830fae2973076d93cc2', 'public', 'mobile', 'PetStore Web Server', 'PetStore Web Server that calls PetStore API', 'petstore.r petstore.w', 'http://localhost:8080/authorization', 'admin');
 
 INSERT INTO service (service_id, service_type, service_name, service_desc, scope, owner_id)
-VALUES ('AACT0001', 'ms', 'Account Service', 'A microservice that serves account information', 'a.r b.r', 'admin');
+VALUES ('AACT0001', 'openapi', 'Account Service', 'A microservice that serves account information', 'a.r b.r', 'admin');
 
