@@ -66,7 +66,7 @@
         <version.swagger>1.0.32</version.swagger>
         <version.hikaricp>2.7.1</version.hikaricp>
         <version.h2>1.4.196</version.h2>
-        <version.hazelcast>3.6.8</version.hazelcast>
+        <version.hazelcast>3.9.2</version.hazelcast>
         <version.oracle>11.2.0.3</version.oracle>
         <version.mysql>6.0.5</version.mysql>
         <version.postgres>9.4.1211</version.postgres>
