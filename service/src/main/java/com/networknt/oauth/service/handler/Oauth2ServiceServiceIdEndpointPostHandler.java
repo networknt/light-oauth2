@@ -35,19 +35,20 @@ public class Oauth2ServiceServiceIdEndpointPostHandler implements HttpHandler {
         String serviceId = exchange.getQueryParameters().get("serviceId").getFirst();
         if(logger.isDebugEnabled()) logger.debug("post serviceEndpoints for serviceId " + serviceId);
 
-        IMap<String, List<ServiceEndpoint>> serviceEndpoints = CacheStartupHookProvider.hz.getMap("serviceEndpoints");
-        if(serviceEndpoints.get(serviceId) != null && serviceEndpoints.get(serviceId).size() > 0) {
-            List<ServiceEndpoint> list = new ArrayList<>();
-            for(Map<String, Object> m: body) {
-                list.add(Config.getInstance().getMapper().convertValue(m, ServiceEndpoint.class));
-            }
-            serviceEndpoints.set(serviceId, list);
-        } else {
+        // ensure that the serviceId exists
+        IMap<String, Service> services = CacheStartupHookProvider.hz.getMap("services");
+        if(services.get(serviceId) == null) {
             Status status = new Status(SERVICE_NOT_FOUND, serviceId);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            return;
         }
+
+        IMap<String, List<ServiceEndpoint>> serviceEndpoints = CacheStartupHookProvider.hz.getMap("serviceEndpoints");
+        List<ServiceEndpoint> list = new ArrayList<>();
+        for(Map<String, Object> m: body) {
+            list.add(Config.getInstance().getMapper().convertValue(m, ServiceEndpoint.class));
+        }
+        serviceEndpoints.set(serviceId, list);
     }
-
-
 }
