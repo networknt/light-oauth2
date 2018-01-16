@@ -198,31 +198,183 @@
         ]
       }
     },
-    "/server/info": {
-      "get": {
-        "security": [
+    "/oauth2/client/{clientId}/service": {
+      "delete": {
+        "description": "Delete all associated services for a client by clientId",
+        "operationId": "deleteAllClientService",
+        "parameters": [
           {
-            "client_auth": [
-              "server.info.r"
-            ]
+            "name": "clientId",
+            "in": "path",
+            "description": "Client Id",
+            "required": true,
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
-            "description": "successful operation"
+            "description": "Successful response"
+          },
+          "404": {
+            "description": "Client not found"
           }
         },
-        "parameters": []
-      }
-    },
-    "/health": {
+        "security": [
+          {
+            "client_auth": [
+              "oauth.client.w"
+            ]
+          }
+        ]
+      },
       "get": {
+        "description": "Get all associated services and endpoints by clientId",
+        "operationId": "getAllClientService",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client Id",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "successful operation"
+            "description": "Successful response"
+          },
+          "404": {
+            "description": "Client not found"
           }
         },
-        "parameters": []
+        "security": [
+          {
+            "client_auth": [
+              "oauth.client.r",
+              "oauth.client.w"
+            ]
+          }
+        ]
+      }
+    },
+    "/oauth2/client/{clientId}/service/{serviceId}": {
+      "post": {
+        "description": "Link a service and its endpoints to a client",
+        "operationId": "linkClientService",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client Id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "serviceId",
+            "in": "path",
+            "description": "Service Id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "A list of endpoints that needs to be linked to the client",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "404": {
+            "description": "Client or service not found"
+          }
+        },
+        "security": [
+          {
+            "client_auth": [
+              "oauth.client.w"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "description": "Delete all endpoints of a service for a client",
+        "operationId": "deleteClientService",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client Id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "serviceId",
+            "in": "path",
+            "description": "Service Id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "404": {
+            "description": "Client or service not found"
+          }
+        },
+        "security": [
+          {
+            "client_auth": [
+              "oauth.client.w"
+            ]
+          }
+        ]
+      },
+      "get": {
+        "description": "Get linked endpoints of a service from a client",
+        "operationId": "getClientService",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "Client Id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "serviceId",
+            "in": "path",
+            "description": "Service Id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "404": {
+            "description": "Client or service not found"
+          }
+        },
+        "security": [
+          {
+            "client_auth": [
+              "oauth.client.r",
+              "oauth.client.w"
+            ]
+          }
+        ]
       }
     }
   },
@@ -233,8 +385,7 @@
       "flow": "implicit",
       "scopes": {
         "oauth.client.w": "write oauth client",
-        "oauth.client.r": "read oauth client",
-        "server.info.r": "read server info"
+        "oauth.client.r": "read oauth client"
       }
     }
   },
@@ -297,16 +448,6 @@
         "redirectUri": {
           "type": "string",
           "description": "redirect uri"
-        },
-        "createDt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "create date time"
-        },
-        "updateDt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "update date time"
         }
       }
     }

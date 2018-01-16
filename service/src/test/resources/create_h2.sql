@@ -57,17 +57,15 @@ create table client_service (
 );
 
 create table audit_log (
-  log_id VARCHAR NOT NULL,
-  action_dt DATE,
+  log_id INT,
   service_id VARCHAR NOT NULL,
   path VARCHAR NOT NULL,
   method VARCHAR NOT NULL,
-  request_header VARCHAR NOT NULL,
+  request_header VARCHAR,
   request_body VARCHAR,
   response_code INT,
-  response_header VARCHAR NOT NULL,
+  response_header VARCHAR,
   response_body VARCHAR,
-  PRIMARY KEY (log_id)
 );
 
 

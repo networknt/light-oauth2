@@ -198,31 +198,109 @@
         ]
       }
     },
-    "/server/info": {
-      "get": {
+    "/oauth2/service/{serviceId}/endpoint": {
+      "post": {
+        "description": "create endpoints for service",
+        "operationId": "createServiceEndpoint",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "description": "Service Id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "A list of endpoint object",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceEndpoint"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful response"
+          }
+        },
         "security": [
           {
             "service_auth": [
-              "server.info.r"
+              "oauth.service.w"
             ]
+          }
+        ]
+      },
+      "delete": {
+        "description": "Delete all endpoints for a service",
+        "operationId": "deleteServiceEndpoint",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "description": "Service Id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid serviceId supplied"
+          },
+          "404": {
+            "description": "Service not found"
+          }
+        },
+        "security": [
+          {
+            "service_auth": [
+              "oauth.service.w"
+            ]
+          }
+        ]
+      },
+      "get": {
+        "description": "Get all endpoints for a service",
+        "operationId": "getServiceEndpoint",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "description": "Service Id",
+            "required": true,
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
-            "description": "successful operation"
+            "description": "Successful response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServiceEndpoint"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid serviceId supplied"
+          },
+          "404": {
+            "description": "ServiceEndpoint not found"
           }
         },
-        "parameters": []
-      }
-    },
-    "/health": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "successful operation"
+        "security": [
+          {
+            "service_auth": [
+              "oauth.service.r",
+              "oauth.service.w"
+            ]
           }
-        },
-        "parameters": []
+        ]
       }
     }
   },
@@ -233,8 +311,7 @@
       "flow": "implicit",
       "scopes": {
         "oauth.service.w": "write oauth service",
-        "oauth.service.r": "read oauth service",
-        "server.info.r": "read server info"
+        "oauth.service.r": "read oauth service"
       }
     }
   },
@@ -256,8 +333,10 @@
           "type": "string",
           "description": "service type",
           "enum": [
-            "ms",
-            "api"
+            "swagger",
+            "openapi",
+            "graphql",
+            "hybrid"
           ]
         },
         "serviceName": {
@@ -285,6 +364,28 @@
           "type": "string",
           "format": "date-time",
           "description": "update date time"
+        }
+      }
+    },
+    "ServiceEndpoint": {
+      "type": "object",
+      "required": [
+        "endpoint",
+        "operation",
+        "scope"
+      ],
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "description": "a combination of path and method to uniquely identify an operation"
+        },
+        "operation": {
+          "type": "string",
+          "description": "operationId of the endpoint"
+        },
+        "scope": {
+          "type": "string",
+          "description": "scope associated with the endpoint"
         }
       }
     }
