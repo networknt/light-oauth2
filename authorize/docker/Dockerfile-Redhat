@@ -15,7 +15,9 @@ RUN groupadd -g ${GROUP_ID} -r ${GROUP_NAME} && \
 ADD target/oauth2-authorize.jar ${APP_DIR}/server.jar
 
 # change permissions of app directory
-RUN chown -R ${USER_NAME}:${GROUP_NAME} "${APP_DIR}"
+RUN chown -R ${USER_NAME}:0 "${APP_DIR}" "/config" && \
+    find "${APP_DIR}" "/config" -type d -exec chmod 750 {} \; && \
+    find "${APP_DIR}" "/config" -type f -exec chmod 640 {} \;
 
 # Port available to the world outside of this container
 EXPOSE 6881
