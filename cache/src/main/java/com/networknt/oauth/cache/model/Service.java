@@ -10,7 +10,6 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.util.Objects;
 
 public class Service implements IdentifiedDataSerializable {
@@ -20,9 +19,10 @@ public class Service implements IdentifiedDataSerializable {
    * service type
    */
   public enum ServiceTypeEnum {
-    MS("ms"),
-    
-    API("api");
+    SWAGGER("swagger"),
+    GRAPHQL("graphql"),
+    HYBRID("hybrid"),
+    OPENAPI("openapi");
 
     private final String value;
 
@@ -56,10 +56,6 @@ public class Service implements IdentifiedDataSerializable {
   private String ownerId = null;
 
   private String scope = null;
-
-  private Date createDt = null;
-
-  private Date updateDt = null;
 
   public Service serviceId(String serviceId) {
     this.serviceId = serviceId;
@@ -151,37 +147,6 @@ public class Service implements IdentifiedDataSerializable {
     this.scope = scope;
   }
 
-  public Service createDt(Date createDt) {
-    this.createDt = createDt;
-    return this;
-  }
-
-  
-  @ApiModelProperty(example = "null", value = "create date time")
-  @JsonProperty("createDt")
-  public Date getCreateDt() {
-    return createDt;
-  }
-  public void setCreateDt(Date createDt) {
-    this.createDt = createDt;
-  }
-
-  public Service updateDt(Date updateDt) {
-    this.updateDt = updateDt;
-    return this;
-  }
-
-  
-  @ApiModelProperty(example = "null", value = "update date time")
-  @JsonProperty("updateDt")
-  public Date getUpdateDt() {
-    return updateDt;
-  }
-  public void setUpdateDt(Date updateDt) {
-    this.updateDt = updateDt;
-  }
-
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -196,14 +161,12 @@ public class Service implements IdentifiedDataSerializable {
         Objects.equals(serviceName, service.serviceName) &&
         Objects.equals(serviceDesc, service.serviceDesc) &&
         Objects.equals(ownerId, service.ownerId) &&
-        Objects.equals(scope, service.scope) &&
-        Objects.equals(createDt, service.createDt) &&
-        Objects.equals(updateDt, service.updateDt);
+        Objects.equals(scope, service.scope);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(serviceId, serviceType, serviceName, serviceDesc, ownerId, scope, createDt, updateDt);
+    return Objects.hash(serviceId, serviceType, serviceName, serviceDesc, ownerId, scope);
   }
 
   @Override
@@ -217,8 +180,6 @@ public class Service implements IdentifiedDataSerializable {
     sb.append("    serviceDesc: ").append(toIndentedString(serviceDesc)).append("\n");
     sb.append("    ownerId: ").append(toIndentedString(ownerId)).append("\n");
     sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
-    sb.append("    createDt: ").append(toIndentedString(createDt)).append("\n");
-    sb.append("    updateDt: ").append(toIndentedString(updateDt)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -246,8 +207,6 @@ public class Service implements IdentifiedDataSerializable {
     this.serviceDesc = in.readUTF();
     this.ownerId = in.readUTF();
     this.scope = in.readUTF();
-    this.createDt = in.readObject();
-    this.updateDt = in.readObject();
   }
 
   @Override
@@ -258,8 +217,6 @@ public class Service implements IdentifiedDataSerializable {
     out.writeUTF(this.serviceDesc);
     out.writeUTF(this.ownerId);
     out.writeUTF(this.scope);
-    out.writeObject(this.createDt);
-    out.writeObject(this.updateDt);
   }
 
   @JsonIgnore
