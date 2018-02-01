@@ -5,6 +5,7 @@ import com.hazelcast.query.Predicate;
 import com.hazelcast.query.SqlPredicate;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.oauth.cache.model.Service;
+import com.networknt.oauth.cache.model.ServiceEndpoint;
 import com.networknt.oauth.cache.model.User;
 import com.networknt.service.SingletonServiceFactory;
 import org.h2.tools.RunScript;
@@ -18,6 +19,7 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -89,7 +91,7 @@ public class CacheStartupHookProviderTest {
         Service service = services.get("AACT0001");
         System.out.println("service = " + service);
 
-        service.setServiceType(Service.ServiceTypeEnum.fromValue("api"));
+        service.setServiceType(Service.ServiceTypeEnum.fromValue("swagger"));
 
         services.replace("AACT0001", service);
 
@@ -177,6 +179,27 @@ public class CacheStartupHookProviderTest {
         tokens.delete("token1");
 
         System.out.println("tokens size = " + tokens.size());
+
+        CacheShutdownHookProvider shutdown = new CacheShutdownHookProvider();
+        shutdown.onShutdown();
+
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testServiceEndpointCache() {
+        CacheStartupHookProvider start = new CacheStartupHookProvider();
+        start.onStartup();
+
+        final IMap<String, List<ServiceEndpoint>> serviceEndpoints = CacheStartupHookProvider.hz.getMap("serviceEndpoints");
+
+        List<ServiceEndpoint> list = serviceEndpoints.get("AACT0001");
+        System.out.println("list size = " + list.size());
+
+        serviceEndpoints.delete("AACT0001");
+
+        System.out.println("list size = " + serviceEndpoints.size());
 
         CacheShutdownHookProvider shutdown = new CacheShutdownHookProvider();
         shutdown.onShutdown();
