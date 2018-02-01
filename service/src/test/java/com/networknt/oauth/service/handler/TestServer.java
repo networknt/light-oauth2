@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicInteger;
+import com.networknt.server.Server;
+import com.networknt.server.ServerConfig;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -43,6 +45,10 @@ public class TestServer extends ExternalResource {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public ServerConfig getServerConfig() {
+        return Server.config;
     }
 
     @Override

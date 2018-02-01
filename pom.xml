@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.networknt</groupId>
     <artifactId>light-oauth2</artifactId>
-    <version>1.5.7</version>
+    <version>1.5.8</version>
     <packaging>pom</packaging>
     <name>Parent POM</name>
     <description>OAuth2 provider microservices based on Light-Java and SQL</description>
@@ -52,8 +52,8 @@
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.light-4j>1.5.7</version.light-4j>
-        <version.light-rest-4j>1.5.7</version.light-rest-4j>
+        <version.light-4j>1.5.8</version.light-4j>
+        <version.light-rest-4j>1.5.8</version.light-rest-4j>
         <version.json-schema-validator>0.1.10</version.json-schema-validator>
         <version.jackson>2.9.1</version.jackson>
         <version.slf4j>1.7.25</version.slf4j>
@@ -66,9 +66,9 @@
         <version.swagger>1.0.32</version.swagger>
         <version.hikaricp>2.7.1</version.hikaricp>
         <version.h2>1.4.196</version.h2>
-        <version.hazelcast>3.6.8</version.hazelcast>
+        <version.hazelcast>3.9.2</version.hazelcast>
         <version.oracle>11.2.0.3</version.oracle>
-        <version.mysql>6.0.4</version.mysql>
+        <version.mysql>6.0.5</version.mysql>
         <version.postgres>9.4.1211</version.postgres>
         <versions.maven-version>2.4</versions.maven-version>
         <argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>

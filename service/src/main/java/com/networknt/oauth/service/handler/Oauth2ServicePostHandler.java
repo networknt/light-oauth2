@@ -39,8 +39,6 @@ public class Oauth2ServicePostHandler implements HttpHandler {
                     exchange.getResponseSender().send(status.toString());
                 }
             }
-            // set date here otherwise database will have the date populated but the cache without date
-            service.setCreateDt(new Date(System.currentTimeMillis()));
             services.set(serviceId, service);
         } else {
             Status status = new Status(SERVICE_ID_EXISTS, serviceId);
