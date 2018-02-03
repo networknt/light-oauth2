@@ -1,5 +1,30 @@
 # Change Log
 
+## [1.5.8](https://github.com/networknt/light-oauth2/tree/1.5.8) (2018-02-03)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.7...1.5.8)
+
+**Fixed bugs:**
+
+- Fix docker-compose build [\#57](https://github.com/networknt/light-oauth2/issues/57)
+
+**Closed issues:**
+
+- uppgrade to Hazelcast 2.9.2 [\#66](https://github.com/networknt/light-oauth2/issues/66)
+- update db scripts and swagger.json for mysql, postgres and oracle [\#65](https://github.com/networknt/light-oauth2/issues/65)
+- update README.md with more information and links to doc site [\#64](https://github.com/networknt/light-oauth2/issues/64)
+- add client to service relationship API [\#62](https://github.com/networknt/light-oauth2/issues/62)
+- add service endpoints API [\#61](https://github.com/networknt/light-oauth2/issues/61)
+- refactor table names before service enhancement [\#60](https://github.com/networknt/light-oauth2/issues/60)
+- externalize config files to db directory [\#59](https://github.com/networknt/light-oauth2/issues/59)
+- Dockerfile for production images for all services [\#52](https://github.com/networknt/light-oauth2/issues/52)
+
+**Merged pull requests:**
+
+- fixes \#52 - update user permissions on artifacts in production docker… [\#67](https://github.com/networknt/light-oauth2/pull/67) ([DineshAlapati](https://github.com/DineshAlapati))
+
+## [1.5.7](https://github.com/networknt/light-oauth2/tree/1.5.7) (2018-01-01)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.6...1.5.7)
+
 ## [1.5.6](https://github.com/networknt/light-oauth2/tree/1.5.6) (2017-12-31)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.4.3...1.5.6)
 
@@ -9,7 +34,6 @@
 - remove dependency-reduced-pom.xml for each sub project [\#55](https://github.com/networknt/light-oauth2/issues/55)
 - upgrade secret.yml to 1.5.6 with emailPassword [\#54](https://github.com/networknt/light-oauth2/issues/54)
 - remove default config for production package [\#53](https://github.com/networknt/light-oauth2/issues/53)
-- Dockerfile for production images for all services [\#52](https://github.com/networknt/light-oauth2/issues/52)
 - Update readme with links to document site and remove docs folder [\#50](https://github.com/networknt/light-oauth2/issues/50)
 - Upgrade docker-compose files and db configurations to 1.5.4 [\#49](https://github.com/networknt/light-oauth2/issues/49)
 - Upgrade dependencies and add maven-version [\#48](https://github.com/networknt/light-oauth2/issues/48)
