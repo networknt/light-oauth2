@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.5.8](https://github.com/networknt/light-oauth2/tree/1.5.8) (2018-02-07)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.8...1.5.8)
+
+**Merged pull requests:**
+
+- fixes \#52 - update Dockerfile-Redhat files in all services [\#70](https://github.com/networknt/light-oauth2/pull/70) ([DineshAlapati](https://github.com/DineshAlapati))
+
 ## [1.5.8](https://github.com/networknt/light-oauth2/tree/1.5.8) (2018-02-03)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.7...1.5.8)
 
