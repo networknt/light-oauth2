@@ -49,7 +49,7 @@ public class Oauth2ServiceServiceIdEndpointDeleteHandlerTest {
         }
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         try {
-            ClientRequest request = new ClientRequest().setPath("/oauth2/service/AACT0002/endpoint").setMethod(Methods.DELETE);
+            ClientRequest request = new ClientRequest().setPath("/oauth2/service/AACT0003/endpoint").setMethod(Methods.DELETE);
             
             connection.sendRequest(request, client.createClientCallback(reference, latch));
             
@@ -78,7 +78,7 @@ public class Oauth2ServiceServiceIdEndpointDeleteHandlerTest {
         }
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         try {
-            ClientRequest request = new ClientRequest().setPath("/oauth2/service/AACT0003/endpoint").setMethod(Methods.DELETE);
+            ClientRequest request = new ClientRequest().setPath("/oauth2/service/AACT0004/endpoint").setMethod(Methods.DELETE);
 
             connection.sendRequest(request, client.createClientCallback(reference, latch));
 
