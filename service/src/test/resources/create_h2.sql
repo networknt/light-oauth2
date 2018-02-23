@@ -76,8 +76,10 @@ INSERT INTO client (client_id, client_type, client_secret, client_profile, clien
 
 INSERT INTO service (service_id, service_type, service_name, service_desc, scope, owner_id) VALUES ('AACT0001', 'openapi', 'Account Service', 'A microservice that serves account information', 'a.r b.r', 'admin');
 INSERT INTO service (service_id, service_type, service_name, service_desc, scope, owner_id) VALUES ('AACT0002', 'openapi', 'Account Service', 'A microservice that serves account information', 'a.r b.r', 'admin');
+INSERT INTO service (service_id, service_type, service_name, service_desc, scope, owner_id) VALUES ('AACT0003', 'openapi', 'Account Service', 'A microservice that serves account information', 'a.r b.r', 'admin');
 
 INSERT INTO service_endpoint(service_id, endpoint, operation, scope) VALUES ('AACT0001', '/v1/getData@get', 'retrieve data', 'data.r');
 INSERT INTO service_endpoint(service_id, endpoint, operation, scope) VALUES ('AACT0001', '/v1/postData@post', 'create data', 'data.w');
 
 INSERT INTO service_endpoint(service_id, endpoint, operation, scope) VALUES ('AACT0002', '/v1/deleteData@delete', 'deleteData', 'data.w');
+INSERT INTO service_endpoint(service_id, endpoint, operation, scope) VALUES ('AACT0003', '/v1/deleteData@delete', 'deleteData', 'data.w');

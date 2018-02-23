@@ -1,7 +1,12 @@
 # Change Log
 
-## [1.5.8](https://github.com/networknt/light-oauth2/tree/1.5.8) (2018-02-07)
-[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.8...1.5.8)
+## [1.5.9](https://github.com/networknt/light-oauth2/tree/1.5.9) (2018-02-21)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.8...1.5.9)
+
+**Closed issues:**
+
+- cascade delete service endpoints if the service is deteted [\#72](https://github.com/networknt/light-oauth2/issues/72)
+- update mysql script and service.yml to use mysqluser instead of root [\#71](https://github.com/networknt/light-oauth2/issues/71)
 
 **Merged pull requests:**
 
