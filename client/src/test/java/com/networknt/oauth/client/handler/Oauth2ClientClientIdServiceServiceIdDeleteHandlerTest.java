@@ -50,7 +50,7 @@ public class Oauth2ClientClientIdServiceServiceIdDeleteHandlerTest {
         }
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         try {
-            ClientRequest request = new ClientRequest().setPath("/oauth2/client/f7d42348-c647-4efb-a52d-4c5787421e72/service/AACT0001").setMethod(Methods.DELETE);
+            ClientRequest request = new ClientRequest().setPath("/oauth2/client/59f347a0-c92d-11e6-9d9d-cec0c932ce02/service/AACT0002").setMethod(Methods.DELETE);
             
             connection.sendRequest(request, client.createClientCallback(reference, latch));
             

@@ -32,7 +32,7 @@ public class Oauth2ClientClientIdGetHandlerTest {
 
     static final Logger logger = LoggerFactory.getLogger(Oauth2ClientClientIdGetHandlerTest.class);
 
-    //@Test
+    @Test
     public void testOauth2ClientClientIdGetHandler() throws ClientException, ApiException {
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
