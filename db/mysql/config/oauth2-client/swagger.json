@@ -445,6 +445,10 @@
           "type": "string",
           "description": "client scope separated by space"
         },
+        "customClaim": {
+          "type": "string",
+          "description": "custom claim string in JSON format"
+        },
         "redirectUri": {
           "type": "string",
           "description": "redirect uri"
