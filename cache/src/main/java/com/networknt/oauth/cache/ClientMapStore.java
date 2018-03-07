@@ -19,10 +19,10 @@ import java.util.*;
 public class ClientMapStore implements MapStore<String, Client> {
     private static final Logger logger = LoggerFactory.getLogger(ClientMapStore.class);
     private static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
-    private static final String insert = "INSERT INTO client (client_id, client_secret, client_type, client_profile, client_name, client_desc, scope, redirect_uri, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String insert = "INSERT INTO client (client_id, client_secret, client_type, client_profile, client_name, client_desc, scope, custom_claim, redirect_uri, owner_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String delete = "DELETE FROM client WHERE client_id = ?";
     private static final String select = "SELECT * FROM client WHERE client_id = ?";
-    private static final String update = "UPDATE client SET client_type=?, client_profile=?, client_name=?, client_desc=?, scope=?, redirect_uri=?, owner_id=? WHERE client_id=?";
+    private static final String update = "UPDATE client SET client_type=?, client_profile=?, client_name=?, client_desc=?, scope=?, custom_claim=?, redirect_uri=?, owner_id=? WHERE client_id=?";
     private static final String loadall = "SELECT client_id FROM client";
 
     @Override
@@ -48,8 +48,9 @@ public class ClientMapStore implements MapStore<String, Client> {
                 stmt.setString(5, client.getClientName());
                 stmt.setString(6, client.getClientDesc());
                 stmt.setString(7, client.getScope());
-                stmt.setString(8, client.getRedirectUri());
-                stmt.setString(9, client.getOwnerId());
+                stmt.setString(8, client.getCustomClaim());
+                stmt.setString(9, client.getRedirectUri());
+                stmt.setString(10, client.getOwnerId());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logger.error("Exception:", e);
@@ -62,9 +63,10 @@ public class ClientMapStore implements MapStore<String, Client> {
                 stmt.setString(3, client.getClientName());
                 stmt.setString(4, client.getClientDesc());
                 stmt.setString(5, client.getScope());
-                stmt.setString(6, client.getRedirectUri());
-                stmt.setString(7, client.getOwnerId());
-                stmt.setString(8, client.getClientId());
+                stmt.setString(6, client.getCustomClaim());
+                stmt.setString(7, client.getRedirectUri());
+                stmt.setString(8, client.getOwnerId());
+                stmt.setString(9, client.getClientId());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logger.error("Exception:", e);
@@ -97,6 +99,7 @@ public class ClientMapStore implements MapStore<String, Client> {
                     client.setClientName(rs.getString("client_name"));
                     client.setClientDesc(rs.getString("client_desc"));
                     client.setScope(rs.getString("scope"));
+                    client.setCustomClaim(rs.getString("custom_claim"));
                     client.setRedirectUri(rs.getString("redirect_uri"));
                     client.setOwnerId(rs.getString("owner_id"));
                 }

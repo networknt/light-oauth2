@@ -1,6 +1,7 @@
 package com.networknt.oauth.token.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.IMap;
 import com.networknt.config.Config;
@@ -27,6 +28,7 @@ import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
@@ -91,17 +93,13 @@ public class Oauth2TokenPostHandler implements HttpHandler {
         try {
             String grantType = (String)formMap.remove("grant_type");
             if("client_credentials".equals(grantType)) {
-                exchange.getResponseSender().send(mapper.writeValueAsString(handleClientCredentials(exchange, (String)formMap.get("scope"), formMap)));
+                exchange.getResponseSender().send(mapper.writeValueAsString(handleClientCredentials(exchange, formMap)));
             } else if("authorization_code".equals(grantType)) {
-                exchange.getResponseSender().send(mapper.writeValueAsString(handleAuthorizationCode(exchange, (String)formMap.get("code"), (String)formMap.get("redirect_uri"), formMap)));
+                exchange.getResponseSender().send(mapper.writeValueAsString(handleAuthorizationCode(exchange, formMap)));
             } else if("password".equals(grantType)) {
-                char[] password = null;
-                if(formMap.get("password") != null) {
-                    password = ((String)formMap.get("password")).toCharArray();
-                }
-                exchange.getResponseSender().send(mapper.writeValueAsString(handlePassword(exchange, (String)formMap.get("username"), password, (String)formMap.get("scope"), formMap)));
+                exchange.getResponseSender().send(mapper.writeValueAsString(handlePassword(exchange, formMap)));
             } else if("refresh_token".equals(grantType)) {
-                exchange.getResponseSender().send(mapper.writeValueAsString(handleRefreshToken(exchange, (String) formMap.get("refresh_token"), (String) formMap.get("scope"), formMap)));
+                exchange.getResponseSender().send(mapper.writeValueAsString(handleRefreshToken(exchange, formMap)));
             } else if("client_authenticated_user".equals(grantType)) {
                 exchange.getResponseSender().send(mapper.writeValueAsString(handleClientAuthenticatedUser(exchange, formMap)));
             } else {
@@ -120,7 +118,8 @@ public class Oauth2TokenPostHandler implements HttpHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handleClientCredentials(HttpServerExchange exchange, String scope, Map<String, Object> formMap) throws ApiException {
+    private Map<String, Object> handleClientCredentials(HttpServerExchange exchange, Map<String, Object> formMap) throws ApiException {
+        String scope = (String)formMap.get("scope");
         if(logger.isDebugEnabled()) logger.debug("scope = " + scope);
         Client client = authenticateClient(exchange, formMap);
         if(client != null) {
@@ -133,9 +132,16 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                 }
             }
             String jwt;
+            Map<String, Object> customMap = null;
             try {
-                jwt = JwtHelper.getJwt(mockCcClaims(client.getClientId(), scope, null));
+                // assume that the custom_claim is in format of json map string.
+                String customClaim = client.getCustomClaim();
+                if(customClaim != null && customClaim.length() > 0) {
+                    customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
+                }
+                jwt = JwtHelper.getJwt(mockCcClaims(client.getClientId(), scope, customMap));
             } catch (Exception e) {
+                logger.error("Exception:", e);
                 throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
             }
             Map<String, Object> resMap = new HashMap<>();
@@ -143,13 +149,14 @@ public class Oauth2TokenPostHandler implements HttpHandler {
             resMap.put("token_type", "bearer");
             resMap.put("expires_in", config.getExpiredInMinutes()*60);
             return resMap;
-
         }
         return new HashMap<>(); // return an empty hash map. this is actually not reachable at all.
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handleAuthorizationCode(HttpServerExchange exchange, String code, String redirectUri, Map<String, Object> formMap) throws ApiException {
+    private Map<String, Object> handleAuthorizationCode(HttpServerExchange exchange, Map<String, Object> formMap) throws ApiException {
+        String code = (String)formMap.get("code");
+        String redirectUri = (String)formMap.get("redirect_uri");
         if(logger.isDebugEnabled()) logger.debug("code = " + code + " redirectUri = " + redirectUri);
         Client client = authenticateClient(exchange, formMap);
         if(client != null) {
@@ -219,8 +226,14 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                 }
 
                 String jwt;
+                Map<String, Object> customMap = null;
                 try {
-                    jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), null));
+                    // assume that the custom_claim is in format of json map string.
+                    String customClaim = client.getCustomClaim();
+                    if(customClaim != null && customClaim.length() > 0) {
+                        customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
+                    }
+                    jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), customMap));
                 } catch (Exception e) {
                     throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                 }
@@ -247,8 +260,15 @@ public class Oauth2TokenPostHandler implements HttpHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handlePassword(HttpServerExchange exchange, String userId, char[] password, String scope, Map<String, Object> formMap) throws ApiException {
+    private Map<String, Object> handlePassword(HttpServerExchange exchange, Map<String, Object> formMap) throws ApiException {
+        String userId = (String)formMap.get("username");
+        String scope = (String)formMap.get("scope");
         if(logger.isDebugEnabled()) logger.debug("userId = " + userId + " scope = " + scope);
+        char[] password = null;
+        if(formMap.get("password") != null) {
+            password = ((String)formMap.get("password")).toCharArray();
+        }
+
         Client client = authenticateClient(exchange, formMap);
         if(client != null) {
             // authenticate user with credentials
@@ -270,8 +290,13 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                                         throw new ApiException(new Status(MISMATCH_SCOPE, scope, client.getScope()));
                                     }
                                 }
-                                String jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), null));
-
+                                Map<String, Object> customMap = null;
+                                // assume that the custom_claim is in format of json map string.
+                                String customClaim = client.getCustomClaim();
+                                if(customClaim != null && customClaim.length() > 0) {
+                                    customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
+                                }
+                                String jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), customMap));
                                 // generate a refresh token and associate it with userId and clientId
                                 String refreshToken = UUID.randomUUID().toString();
                                 RefreshToken token = new RefreshToken();
@@ -294,7 +319,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                         } else {
                             throw new ApiException(new Status(INCORRECT_PASSWORD));
                         }
-                    } catch (NoSuchAlgorithmException | InvalidKeySpecException | JoseException e) {
+                    } catch (NoSuchAlgorithmException | InvalidKeySpecException | JoseException | IOException e) {
                         throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                     }
                 } else {
@@ -309,7 +334,9 @@ public class Oauth2TokenPostHandler implements HttpHandler {
 
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> handleRefreshToken(HttpServerExchange exchange, String refreshToken, String scope, Map<String, Object> formMap) throws ApiException {
+    private Map<String, Object> handleRefreshToken(HttpServerExchange exchange, Map<String, Object> formMap) throws ApiException {
+        String refreshToken = (String)formMap.get("refresh_token");
+        String scope = (String) formMap.get("scope");
         if(logger.isDebugEnabled()) logger.debug("refreshToken = " + refreshToken + " scope = " + scope);
         Client client = authenticateClient(exchange, formMap);
         if(client != null) {
@@ -332,8 +359,14 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                         }
                     }
                     String jwt;
+                    Map<String, Object> customMap = null;
+                    // assume that the custom_claim is in format of json map string.
+                    String customClaim = client.getCustomClaim();
                     try {
-                        jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), null));
+                        if(customClaim != null && customClaim.length() > 0) {
+                            customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
+                        }
+                        jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), customMap));
                     } catch (Exception e) {
                         throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                     }

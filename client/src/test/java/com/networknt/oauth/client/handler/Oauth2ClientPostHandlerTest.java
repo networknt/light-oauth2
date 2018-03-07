@@ -36,7 +36,7 @@ public class Oauth2ClientPostHandlerTest {
 
     @Test
     public void testOauth2ClientPostHandler() throws ClientException, ApiException, UnsupportedEncodingException {
-        String s = "{\"clientType\":\"public\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\": \"https://localhost:8080/authorization\",\"ownerId\":\"admin\"}";
+        String s = "{\"clientType\":\"public\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"customClaim\":\"{\\\"consumer_application_id\\\": \\\"361\\\", \\\"request_transit\\\": \\\"67\\\"}\",\"redirectUri\":\"https://localhost:8080/authorization\",\"ownerId\":\"admin\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
