@@ -1,4 +1,11 @@
+DROP TABLE IF EXISTS client_service;
+DROP TABLE IF EXISTS service_endpoint;
+DROP TABLE IF EXISTS service;
+DROP TABLE IF EXISTS client;
 DROP TABLE IF EXISTS user_profile;
+DROP TABLE IF EXISTS audit_log;
+
+
 CREATE TABLE user_profile (
   user_id VARCHAR(32) NOT NULL,
   user_type VARCHAR(16) NOT NULL,  -- admin, customer, employee, partner
@@ -11,7 +18,6 @@ CREATE TABLE user_profile (
 
 CREATE UNIQUE INDEX email_idx ON user_profile(email);
 
-DROP TABLE IF EXISTS client;
 CREATE TABLE client (
   client_id VARCHAR(36) NOT NULL,
   client_type VARCHAR(12) NOT NULL,  -- public, confidential, trusted
@@ -28,7 +34,6 @@ CREATE TABLE client (
   FOREIGN KEY (owner_id) REFERENCES user_profile(user_id)
 );
 
-DROP TABLE IF EXISTS service;
 CREATE TABLE service (
   service_id VARCHAR(32) NOT NULL,
   service_type VARCHAR(16) NOT NULL,  -- swagger, openapi, graphql, hybrid
@@ -40,7 +45,6 @@ CREATE TABLE service (
   FOREIGN KEY (owner_id) REFERENCES user_profile(user_id)
 );
 
-DROP TABLE IF EXISTS service_endpoint;
 CREATE TABLE service_endpoint (
   service_id VARCHAR(32) NOT NULL,
   endpoint VARCHAR(256) NOT NULL,  -- different framework will have different endpoint format.
@@ -51,7 +55,6 @@ CREATE TABLE service_endpoint (
 );
 
 
-DROP TABLE IF EXISTS client_service;
 CREATE TABLE client_service (
   client_id VARCHAR(36) NOT NULL,
   service_id VARCHAR(32) NOT NULL,
@@ -61,7 +64,6 @@ CREATE TABLE client_service (
   FOREIGN KEY (client_id) REFERENCES client(client_id)
 );
 
-DROP TABLE IF EXISTS audit_log;
 create table audit_log (
   log_id INT, -- system milliseonds from 1970.
   service_id VARCHAR(32) NOT NULL,

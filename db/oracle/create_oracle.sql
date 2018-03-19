@@ -1,4 +1,10 @@
+DROP TABLE client_service CASCADE CONSTRAINTS;
+DROP TABLE service_endpoint CASCADE CONSTRAINTS;
+DROP TABLE service CASCADE CONSTRAINTS;
+DROP TABLE client CASCADE CONSTRAINTS;
 DROP TABLE user_profile CASCADE CONSTRAINTS;
+DROP TABLE audit_log CASCADE CONSTRAINTS;
+
 CREATE TABLE user_profile (
   user_id VARCHAR2(32) NOT NULL,
   user_type VARCHAR2(16) NOT NULL,  -- admin, customer, employee, partner
@@ -11,7 +17,6 @@ CREATE TABLE user_profile (
 
 CREATE UNIQUE INDEX email_idx ON user_profile(email);
 
-DROP TABLE client CASCADE CONSTRAINTS;
 CREATE TABLE client (
   client_id VARCHAR2(36) NOT NULL,
   client_type VARCHAR2(12) NOT NULL,  -- public, confidential, trusted
@@ -30,7 +35,6 @@ CREATE TABLE client (
     REFERENCES user_profile(user_id)
 );
 
-DROP TABLE service CASCADE CONSTRAINTS;
 CREATE TABLE service (
   service_id VARCHAR2(32) NOT NULL,
   service_type VARCHAR2(16) NOT NULL,  -- swagger, openapi, graphql, hybrid
@@ -44,7 +48,6 @@ CREATE TABLE service (
     REFERENCES user_profile(user_id)
 );
 
-DROP TABLE service_endpoint CASCADE CONSTRAINTS;
 CREATE TABLE service_endpoint (
   service_id VARCHAR2(32) NOT NULL,
   endpoint VARCHAR2(256) NOT NULL,  -- different framework will have different endpoint format.
@@ -54,7 +57,6 @@ CREATE TABLE service_endpoint (
   CONSTRAINT service_endpoint_service_fk FOREIGN KEY (service_id) REFERENCES service(service_id)
 );
 
-DROP TABLE client_service CASCADE CONSTRAINTS;
 CREATE TABLE client_service (
   client_id VARCHAR2(36) NOT NULL,
   service_id VARCHAR2(32) NOT NULL,
@@ -64,7 +66,6 @@ CREATE TABLE client_service (
   CONSTRAINT client_service_client_fk FOREIGN KEY (client_id) REFERENCES client(client_id)
 );
 
-DROP TABLE audit_log CASCADE CONSTRAINTS;
 create table audit_log (
   log_id INT, -- system milliseonds from 1970.
   service_id VARCHAR2(32) NOT NULL,
