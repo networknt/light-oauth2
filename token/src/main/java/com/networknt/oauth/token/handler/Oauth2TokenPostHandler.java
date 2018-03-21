@@ -13,7 +13,7 @@ import com.networknt.oauth.cache.model.RefreshToken;
 import com.networknt.oauth.cache.model.User;
 import com.networknt.oauth.token.helper.HttpAuth;
 import com.networknt.security.JwtConfig;
-import com.networknt.security.JwtHelper;
+import com.networknt.security.JwtIssuer;
 import com.networknt.status.Status;
 import com.networknt.utility.CodeVerifierUtil;
 import com.networknt.utility.HashUtil;
@@ -139,7 +139,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                 if(customClaim != null && customClaim.length() > 0) {
                     customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
                 }
-                jwt = JwtHelper.getJwt(mockCcClaims(client.getClientId(), scope, customMap));
+                jwt = JwtIssuer.getJwt(mockCcClaims(client.getClientId(), scope, customMap));
             } catch (Exception e) {
                 logger.error("Exception:", e);
                 throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
@@ -233,7 +233,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                     if(customClaim != null && customClaim.length() > 0) {
                         customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
                     }
-                    jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), customMap));
+                    jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), customMap));
                 } catch (Exception e) {
                     throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                 }
@@ -296,7 +296,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                                 if(customClaim != null && customClaim.length() > 0) {
                                     customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
                                 }
-                                String jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), customMap));
+                                String jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), customMap));
                                 // generate a refresh token and associate it with userId and clientId
                                 String refreshToken = UUID.randomUUID().toString();
                                 RefreshToken token = new RefreshToken();
@@ -366,7 +366,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                         if(customClaim != null && customClaim.length() > 0) {
                             customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
                         }
-                        jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), customMap));
+                        jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), customMap));
                     } catch (Exception e) {
                         throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                     }
@@ -438,7 +438,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                 }
                 String jwt;
                 try {
-                    jwt = JwtHelper.getJwt(mockAcClaims(client.getClientId(), scope, userId, userType, formMap));
+                    jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, userType, formMap));
                 } catch (Exception e) {
                     throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                 }
@@ -513,7 +513,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
     }
 
     private JwtClaims mockCcClaims(String clientId, String scopeString, Map<String, Object> formMap) {
-        JwtClaims claims = JwtHelper.getDefaultJwtClaims();
+        JwtClaims claims = JwtIssuer.getDefaultJwtClaims();
         claims.setClaim("client_id", clientId);
         List<String> scope = Arrays.asList(scopeString.split("\\s+"));
         claims.setStringListClaim("scope", scope); // multi-valued claims work too and will end up as a JSON array
@@ -526,7 +526,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
     }
 
     private JwtClaims mockAcClaims(String clientId, String scopeString, String userId, String userType, Map<String, Object> formMap) {
-        JwtClaims claims = JwtHelper.getDefaultJwtClaims();
+        JwtClaims claims = JwtIssuer.getDefaultJwtClaims();
         claims.setClaim("user_id", userId);
         claims.setClaim("user_type", userType);
         claims.setClaim("client_id", clientId);
