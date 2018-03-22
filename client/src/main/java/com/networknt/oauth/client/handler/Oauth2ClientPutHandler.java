@@ -43,6 +43,7 @@ public class Oauth2ClientPutHandler implements HttpHandler {
                     Status status = new Status(USER_NOT_FOUND, ownerId);
                     exchange.setStatusCode(status.getStatusCode());
                     exchange.getResponseSender().send(status.toString());
+                    return;
                 }
             }
             // set updateDt here.
