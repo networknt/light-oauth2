@@ -63,7 +63,7 @@
         <version.logback>1.2.3</version.logback>
         <version.junit>4.12</version.junit>
         <version.undertow>1.4.20.Final</version.undertow>
-        <version.swagger>1.0.32</version.swagger>
+        <version.swagger-parser>1.0.34</version.swagger-parser>
         <version.hikaricp>2.7.1</version.hikaricp>
         <version.h2>1.4.196</version.h2>
         <version.hazelcast>3.9.2</version.hazelcast>
@@ -282,7 +282,7 @@
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-parser</artifactId>
-                <version>${version.swagger}</version>
+                <version>${version.swagger-parser}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
