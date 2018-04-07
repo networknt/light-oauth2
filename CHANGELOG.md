@@ -1,10 +1,25 @@
 # Change Log
 
+## [1.5.11](https://github.com/networknt/light-oauth2/tree/1.5.11) (2018-04-01)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.10...1.5.11)
+
+**Implemented enhancements:**
+
+- create a new table client\_service to define the one to many relationship and scope dependencies. [\#18](https://github.com/networknt/light-oauth2/issues/18)
+
+**Closed issues:**
+
+- return to the caller after sending error to the exchange. [\#78](https://github.com/networknt/light-oauth2/issues/78)
+- switch to JwtIssuer for token generation [\#77](https://github.com/networknt/light-oauth2/issues/77)
+- update postgres and oracle db scripts to remove tables in the beginning [\#76](https://github.com/networknt/light-oauth2/issues/76)
+- support custom claim in json format with client registration [\#75](https://github.com/networknt/light-oauth2/issues/75)
+
 ## [1.5.10](https://github.com/networknt/light-oauth2/tree/1.5.10) (2018-03-02)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.9...1.5.10)
 
 **Closed issues:**
 
+- refactor test cases to make them independent [\#74](https://github.com/networknt/light-oauth2/issues/74)
 - update Dockerfile to remove EXPOSE [\#73](https://github.com/networknt/light-oauth2/issues/73)
 
 ## [1.5.9](https://github.com/networknt/light-oauth2/tree/1.5.9) (2018-02-21)
