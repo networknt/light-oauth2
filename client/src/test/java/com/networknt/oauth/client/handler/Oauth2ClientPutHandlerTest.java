@@ -114,4 +114,44 @@ public class Oauth2ClientPutHandlerTest {
             IoUtils.safeClose(connection);
         }
     }
+
+    @Test
+    public void test80() throws ClientException, ApiException, UnsupportedEncodingException {
+        String s = "{\"clientId\":\"47b943db-a4d5-4df5-b21f-c3cfb44b1bb3\",\"clientType\":\"public\",\"clientProfile\":\"mobile\",\"clientName\":\"Test80Client\",\"clientDesc\":\"Issue 80 Test Client\",\"scope\":\"act.r act.w\",\"redirectUri\":\"http://localhost:8080/authorization\",\"ownerId\":\"admin\"}";
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6884"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.PUT).setPath("/oauth2/client");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/json");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(200, statusCode);
+            if(statusCode == 200) {
+                Assert.assertNotNull(body);
+            }
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+    }
+
 }

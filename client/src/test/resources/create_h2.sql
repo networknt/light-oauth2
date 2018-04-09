@@ -94,3 +94,9 @@ INSERT INTO service_endpoint(service_id, endpoint, operation, scope) VALUES ('AA
 
 INSERT INTO client_service(client_id, service_id, endpoint) VALUES ('59f347a0-c92d-11e6-9d9d-cec0c932ce01', 'AACT0001', '/v1/data@get');
 INSERT INTO client_service(client_id, service_id, endpoint) VALUES ('59f347a0-c92d-11e6-9d9d-cec0c932ce02', 'AACT0002', '/v1/data@get');
+
+-- test case for #80 trying to change scope with the relationship between client and service in place.
+INSERT INTO client (client_id, client_type, client_secret, client_profile, client_name, client_desc, scope, custom_claim, redirect_uri, authenticate_class, owner_id) VALUES('47b943db-a4d5-4df5-b21f-c3cfb44b1bb3', 'public', '1000:5b37332c202d36362c202d36392c203131362c203132362c2036322c2037382c20342c202d37382c202d3131352c202d35332c202d34352c202d342c202d3132322c203130322c2033325d:29ad1fe88d66584c4d279a6f58277858298dbf9270ffc0de4317a4d38ba4b41f35f122e0825c466f2fa14d91e17ba82b1a2f2a37877a2830fae2973076d93cc2', 'mobile', 'Test80Client', 'Issue 80 Test Client', 'test80.r test80.w', '{"c1": "361", "c2": "67"}', 'http://localhost:8080/authorization', null, 'admin' );
+INSERT INTO service (service_id, service_type, service_name, service_desc, scope, owner_id) VALUES ('Test80', 'swagger', 'Test 80 Service', 'A microservice that serves API for Test80 client', 'test80.r test80.r', 'admin');
+INSERT INTO service_endpoint(service_id, endpoint, operation, scope) VALUES ('Test80', '/v1/data@get', 'get', 'test80.w test80.r');
+INSERT INTO client_service(client_id, service_id, endpoint) VALUES ('47b943db-a4d5-4df5-b21f-c3cfb44b1bb3', 'Test80', '/v1/data@get');
