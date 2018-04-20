@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.5.13](https://github.com/networknt/light-oauth2/tree/1.5.13) (2018-04-20)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.12...1.5.13)
+
+**Closed issues:**
+
+- Unrecognized field authenticateClass not marked as ignorable [\#81](https://github.com/networknt/light-oauth2/issues/81)
+- do not allow scope update once client and service are linked.  [\#80](https://github.com/networknt/light-oauth2/issues/80)
+
 ## [1.5.12](https://github.com/networknt/light-oauth2/tree/1.5.12) (2018-04-08)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.11...1.5.12)
 
