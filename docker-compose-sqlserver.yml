@@ -1,0 +1,130 @@
+  version: '2'
+  services:
+    sqlserver:
+      image: microsoft/mssql-server-linux:2017-latest
+      volumes:
+        - ./db/sqlserver:/usr/src/app
+      working_dir: /usr/src/app
+      # run the entrypoint.sh that will import the data AND sqlserver
+      command: sh -c ' chmod +x ./entrypoint.sh; ./entrypoint.sh & /opt/mssql/bin/sqlservr;'
+      environment:
+        ACCEPT_EULA: Y
+        MSSQL_SA_PASSWORD: StrongPassw0rd
+        MSSQL_PID: Developer
+      ports:
+        - '1433:1433'
+    oauth2-code:
+      build: code/
+      ports:
+        - "6881:6881"
+      volumes:
+        - ./db/sqlserver/config/oauth2-code:/config
+      depends_on:
+        - sqlserver
+      links:
+        - sqlserver
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-code"
+      #    env: "dev"
+    oauth2-token:
+      build: token/
+      ports:
+        - "6882:6882"
+      volumes:
+        - ./db/sqlserver/config/oauth2-token:/config
+      depends_on:
+        - sqlserver
+      links:
+        - sqlserver
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-token"
+      #    env: "dev"
+    oauth2-service:
+      build: service/
+      ports:
+        - "6883:6883"
+      volumes:
+        - ./db/sqlserver/config/oauth2-service:/config
+      depends_on:
+        - sqlserver
+      links:
+        - sqlserver
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-service"
+      #    env: "dev"
+    oauth2-client:
+      build: client/
+      ports:
+        - "6884:6884"
+      volumes:
+        - ./db/sqlserver/config/oauth2-client:/config
+      depends_on:
+        - sqlserver
+      links:
+        - sqlserver
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-client"
+      #    env: "dev"
+    oauth2-user:
+      build: user/
+      ports:
+        - "6885:6885"
+      volumes:
+        - ./db/sqlserver/config/oauth2-user:/config
+      depends_on:
+        - sqlserver
+      links:
+        - sqlserver
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-user"
+      #    env: "dev"
+    oauth2-key:
+      build: key/
+      ports:
+        - "6886:6886"
+      volumes:
+        - ./db/sqlserver/config/oauth2-key:/config
+      depends_on:
+        - sqlserver
+      links:
+        - sqlserver
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-key"
+      #    env: "dev"
+    oauth2-refresh-token:
+      build: refresh-token/
+      ports:
+        - "6887:6887"
+      volumes:
+        - ./db/sqlserver/config/oauth2-refresh-token:/config
+      depends_on:
+        - sqlserver
+      links:
+        - sqlserver
+      #logging:
+      #  driver: "gelf"
+      #  options:
+      #    gelf-address: "udp://localhost:12201"
+      #    tag: "oauth2-refresh-token"
+      #    env: "dev"
+
+
+
