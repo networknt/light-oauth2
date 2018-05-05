@@ -41,7 +41,7 @@ singletons:
       jdbcUrl: jdbc:mysql://mysqldb:3306/oauth2?useSSL=false
       username: mysqluser
       password: mysqlpw
-      maximumPoolSize: 15
+      maximumPoolSize: 2
       useServerPrepStmts: true
       cachePrepStmts: true
       cacheCallableStmts: true

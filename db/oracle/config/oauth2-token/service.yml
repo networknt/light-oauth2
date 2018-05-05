@@ -42,3 +42,4 @@ singletons:
       jdbcUrl: jdbc:oracle:thin:@oracledb:1521:XE
       username: SYSTEM
       password: oracle
+      maximumPoolSize: 2

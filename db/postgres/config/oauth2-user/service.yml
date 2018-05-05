@@ -41,4 +41,4 @@ singletons:
       jdbcUrl: jdbc:postgresql://postgresdb:5432/oauth2
       username: postgres
       password: my-secret-pw
-      maximumPoolSize: 15
+      maximumPoolSize: 2
