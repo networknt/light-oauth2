@@ -19,6 +19,8 @@ public class RefreshToken implements IdentifiedDataSerializable {
 
   private String scope = null;
 
+  private String csrf = null;
+
   public RefreshToken refreshToken(String refreshToken) {
     this.refreshToken = refreshToken;
     return this;
@@ -79,6 +81,21 @@ public class RefreshToken implements IdentifiedDataSerializable {
     this.scope = scope;
   }
 
+  public RefreshToken csrf(String csrf) {
+    this.csrf = csrf;
+    return this;
+  }
+
+
+  @ApiModelProperty(example = "null", value = "csrf")
+  @JsonProperty("csrf")
+  public String getCsrf() {
+    return csrf;
+  }
+  public void setCsrf(String csrf) {
+    this.csrf = csrf;
+  }
+
 
   @Override
   public boolean equals(Object o) {
@@ -92,12 +109,14 @@ public class RefreshToken implements IdentifiedDataSerializable {
     return Objects.equals(refreshToken, token.refreshToken) &&
         Objects.equals(userId, token.userId) &&
         Objects.equals(clientId, token.clientId) &&
+        Objects.equals(csrf, token.csrf) &&
         Objects.equals(scope, token.scope);
+
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(refreshToken, userId, clientId, scope);
+    return Objects.hash(refreshToken, userId, clientId, scope, csrf);
   }
 
   @Override
@@ -109,6 +128,7 @@ public class RefreshToken implements IdentifiedDataSerializable {
     sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
     sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
     sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
+    sb.append("    csrf: ").append(toIndentedString(csrf)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -134,6 +154,7 @@ public class RefreshToken implements IdentifiedDataSerializable {
     this.userId = in.readUTF();
     this.clientId = in.readUTF();
     this.scope = in.readUTF();
+    this.csrf = in.readUTF();
   }
 
   @Override
@@ -142,6 +163,7 @@ public class RefreshToken implements IdentifiedDataSerializable {
     out.writeUTF(this.userId);
     out.writeUTF(this.clientId);
     out.writeUTF(this.scope);
+    out.writeUTF(this.csrf);
   }
 
   @JsonIgnore

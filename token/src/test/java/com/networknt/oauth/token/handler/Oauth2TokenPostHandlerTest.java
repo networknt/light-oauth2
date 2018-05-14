@@ -7,6 +7,7 @@ import com.networknt.exception.ClientException;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.RefreshToken;
 import com.networknt.status.Status;
+import com.networknt.utility.Util;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
@@ -1083,6 +1084,7 @@ public class Oauth2TokenPostHandlerTest {
         params.put("grant_type", "authorization_code");
         params.put("code", "code1");
         params.put("redirect_uri", "http://localhost:8080/authorization");
+        params.put("csrf", Util.getUUID());
         String s = Http2Client.getFormDataString(params);
 
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
