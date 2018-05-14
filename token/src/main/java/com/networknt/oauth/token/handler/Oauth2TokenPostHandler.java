@@ -157,6 +157,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
     private Map<String, Object> handleAuthorizationCode(HttpServerExchange exchange, Map<String, Object> formMap) throws ApiException {
         String code = (String)formMap.get("code");
         String redirectUri = (String)formMap.get("redirect_uri");
+        String csrf = (String)formMap.get("csrf");
         if(logger.isDebugEnabled()) logger.debug("code = " + code + " redirectUri = " + redirectUri);
         Client client = authenticateClient(exchange, formMap);
         if(client != null) {
@@ -164,7 +165,6 @@ public class Oauth2TokenPostHandler implements HttpHandler {
             String userId = codeMap.get("userId");
             String uri = codeMap.get("redirectUri");
             String scope = codeMap.get("scope");
-            String csrf = codeMap.get("csrf");
 
             // PKCE
             String codeChallenge = codeMap.get(OAuth2Constants.CODE_CHALLENGE);
