@@ -1,7 +1,7 @@
   version: '2'
   services:
-    mysqldb:
-      image: mysql:5.7.16
+    mariadb:
+      image: mariadb:10.3
       volumes:
         - ./db/mysql:/docker-entrypoint-initdb.d
       environment:
@@ -15,9 +15,9 @@
       volumes:
         - ./db/mysql/config/oauth2-code:/config
       depends_on:
-        - mysqldb
+        - mariadb
       links:
-        - mysqldb
+        - mariadb
       #logging:
       #  driver: "gelf"
       #  options:
@@ -31,9 +31,9 @@
       volumes:
         - ./db/mysql/config/oauth2-token:/config
       depends_on:
-        - mysqldb
+        - mariadb
       links:
-        - mysqldb
+        - mariadb
       #logging:
       #  driver: "gelf"
       #  options:
@@ -47,9 +47,9 @@
       volumes:
         - ./db/mysql/config/oauth2-service:/config
       depends_on:
-        - mysqldb
+        - mariadb
       links:
-        - mysqldb
+        - mariadb
       #logging:
       #  driver: "gelf"
       #  options:
@@ -63,9 +63,9 @@
       volumes:
         - ./db/mysql/config/oauth2-client:/config
       depends_on:
-        - mysqldb
+        - mariadb
       links:
-        - mysqldb
+        - mariadb
       #logging:
       #  driver: "gelf"
       #  options:
@@ -79,9 +79,9 @@
       volumes:
         - ./db/mysql/config/oauth2-user:/config
       depends_on:
-        - mysqldb
+        - mariadb
       links:
-        - mysqldb
+        - mariadb
       #logging:
       #  driver: "gelf"
       #  options:
@@ -95,9 +95,9 @@
       volumes:
         - ./db/mysql/config/oauth2-key:/config
       depends_on:
-        - mysqldb
+        - mariadb
       links:
-        - mysqldb
+        - mariadb
       #logging:
       #  driver: "gelf"
       #  options:
@@ -111,9 +111,9 @@
       volumes:
         - ./db/mysql/config/oauth2-refresh-token:/config
       depends_on:
-        - mysqldb
+        - mariadb
       links:
-        - mysqldb
+        - mariadb
       #logging:
       #  driver: "gelf"
       #  options:
