@@ -1,6 +1,6 @@
 #!/bin/bash
 database=oauth2
-wait_time=15s
+wait_time=10s
 password=StrongPassw0rd
 
 # wait for SQL Server to come up

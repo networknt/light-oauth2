@@ -38,7 +38,7 @@ singletons:
   - com.networknt.validator.ValidatorHandler
 - javax.sql.DataSource:
   - com.zaxxer.hikari.HikariDataSource:
-      jdbcUrl: jdbc:sqlserver://sqlserver:1433/oauth2
+      jdbcUrl: jdbc:sqlserver://sqlserver:1433;databaseName=oauth2
       username: sa
       password: StrongPassw0rd
       maximumPoolSize: 2
