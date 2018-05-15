@@ -3,7 +3,7 @@
     mariadb:
       image: mariadb:10.3
       volumes:
-        - ./db/mysql:/docker-entrypoint-initdb.d
+        - ./db/mariadb:/docker-entrypoint-initdb.d
       environment:
          - MYSQL_ROOT_PASSWORD=my-secret-pw
          - MYSQL_USER=mysqluser
@@ -13,7 +13,7 @@
       ports:
         - "6881:6881"
       volumes:
-        - ./db/mysql/config/oauth2-code:/config
+        - ./db/mariadb/config/oauth2-code:/config
       depends_on:
         - mariadb
       links:
@@ -29,7 +29,7 @@
       ports:
         - "6882:6882"
       volumes:
-        - ./db/mysql/config/oauth2-token:/config
+        - ./db/mariadb/config/oauth2-token:/config
       depends_on:
         - mariadb
       links:
@@ -45,7 +45,7 @@
       ports:
         - "6883:6883"
       volumes:
-        - ./db/mysql/config/oauth2-service:/config
+        - ./db/mariadb/config/oauth2-service:/config
       depends_on:
         - mariadb
       links:
@@ -61,7 +61,7 @@
       ports:
         - "6884:6884"
       volumes:
-        - ./db/mysql/config/oauth2-client:/config
+        - ./db/mariadb/config/oauth2-client:/config
       depends_on:
         - mariadb
       links:
@@ -77,7 +77,7 @@
       ports:
         - "6885:6885"
       volumes:
-        - ./db/mysql/config/oauth2-user:/config
+        - ./db/mariadb/config/oauth2-user:/config
       depends_on:
         - mariadb
       links:
@@ -93,7 +93,7 @@
       ports:
         - "6886:6886"
       volumes:
-        - ./db/mysql/config/oauth2-key:/config
+        - ./db/mariadb/config/oauth2-key:/config
       depends_on:
         - mariadb
       links:
@@ -109,7 +109,7 @@
       ports:
         - "6887:6887"
       volumes:
-        - ./db/mysql/config/oauth2-refresh-token:/config
+        - ./db/mariadb/config/oauth2-refresh-token:/config
       depends_on:
         - mariadb
       links:
