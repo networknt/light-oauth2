@@ -334,11 +334,12 @@ public class Oauth2TokenPostHandler implements HttpHandler {
         return new HashMap<>(); // return an empty hash map. this is actually not reachable at all.
     }
 
-
     @SuppressWarnings("unchecked")
     private Map<String, Object> handleRefreshToken(HttpServerExchange exchange, Map<String, Object> formMap) throws ApiException {
         String refreshToken = (String)formMap.get("refresh_token");
         String scope = (String) formMap.get("scope");
+        // Get csrf token from the input. every time a new token is generated, a new csrf token will be used.
+        String csrf = (String)formMap.get("csrf");
         if(logger.isDebugEnabled()) logger.debug("refreshToken = " + refreshToken + " scope = " + scope);
         Client client = authenticateClient(exchange, formMap);
         if(client != null) {
@@ -349,7 +350,6 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                 String userId = token.getUserId();
                 String clientId = token.getClientId();
                 String oldScope = token.getScope();
-                String csrf = token.getCsrf();
 
                 if(client.getClientId().equals(clientId)) {
                     IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
