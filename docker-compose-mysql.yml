@@ -5,7 +5,9 @@
       volumes:
         - ./db/mysql:/docker-entrypoint-initdb.d
       environment:
-        MYSQL_ROOT_PASSWORD: my-secret-pw
+         - MYSQL_ROOT_PASSWORD=my-secret-pw
+         - MYSQL_USER=mysqluser
+         - MYSQL_PASSWORD=mysqlpw
     oauth2-code:
       build: code/
       ports:
