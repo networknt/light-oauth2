@@ -1,8 +1,10 @@
 package com.networknt.oauth.code.handler;
 
+import com.networknt.oauth.code.KerberosKDCUtil;
 import com.networknt.server.Server;
 import com.networknt.service.SingletonServiceFactory;
 import org.h2.tools.RunScript;
+import org.ietf.jgss.Oid;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +20,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TestServer extends ExternalResource {
     static final Logger logger = LoggerFactory.getLogger(TestServer.class);
-
+    public static Oid SPNEGO;
     private static final AtomicInteger refCount = new AtomicInteger(0);
     private static Server server;
 
@@ -47,7 +49,7 @@ public class TestServer extends ExternalResource {
     }
 
     @Override
-    protected void before() {
+    protected void before() throws Exception {
         try {
             if (refCount.get() == 0) {
                 Server.start();
@@ -56,6 +58,8 @@ public class TestServer extends ExternalResource {
         finally {
             refCount.getAndIncrement();
         }
+        KerberosKDCUtil.startServer();
+        SPNEGO = new Oid("1.3.6.1.5.5.2");
     }
 
     @Override
@@ -65,5 +69,4 @@ public class TestServer extends ExternalResource {
             Server.stop();
         }
     }
-
 }

@@ -12,6 +12,7 @@ import com.networknt.server.HandlerProvider;
 import io.undertow.Handlers;
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.AuthenticationMode;
+import io.undertow.security.api.GSSAPIServerSubjectFactory;
 import io.undertow.security.handlers.AuthenticationCallHandler;
 import io.undertow.security.handlers.AuthenticationConstraintHandler;
 import io.undertow.security.handlers.AuthenticationMechanismsHandler;
@@ -20,42 +21,38 @@ import io.undertow.security.idm.IdentityManager;
 import io.undertow.security.impl.BasicAuthenticationMechanism;
 import io.undertow.security.impl.CachedAuthenticatedSessionMechanism;
 import io.undertow.security.impl.FormAuthenticationMechanism;
+import io.undertow.security.impl.GSSAPIAuthenticationMechanism;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.session.InMemorySessionManager;
 import io.undertow.server.session.SessionAttachmentHandler;
 import io.undertow.server.session.SessionCookieConfig;
 import io.undertow.util.Methods;
 
+import javax.security.auth.Subject;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.networknt.oauth.code.KerberosKDCUtil.login;
+
 public class PathHandlerProvider implements HandlerProvider {
+
     @Override
     public HttpHandler getHandler() {
         IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
-        final IdentityManager identityManager = new MapIdentityManager(users);
+        final IdentityManager basicIdentityManager = new MapIdentityManager(users);
 
         HttpHandler handler = Handlers.routing()
             .add(Methods.GET, "/health", new HealthGetHandler())
             .add(Methods.GET, "/server/info", new ServerInfoGetHandler())
-            .add(Methods.GET, "/oauth2/code", addBasicSecurity(new Oauth2CodeGetHandler(), identityManager))
-            .add(Methods.POST, "/oauth2/code", addFormSecurity(new Oauth2CodePostHandler(), identityManager))
+            .add(Methods.GET, "/oauth2/code", addGetSecurity(new Oauth2CodeGetHandler(), basicIdentityManager))
+            .add(Methods.POST, "/oauth2/code", addFormSecurity(new Oauth2CodePostHandler(), basicIdentityManager))
         ;
         return handler;
     }
 
-    private static HttpHandler addBasicSecurity(final HttpHandler toWrap, final IdentityManager identityManager) {
-        HttpHandler handler = toWrap;
-        handler = new AuthenticationCallHandler(handler);
-        handler = new AuthenticationConstraintHandler(handler);
-        final List<AuthenticationMechanism> mechanisms = Collections.singletonList(new BasicAuthenticationMechanism("oauth2"));
-        handler = new AuthenticationMechanismsHandler(handler, mechanisms);
-        handler = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, identityManager, handler);
-        return handler;
-    }
-
-    private static HttpHandler addFormSecurity(final HttpHandler toWrap, final IdentityManager identityManager) {
+    private HttpHandler addFormSecurity(final HttpHandler toWrap, final IdentityManager identityManager) {
         HttpHandler handler = toWrap;
         handler = new AuthenticationCallHandler(handler);
         handler = new AuthenticationConstraintHandler(handler);
@@ -66,5 +63,24 @@ public class PathHandlerProvider implements HandlerProvider {
         handler = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, identityManager, handler);
         handler = new SessionAttachmentHandler(handler, new InMemorySessionManager("oauth2"), new SessionCookieConfig());
         return handler;
+    }
+
+    private HttpHandler addGetSecurity(final HttpHandler toWrap, final IdentityManager identityManager) {
+        HttpHandler handler = toWrap;
+        handler = new AuthenticationCallHandler(handler);
+        handler = new AuthenticationConstraintHandler(handler);
+        List<AuthenticationMechanism> mechanisms = new ArrayList<>();
+        mechanisms.add(new GSSAPIAuthenticationMechanism(new SubjectFactory()));
+        mechanisms.add(new BasicAuthenticationMechanism("OAuth"));
+        handler = new AuthenticationMechanismsHandler(handler, mechanisms);
+        handler = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, identityManager, handler);
+        return handler;
+    }
+
+    private class SubjectFactory implements GSSAPIServerSubjectFactory {
+        @Override
+        public Subject getSubjectForHost(String hostName) throws GeneralSecurityException {
+            return login("HTTP/" + hostName, "servicepwd".toCharArray());
+        }
     }
 }

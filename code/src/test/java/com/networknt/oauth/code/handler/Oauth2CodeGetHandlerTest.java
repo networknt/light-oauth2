@@ -3,13 +3,19 @@ package com.networknt.oauth.code.handler;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
 import com.networknt.exception.ClientException;
+import com.networknt.oauth.code.KerberosKDCUtil;
+import com.networknt.oauth.code.PathHandlerProvider;
 import com.networknt.status.Status;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
-import io.undertow.util.Headers;
-import io.undertow.util.Methods;
+import io.undertow.security.api.SecurityNotification;
+import io.undertow.util.*;
+import org.apache.commons.lang.ArrayUtils;
+import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSManager;
+import org.ietf.jgss.GSSName;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -18,11 +24,23 @@ import org.slf4j.LoggerFactory;
 import org.xnio.IoUtils;
 import org.xnio.OptionMap;
 
+import javax.security.auth.Subject;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.PrivilegedExceptionAction;
+import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.networknt.client.oauth.OauthHelper.encodeCredentials;
+import static io.undertow.util.Headers.AUTHORIZATION;
+import static io.undertow.util.Headers.NEGOTIATE;
+import static io.undertow.util.Headers.WWW_AUTHENTICATE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static com.networknt.oauth.code.KerberosKDCUtil.login;
 
 
 /**
@@ -380,4 +398,143 @@ public class Oauth2CodeGetHandlerTest {
             IoUtils.safeClose(connection);
         }
     }
+
+    /**
+     * Without Authorization Header, a 401 status code is returned with empty body; However,
+     * the header must include Negotiate
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSpnegoUnauthorized() throws Exception {
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6881"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        try {
+            ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath("/oauth2/code?response_type=code&client_id=59f347a0-c92d-11e6-9d9d-cec0c932ce01&code_challenge=G$IiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s&code_challenge_method=S256&redirect_uri=http://localhost:8888/authorization");
+            connection.sendRequest(request, client.createClientCallback(reference, latch));
+            latch.await();
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(401, statusCode);
+            Assert.assertTrue(body == null || body.length() == 0);
+            HeaderMap headerMap = reference.get().getResponseHeaders();
+            Assert.assertTrue(headerMap.size() > 0);
+            HeaderValues values = headerMap.get(WWW_AUTHENTICATE);
+            Assert.assertTrue(values.size() > 0);
+            // Make sure that you have Negotiate in the response header.
+            Assert.assertTrue(values.contains(NEGOTIATE.toString()));
+        } catch (Exception e) {
+            logger.error("Exception: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+    }
+
+    /**
+     * This time, we send the right www_authenticate header
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSpnegoWwwAuth() throws Exception {
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6881"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        Subject clientSubject = login("jduke", "theduke".toCharArray());
+
+        Subject.doAs(clientSubject, new PrivilegedExceptionAction<Void>() {
+
+            @Override
+            public Void run() throws Exception {
+                GSSManager gssManager = GSSManager.getInstance();
+                GSSName serverName = gssManager.createName("HTTP/localhost", null);
+
+                GSSContext context = gssManager.createContext(serverName, TestServer.SPNEGO, null, GSSContext.DEFAULT_LIFETIME);
+
+                byte[] token = new byte[0];
+
+                boolean gotOur200 = false;
+                while (!context.isEstablished()) {
+                    token = context.initSecContext(token, 0, token.length);
+
+                    if (token != null && token.length > 0) {
+                        logger.debug("token = " + token);
+
+                        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+                        try {
+                            ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath("/oauth2/code?response_type=code&client_id=59f347a0-c92d-11e6-9d9d-cec0c932ce01&code_challenge=GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s&code_challenge_method=S256&redirect_uri=http://localhost:8080/authorization");
+
+                            request.getRequestHeaders().put(AUTHORIZATION, NEGOTIATE + " " + FlexBase64.encodeString(token, false));
+                            connection.sendRequest(request, client.createClientCallback(reference, latch));
+                            latch.await();
+                            HeaderMap headerMap = reference.get().getResponseHeaders();
+                            HeaderValues values = headerMap.get(WWW_AUTHENTICATE);
+                            Assert.assertTrue(values.size() > 0);
+
+                            if (values.size() > 0) {
+                                String header = getAuthHeader(NEGOTIATE, values);
+
+                                byte[] headerBytes = header.getBytes(StandardCharsets.US_ASCII);
+                                // FlexBase64.decode() returns byte buffer, which can contain backend array of greater size.
+                                // when on such ByteBuffer is called array(), it returns the underlying byte array including the 0 bytes
+                                // at the end, which makes the token invalid. => using Base64 mime decoder, which returnes directly properly sized byte[].
+                                token = Base64.getMimeDecoder().decode(ArrayUtils.subarray(headerBytes, NEGOTIATE.toString().length() + 1, headerBytes.length));
+                            }
+
+                            int statusCode = reference.get().getResponseCode();
+                            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+
+                            if (statusCode == StatusCodes.OK) {
+
+                                HeaderValues hvs = headerMap.get("ProcessedBy");
+                                assertEquals(1, hvs.size());
+                                assertEquals("ResponseHandler", hvs.getFirst());
+                                //assertSingleNotificationType(SecurityNotification.EventType.AUTHENTICATED);
+                                gotOur200 = true;
+                            } else if (statusCode == StatusCodes.UNAUTHORIZED) {
+                                assertTrue("We did get a header.", values.size() > 0);
+                            } else {
+                                fail(String.format("Unexpected status code %d", statusCode));
+                            }
+                        } catch (Exception e) {
+                            logger.error("Exception: ", e);
+                            throw new ClientException(e);
+                        } finally {
+                            IoUtils.safeClose(connection);
+                        }
+                    }
+                }
+                assertTrue(gotOur200);
+                assertTrue(context.isEstablished());
+                return null;
+            }
+        });
+
+    }
+
+
+    protected static String getAuthHeader(final HttpString prefix, final HeaderValues values) {
+        for (String current : values) {
+            if (current.startsWith(prefix.toString())) {
+                return current;
+            }
+        }
+        fail("Expected header not found.");
+        return null; // Unreachable
+    }
+
 }
