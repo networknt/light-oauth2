@@ -1,5 +1,21 @@
 # Change Log
 
+## [1.5.14](https://github.com/networknt/light-oauth2/tree/1.5.14) (2018-05-20)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.13...1.5.14)
+
+**Closed issues:**
+
+- remove csrf token from refresh token object as it should not be persisted [\#97](https://github.com/networknt/light-oauth2/issues/97)
+- pass in csrf token to refresh token grant flow [\#95](https://github.com/networknt/light-oauth2/issues/95)
+- docker image error related to JVM [\#94](https://github.com/networknt/light-oauth2/issues/94)
+- add MariaDB support [\#92](https://github.com/networknt/light-oauth2/issues/92)
+- add csrf token into the jwt token for token service if it exists [\#90](https://github.com/networknt/light-oauth2/issues/90)
+- remove signature of ms sqlserver as the fatjar cannot be loaded [\#89](https://github.com/networknt/light-oauth2/issues/89)
+- sync config files between light-docker and light-oauth2 [\#87](https://github.com/networknt/light-oauth2/issues/87)
+- enable sensitive data encryption in config files [\#86](https://github.com/networknt/light-oauth2/issues/86)
+- enable container memory limit in dockerfile [\#85](https://github.com/networknt/light-oauth2/issues/85)
+- add ms sql server support [\#84](https://github.com/networknt/light-oauth2/issues/84)
+
 ## [1.5.13](https://github.com/networknt/light-oauth2/tree/1.5.13) (2018-04-20)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.12...1.5.13)
 
