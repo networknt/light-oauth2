@@ -1,0 +1,15 @@
+.idea/
+**/target/
+db/
+**/docker/
+**/.gitignore
+**/.build.sh
+**/Dockerfile
+**/LICENSE
+**/*.iml
+**/README.md
+**/dependency-reduced-pom.xml
+**/build.sh
+.travis.yml
+CHANGELOG.md
+CONTRIBUTING.md
