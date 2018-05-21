@@ -62,7 +62,7 @@
         <version.encoder>1.2.1</version.encoder>
         <version.logback>1.2.3</version.logback>
         <version.junit>4.12</version.junit>
-        <version.undertow>1.4.23.Final</version.undertow>
+        <version.undertow>1.4.26.Final-SNAPSHOT</version.undertow>
         <version.swagger-parser>1.0.34</version.swagger-parser>
         <version.hikaricp>3.1.0</version.hikaricp>
         <version.h2>1.4.196</version.h2>
@@ -350,6 +350,16 @@
                 <groupId>org.apache.directory.server</groupId>
                 <artifactId>apacheds-all</artifactId>
                 <version>${version.org.apache.directory.server}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-io</groupId>
+                        <artifactId>commons-io</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Test Dependencies -->

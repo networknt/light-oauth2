@@ -445,15 +445,6 @@ public class Oauth2CodeGetHandlerTest {
      */
     @Test
     public void testSpnegoWwwAuth() throws Exception {
-        final Http2Client client = Http2Client.getInstance();
-        final CountDownLatch latch = new CountDownLatch(1);
-        final ClientConnection connection;
-        try {
-            connection = client.connect(new URI("https://localhost:6881"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
-        } catch (Exception e) {
-            throw new ClientException(e);
-        }
-
         Subject clientSubject = login("jduke", "theduke".toCharArray());
 
         Subject.doAs(clientSubject, new PrivilegedExceptionAction<Void>() {
@@ -467,13 +458,19 @@ public class Oauth2CodeGetHandlerTest {
 
                 byte[] token = new byte[0];
 
-                boolean gotOur200 = false;
+                boolean gotOur302 = false;
                 while (!context.isEstablished()) {
                     token = context.initSecContext(token, 0, token.length);
 
                     if (token != null && token.length > 0) {
-                        logger.debug("token = " + token);
-
+                        final Http2Client client = Http2Client.getInstance();
+                        final CountDownLatch latch = new CountDownLatch(1);
+                        final ClientConnection connection;
+                        try {
+                            connection = client.connect(new URI("https://localhost:6881"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+                        } catch (Exception e) {
+                            throw new ClientException(e);
+                        }
                         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
                         try {
                             ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath("/oauth2/code?response_type=code&client_id=59f347a0-c92d-11e6-9d9d-cec0c932ce01&code_challenge=GIDiZShhVObyvaTrpkPM8VPmtMkj_qnBWlDwE7uz90s&code_challenge_method=S256&redirect_uri=http://localhost:8080/authorization");
@@ -498,13 +495,10 @@ public class Oauth2CodeGetHandlerTest {
                             int statusCode = reference.get().getResponseCode();
                             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
 
-                            if (statusCode == StatusCodes.OK) {
-
-                                HeaderValues hvs = headerMap.get("ProcessedBy");
-                                assertEquals(1, hvs.size());
-                                assertEquals("ResponseHandler", hvs.getFirst());
-                                //assertSingleNotificationType(SecurityNotification.EventType.AUTHENTICATED);
-                                gotOur200 = true;
+                            if (statusCode == StatusCodes.FOUND) {
+                                HeaderValues locations = headerMap.get("location");
+                                assertEquals(1, locations.size());
+                                gotOur302 = true;
                             } else if (statusCode == StatusCodes.UNAUTHORIZED) {
                                 assertTrue("We did get a header.", values.size() > 0);
                             } else {
@@ -518,7 +512,7 @@ public class Oauth2CodeGetHandlerTest {
                         }
                     }
                 }
-                assertTrue(gotOur200);
+                assertTrue(gotOur302);
                 assertTrue(context.isEstablished());
                 return null;
             }
