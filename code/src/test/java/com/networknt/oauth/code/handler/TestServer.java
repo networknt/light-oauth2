@@ -58,7 +58,7 @@ public class TestServer extends ExternalResource {
         finally {
             refCount.getAndIncrement();
         }
-        KerberosKDCUtil.startServer();
+        ApacheDirectoryServer.startServer();
         SPNEGO = new Oid("1.3.6.1.5.5.2");
     }
 

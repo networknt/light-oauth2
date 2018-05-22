@@ -3,14 +3,11 @@ package com.networknt.oauth.code.handler;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
 import com.networknt.exception.ClientException;
-import com.networknt.oauth.code.KerberosKDCUtil;
-import com.networknt.oauth.code.PathHandlerProvider;
 import com.networknt.status.Status;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
-import io.undertow.security.api.SecurityNotification;
 import io.undertow.util.*;
 import org.apache.commons.lang.ArrayUtils;
 import org.ietf.jgss.GSSContext;
@@ -29,18 +26,13 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivilegedExceptionAction;
 import java.util.Base64;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.networknt.client.oauth.OauthHelper.encodeCredentials;
-import static io.undertow.util.Headers.AUTHORIZATION;
-import static io.undertow.util.Headers.NEGOTIATE;
-import static io.undertow.util.Headers.WWW_AUTHENTICATE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static com.networknt.oauth.code.KerberosKDCUtil.login;
+import static io.undertow.util.Headers.*;
+import static org.junit.Assert.*;
 
 
 /**

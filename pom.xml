@@ -346,10 +346,13 @@
                 <artifactId>mssql-jdbc</artifactId>
                 <version>${version.sqlserver}</version>
             </dependency>
+
+            <!-- Test Dependencies -->
             <dependency>
                 <groupId>org.apache.directory.server</groupId>
                 <artifactId>apacheds-all</artifactId>
                 <version>${version.org.apache.directory.server}</version>
+                <scope>test</scope>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
@@ -361,8 +364,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
-            <!-- Test Dependencies -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
