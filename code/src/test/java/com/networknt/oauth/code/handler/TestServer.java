@@ -1,6 +1,5 @@
 package com.networknt.oauth.code.handler;
 
-import com.networknt.oauth.code.KerberosKDCUtil;
 import com.networknt.server.Server;
 import com.networknt.service.SingletonServiceFactory;
 import org.h2.tools.RunScript;

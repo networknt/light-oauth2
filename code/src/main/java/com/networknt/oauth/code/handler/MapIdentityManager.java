@@ -21,8 +21,6 @@ import java.util.Set;
  */
 public class MapIdentityManager implements IdentityManager {
     final Logger logger = LoggerFactory.getLogger(MapIdentityManager.class);
-
-    private final Set<String> gssApiUsers = new HashSet<>(Arrays.asList("jduke@UNDERTOW.IO"));
     private final IMap<String, User> users;
     public MapIdentityManager(final IMap<String, User> users) {
         this.users = users;
@@ -48,29 +46,27 @@ public class MapIdentityManager implements IdentityManager {
             try {
                 final GSSContextCredential gssCredential = (GSSContextCredential) credential;
                 final String name = gssCredential.getGssContext().getSrcName().toString();
-                if (gssApiUsers.contains(name)) {
-                    return new Account() {
+                return new Account() {
 
-                        private final Principal principal = new Principal() {
-
-                            @Override
-                            public String getName() {
-                                return name;
-                            }
-                        };
+                    private final Principal principal = new Principal() {
 
                         @Override
-                        public Principal getPrincipal() {
-                            return principal;
-                        }
-
-                        @Override
-                        public Set<String> getRoles() {
-                            return Collections.emptySet();
+                        public String getName() {
+                            return name;
                         }
                     };
 
-                }
+                    @Override
+                    public Principal getPrincipal() {
+                        return principal;
+                    }
+
+                    // TODO add authorization roles here from LDAP
+                    @Override
+                    public Set<String> getRoles() {
+                        return Collections.emptySet();
+                    }
+                };
 
             } catch (GSSException e) {
                 throw new RuntimeException(e);
@@ -115,4 +111,6 @@ public class MapIdentityManager implements IdentityManager {
         }
         return null;
     }
+
+    //
 }

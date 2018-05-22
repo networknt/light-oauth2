@@ -1,4 +1,4 @@
-package com.networknt.oauth.code;
+package com.networknt.oauth.code.spnego;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.*;

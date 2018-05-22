@@ -31,10 +31,9 @@ import io.undertow.util.Methods;
 import javax.security.auth.Subject;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import static com.networknt.oauth.code.KerberosKDCUtil.login;
+import static com.networknt.oauth.code.spnego.KerberosKDCUtil.login;
 
 public class PathHandlerProvider implements HandlerProvider {
 
