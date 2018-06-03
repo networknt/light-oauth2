@@ -2,6 +2,8 @@ package com.networknt.oauth.code.handler;
 
 import com.hazelcast.core.IMap;
 import com.networknt.oauth.cache.model.User;
+import com.networknt.oauth.code.security.LightGSSContextCredential;
+import com.networknt.oauth.code.security.LightPasswordCredential;
 import com.networknt.utility.HashUtil;
 import io.undertow.security.idm.*;
 import org.ietf.jgss.GSSException;
@@ -42,10 +44,13 @@ public class MapIdentityManager implements IdentityManager {
     }
     @Override
     public Account verify(Credential credential) {
-        if (credential instanceof GSSContextCredential) {
+        if (credential instanceof LightGSSContextCredential) {
             try {
-                final GSSContextCredential gssCredential = (GSSContextCredential) credential;
+                final LightGSSContextCredential gssCredential = (LightGSSContextCredential) credential;
                 final String name = gssCredential.getGssContext().getSrcName().toString();
+                final String clientAuthClass = gssCredential.getClientAuthClass();
+                final String userType = gssCredential.getUserType();
+
                 return new Account() {
 
                     private final Principal principal = new Principal() {
@@ -78,8 +83,13 @@ public class MapIdentityManager implements IdentityManager {
     @SuppressWarnings("unchecked")
     private boolean verifyCredential(Account account, Credential credential) {
         boolean match = false;
-        if (credential instanceof PasswordCredential) {
-            char[] password = ((PasswordCredential) credential).getPassword();
+        if (credential instanceof LightPasswordCredential) {
+            LightPasswordCredential passwordCredential = (LightPasswordCredential)credential;
+
+            char[] password = passwordCredential.getPassword();
+            String clientAuthClass = passwordCredential.getClientAuthClass();
+            String userType = passwordCredential.getUserType();
+
             User user = users.get(account.getPrincipal().getName());
             String expectedPassword = user.getPassword();
             try {
