@@ -35,7 +35,6 @@ public class Oauth2ClientPostHandler implements HttpHandler {
         client.setClientId(clientId);
         String clientSecret = Util.getUUID();
         client.setClientSecret(HashUtil.generateStorngPasswordHash(clientSecret));
-        client.setCreateDt(new Date(System.currentTimeMillis()));
 
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         if(clients.get(clientId) == null) {

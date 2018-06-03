@@ -46,8 +46,6 @@ public class Oauth2ClientPutHandler implements HttpHandler {
                     return;
                 }
             }
-            // set updateDt here.
-            client.setUpdateDt(new Date(System.currentTimeMillis()));
             // set client secret as it is not returned by query.
             client.setClientSecret(originalClient.getClientSecret());
             clients.set(clientId, client);
