@@ -46,6 +46,7 @@ import java.util.Map;
 public class ApacheDirectoryServer {
 
     static final int LDAP_PORT = 11389;
+    static final int LDAPS_PORT = 10636;
     static final int KDC_PORT = 6088;
 
     private static final String DIRECTORY_NAME = "Test Service";
@@ -98,8 +99,12 @@ public class ApacheDirectoryServer {
 
         ldapServer = new LdapServer();
         ldapServer.setServiceName("DefaultLDAP");
-        Transport ldap = new TcpTransport( "0.0.0.0", LDAP_PORT, 3, 5 );
+        Transport ldap = new TcpTransport( "0.0.0.0", LDAPS_PORT, 3, 5 );
+        ldap.enableSSL(true);
         ldapServer.addTransports(ldap);
+        ldapServer.setKeystoreFile(ApacheDirectoryServer.class.getResource("/config/tls/server.keystore").getFile());
+        ldapServer.setCertificatePassword("password");
+        ldapServer.loadKeyStore();
         ldapServer.setDirectoryService(directoryService);
         ldapServer.start();
     }

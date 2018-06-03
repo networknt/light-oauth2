@@ -13,7 +13,7 @@ public class LdapAuthTest {
     public static TestServer server = TestServer.getInstance();
     static final Logger logger = LoggerFactory.getLogger(LdapAuthTest.class);
 
-    private final static String ldapURI = "ldap://localhost:11389/ou=users,dc=undertow,dc=io";
+    private final static String ldapURI = "ldaps://localhost:10636/ou=users,dc=undertow,dc=io";
     private final static String contextFactory = "com.sun.jndi.ldap.LdapCtxFactory";
 
     private static DirContext ldapContext () throws Exception {
@@ -24,8 +24,13 @@ public class LdapAuthTest {
     private static DirContext ldapContext (Hashtable <String,String>env) throws Exception {
         env.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
         env.put(Context.PROVIDER_URL, ldapURI);
+        if(ldapURI.toUpperCase().startsWith("LDAPS://")) {
+            env.put(Context.SECURITY_PROTOCOL, "ssl");
+            env.put("java.naming.ldap.factory.socket", "com.networknt.oauth.code.handler.LdapSSLSocketFactory");
+        }
         env.put(Context.SECURITY_PRINCIPAL, "uid=oauth,ou=users,dc=undertow,dc=io");
         env.put(Context.SECURITY_CREDENTIALS, "theoauth");
+
         DirContext ctx = new InitialDirContext(env);
         return ctx;
     }
@@ -54,6 +59,10 @@ public class LdapAuthTest {
         Hashtable<String,String> env = new Hashtable();
         env.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
         env.put(Context.PROVIDER_URL, ldapURI);
+        if(ldapURI.toUpperCase().startsWith("LDAPS://")) {
+            env.put(Context.SECURITY_PROTOCOL, "ssl");
+            env.put("java.naming.ldap.factory.socket", "com.networknt.oauth.code.handler.LdapSSLSocketFactory");
+        }
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
         env.put(Context.SECURITY_PRINCIPAL, dn);
         env.put(Context.SECURITY_CREDENTIALS, password);
