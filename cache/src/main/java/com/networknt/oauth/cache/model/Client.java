@@ -103,9 +103,7 @@ public class Client implements IdentifiedDataSerializable {
 
   private String redirectUri = null;
 
-  private Date createDt = null;
-
-  private Date updateDt = null;
+  private String authenticateClass = null;
 
   public Client clientId(String clientId) {
     this.clientId = clientId;
@@ -258,34 +256,20 @@ public class Client implements IdentifiedDataSerializable {
     this.redirectUri = redirectUri;
   }
 
-  public Client createDt(Date createDt) {
-    this.createDt = createDt;
+
+  public Client authenticateClass(String authenticateClass) {
+    this.authenticateClass = authenticateClass;
     return this;
   }
 
-  
-  @ApiModelProperty(example = "null", value = "create date time")
-  @JsonProperty("createDt")
-  public Date getCreateDt() {
-    return createDt;
-  }
-  public void setCreateDt(Date createDt) {
-    this.createDt = createDt;
-  }
 
-  public Client updateDt(Date updateDt) {
-    this.updateDt = updateDt;
-    return this;
+  @ApiModelProperty(example = "null", value = "authenticate class")
+  @JsonProperty("authenticateClass")
+  public String getAuthenticateClass() {
+    return authenticateClass;
   }
-
-  
-  @ApiModelProperty(example = "null", value = "update date time")
-  @JsonProperty("updateDt")
-  public Date getUpdateDt() {
-    return updateDt;
-  }
-  public void setUpdateDt(Date updateDt) {
-    this.updateDt = updateDt;
+  public void setAuthenticateClass(String authenticateClass) {
+    this.authenticateClass = authenticateClass;
   }
 
 
@@ -308,13 +292,12 @@ public class Client implements IdentifiedDataSerializable {
         Objects.equals(scope, client.scope) &&
         Objects.equals(customClaim, client.customClaim) &&
         Objects.equals(redirectUri, client.redirectUri) &&
-        Objects.equals(createDt, client.createDt) &&
-        Objects.equals(updateDt, client.updateDt);
+        Objects.equals(authenticateClass, client.authenticateClass);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clientId, clientSecret, clientType, clientProfile, clientName, clientDesc, ownerId, scope, customClaim, redirectUri, createDt, updateDt);
+    return Objects.hash(clientId, clientSecret, clientType, clientProfile, clientName, clientDesc, ownerId, scope, customClaim, redirectUri, authenticateClass);
   }
 
   @Override
@@ -332,8 +315,7 @@ public class Client implements IdentifiedDataSerializable {
     sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
     sb.append("    customClaim: ").append(toIndentedString(customClaim)).append("\n");
     sb.append("    redirectUri: ").append(toIndentedString(redirectUri)).append("\n");
-    sb.append("    createDt: ").append(toIndentedString(createDt)).append("\n");
-    sb.append("    updateDt: ").append(toIndentedString(updateDt)).append("\n");
+    sb.append("    authenticateClass: ").append(toIndentedString(authenticateClass)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -365,8 +347,7 @@ public class Client implements IdentifiedDataSerializable {
     this.scope = in.readUTF();
     this.customClaim = in.readUTF();
     this.redirectUri = in.readUTF();
-    this.createDt = in.readObject();
-    this.updateDt = in.readObject();
+    this.authenticateClass = in.readObject();
   }
 
   @Override
@@ -381,8 +362,7 @@ public class Client implements IdentifiedDataSerializable {
     out.writeUTF(this.scope);
     out.writeUTF(this.customClaim);
     out.writeUTF(this.redirectUri);
-    out.writeObject(this.createDt);
-    out.writeObject(this.updateDt);
+    out.writeObject(this.authenticateClass);
   }
 
   @JsonIgnore
@@ -411,8 +391,7 @@ public class Client implements IdentifiedDataSerializable {
     n.setScope(c.getScope());
     n.setCustomClaim(c.getCustomClaim());
     n.setRedirectUri(c.getRedirectUri());
-    n.setCreateDt(c.getCreateDt());
-    n.setUpdateDt(c.getUpdateDt());
+    n.setAuthenticateClass(c.getAuthenticateClass());
     return n;
   }
 }
