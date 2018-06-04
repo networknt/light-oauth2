@@ -69,6 +69,7 @@ public class MapIdentityManager implements IdentityManager {
                     // TODO add authorization roles here from LDAP
                     @Override
                     public Set<String> getRoles() {
+                        // TODO based on clientAuthClass and userType to make decision to populate roles
                         return Collections.emptySet();
                     }
                 };

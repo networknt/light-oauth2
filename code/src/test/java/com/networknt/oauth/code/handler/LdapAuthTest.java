@@ -66,13 +66,16 @@ public class LdapAuthTest {
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
         env.put(Context.SECURITY_PRINCIPAL, dn);
         env.put(Context.SECURITY_CREDENTIALS, password);
-
+        DirContext ctx = null;
         try {
-            DirContext ctx = new InitialDirContext(env);
-
+            ctx = new InitialDirContext(env);
         }
         catch (javax.naming.AuthenticationException e) {
             return false;
+        } finally {
+            try {
+                if(ctx != null) ctx.close();
+            } catch(Exception e) {}
         }
         return true;
     }
@@ -97,5 +100,53 @@ public class LdapAuthTest {
             System.out.println( "user '" + user + "' not found" );
             System.exit(1);
         }
+    }
+
+    @Test
+    public void testAuthorization() throws Exception {
+        String uid = "jduke";
+        String domainName = "undertow.io";
+        DirContext ctx = ldapContext();
+        try {
+            SearchControls ctrls = new SearchControls();
+            ctrls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+            NamingEnumeration<SearchResult> results = ctx.search("","(& (uid="+uid+")(objectClass=person))", ctrls);
+            if(!results.hasMore())
+                throw new AuthenticationException("Principal name not found");
+
+            SearchResult result = results.next();
+            System.out.println("distinguisedName: " + result.getNameInNamespace() ); // CN=Firstname Lastname,OU=Mycity,DC=mydomain,DC=com
+
+            Attribute memberOf = result.getAttributes().get("memberOf");
+            if(memberOf!=null) {
+                for(int idx=0; idx<memberOf.size(); idx++) {
+                    System.out.println("memberOf: " + memberOf.get(idx).toString() ); // CN=Mygroup,CN=Users,DC=mydomain,DC=com
+                    //Attribute att = context.getAttributes(memberOf.get(idx).toString(), new String[]{"CN"}).get("CN");
+                    //System.out.println( att.get().toString() ); //  CN part of groupname
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(ctx != null) ctx.close();
+            } catch(Exception e) {}
+        }
+    }
+
+    /**
+     * Create "DC=sub,DC=mydomain,DC=com" string
+     * @param domainName    sub.mydomain.com
+     * @return
+     */
+    private static String toDC(String domainName) {
+        StringBuilder buf = new StringBuilder();
+        for (String token : domainName.split("\\.")) {
+            if(token.length()==0) continue;
+            if(buf.length()>0)  buf.append(",");
+            buf.append("DC=").append(token);
+        }
+        return buf.toString();
     }
 }
