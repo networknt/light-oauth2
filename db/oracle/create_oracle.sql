@@ -4,6 +4,7 @@ DROP TABLE service CASCADE CONSTRAINTS;
 DROP TABLE client CASCADE CONSTRAINTS;
 DROP TABLE user_profile CASCADE CONSTRAINTS;
 DROP TABLE audit_log CASCADE CONSTRAINTS;
+DROP TABLE refresh_token CASCADE CONSTRAINTS;
 
 CREATE TABLE user_profile (
   user_id VARCHAR2(32) NOT NULL,
@@ -64,6 +65,16 @@ CREATE TABLE client_service (
   CONSTRAINT client_service_pk PRIMARY KEY (client_id, service_id, endpoint),
   CONSTRAINT client_service_endpoint_fk FOREIGN KEY (service_id, endpoint) REFERENCES service_endpoint(service_id, endpoint),
   CONSTRAINT client_service_client_fk FOREIGN KEY (client_id) REFERENCES client(client_id)
+);
+
+CREATE TABLE refresh_token (
+  user_id VARCHAR2(36) NOT NULL,
+  client_id VARCHAR2(36) NOT NULL,
+  scope VARCHAR2(64) NOT NULL,
+  refresh_token VARCHAR2(1024) NOT NULL,
+  CONSTRAINT refresh_token_pk PRIMARY KEY (user_id, client_id, refresh_token),
+  CONSTRAINT refresh_token_user_fk FOREIGN KEY (user_id) REFERENCES user_profile(service_id),
+  CONSTRAINT refresh_token_client_fk FOREIGN KEY (client_id) REFERENCES client(client_id)
 );
 
 create table audit_log (

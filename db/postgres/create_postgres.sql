@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS service_endpoint;
 DROP TABLE IF EXISTS service;
 DROP TABLE IF EXISTS client;
 DROP TABLE IF EXISTS user_profile;
+DROP TABLE IF EXISTS refresh_token;
 DROP TABLE IF EXISTS audit_log;
 
 CREATE TABLE user_profile (
@@ -60,6 +61,16 @@ CREATE TABLE client_service (
   endpoint VARCHAR(256) NOT NULL,  -- different framework will have different endpoint format.
   PRIMARY KEY (client_id, service_id, endpoint),
   FOREIGN KEY (service_id, endpoint) REFERENCES service_endpoint(service_id, endpoint),
+  FOREIGN KEY (client_id) REFERENCES client(client_id)
+);
+
+CREATE TABLE refresh_token (
+  user_id VARCHAR2(36) NOT NULL,
+  client_id VARCHAR2(36) NOT NULL,
+  scope VARCHAR2(64) NOT NULL,
+  refresh_token VARCHAR2(1024) NOT NULL,
+  PRIMARY KEY (user_id, client_id, refresh_token),
+  FOREIGN KEY (user_id) REFERENCES user_profile(service_id),
   FOREIGN KEY (client_id) REFERENCES client(client_id)
 );
 

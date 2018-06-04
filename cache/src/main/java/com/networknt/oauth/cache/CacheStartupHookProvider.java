@@ -86,11 +86,19 @@ public class CacheStartupHookProvider implements StartupHookProvider {
         MapConfig tokenConfig = new MapConfig();
         tokenConfig.setName("tokens");
         NearCacheConfig tokenCacheConfig = new NearCacheConfig();
+        /*
         tokenCacheConfig.setTimeToLiveSeconds(24 * 60 * 60 * 1000); // 1 hour TTL
         tokenCacheConfig.setMaxIdleSeconds(24 * 60 * 60 * 1000);    // 30 minutes max idle seconds
         tokenCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
-        tokenCacheConfig.setCacheLocalEntries(true); // this enables the local caching
+        tokenCacheConfig.setCacheLocalEntries(true); // this enables the local
+        */
+
         tokenConfig.setNearCacheConfig(tokenCacheConfig);
+
+        tokenConfig.getMapStoreConfig()
+                .setEnabled(true)
+                .setClassName("com.networknt.oauth.cache.RefreshTokenMapStore");
+
         config.addMapConfig(tokenConfig);
 
         // user map distributed.
