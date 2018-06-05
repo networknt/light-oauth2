@@ -3,10 +3,7 @@ package com.networknt.oauth.cache;
 import com.hazelcast.core.IMap;
 import com.hazelcast.query.Predicate;
 import com.hazelcast.query.SqlPredicate;
-import com.networknt.oauth.cache.model.Client;
-import com.networknt.oauth.cache.model.Service;
-import com.networknt.oauth.cache.model.ServiceEndpoint;
-import com.networknt.oauth.cache.model.User;
+import com.networknt.oauth.cache.model.*;
 import com.networknt.service.SingletonServiceFactory;
 import org.h2.tools.RunScript;
 import org.junit.AfterClass;
@@ -167,12 +164,16 @@ public class CacheStartupHookProviderTest {
         CacheStartupHookProvider start = new CacheStartupHookProvider();
         start.onStartup();
 
-        final IMap<String, Object> tokens = CacheStartupHookProvider.hz.getMap("tokens");
-        Map<String, String> tokenMap = new HashMap<>();
-        tokenMap.put("userId", "admin");
-        tokenMap.put("redirectUri", "https://localhost:8080/authorization");
+        final IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
+        RefreshToken token = new RefreshToken();
+        token.setUserId("admin2");
+        token.setClientId("59f347a0-c92d-11e6-9d9d-cec0c932ce01");
 
-        tokens.put("token1", tokenMap);
+        token.setScope("todo.r");
+        token.setRefreshToken("token1");
+
+
+        tokens.put("token1", token);
 
         System.out.println("tokens size = " + tokens.size());
 

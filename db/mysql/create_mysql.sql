@@ -84,9 +84,9 @@ CREATE TABLE refresh_token (
   user_id VARCHAR2(36) NOT NULL,
   client_id VARCHAR2(36) NOT NULL,
   scope VARCHAR2(64) NOT NULL,
-  refresh_token VARCHAR2(1024) NOT NULL,
+  refresh_token VARCHAR2(256) NOT NULL,
   PRIMARY KEY (user_id, client_id, refresh_token),
-  FOREIGN KEY (user_id) REFERENCES user_profile(service_id),
+  FOREIGN KEY (user_id) REFERENCES user_profile(user_id),
   FOREIGN KEY (client_id) REFERENCES client(client_id)
 )
 ENGINE=INNODB;
