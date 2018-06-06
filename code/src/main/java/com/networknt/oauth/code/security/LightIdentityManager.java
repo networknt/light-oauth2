@@ -1,6 +1,8 @@
 package com.networknt.oauth.code.security;
 
 import com.networknt.oauth.code.auth.Authenticator;
+import com.networknt.oauth.code.auth.DefaultAuth;
+import com.networknt.oauth.code.auth.DefaultAuthenticator;
 import com.networknt.service.SingletonServiceFactory;
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
@@ -41,12 +43,14 @@ public class LightIdentityManager implements IdentityManager {
             LightPasswordCredential passwordCredential = (LightPasswordCredential) credential;
             String clientAuthClass = passwordCredential.getClientAuthClass();
             // get authenticator object.
-            Class clazz = null;
-            try {
-                clazz = Class.forName(clientAuthClass);
-            } catch (ClassNotFoundException e) {
-                logger.error("Authenticate Class " + clientAuthClass + " not found.", e);
-                return null;
+            Class clazz = DefaultAuth.class;
+            if(clientAuthClass != null && clientAuthClass.trim().length() > 0) {
+                try {
+                    clazz = Class.forName(clientAuthClass);
+                } catch (ClassNotFoundException e) {
+                    logger.error("Authenticate Class " + clientAuthClass + " not found.", e);
+                    return null;
+                }
             }
             Authenticator authenticator = SingletonServiceFactory.getBean(Authenticator.class, clazz);
             return authenticator.authenticate(id, credential);
@@ -62,12 +66,14 @@ public class LightIdentityManager implements IdentityManager {
                 final String name = gssCredential.getGssContext().getSrcName().toString();
                 final String clientAuthClass = gssCredential.getClientAuthClass();
                 // get authenticator object.
-                Class clazz = null;
-                try {
-                    clazz = Class.forName(clientAuthClass);
-                } catch (ClassNotFoundException e) {
-                    logger.error("Authenticate Class " + clientAuthClass + " not found.", e);
-                    return null;
+                Class clazz = DefaultAuth.class;
+                if(clientAuthClass != null && clientAuthClass.trim().length() > 0) {
+                    try {
+                        clazz = Class.forName(clientAuthClass);
+                    } catch (ClassNotFoundException e) {
+                        logger.error("Authenticate Class " + clientAuthClass + " not found.", e);
+                        return null;
+                    }
                 }
                 Authenticator authenticator = SingletonServiceFactory.getBean(Authenticator.class, clazz);
                 return authenticator.authenticate(name, credential);
