@@ -3,6 +3,8 @@ package com.networknt.oauth.code.auth;
 import com.hazelcast.core.IMap;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.User;
+import com.networknt.oauth.code.ldap.LdapUtil;
+import com.networknt.oauth.code.security.LightGSSContextCredential;
 import com.networknt.oauth.code.security.LightPasswordCredential;
 import com.networknt.utility.HashUtil;
 import io.undertow.security.idm.Account;
@@ -42,6 +44,17 @@ public class DefaultAuthenticator extends AuthenticatorBase<DefaultAuth> {
                 return null;
             }
             if(!match) return null;
+        } else if(credential instanceof LightGSSContextCredential) {
+            return new Account() {
+                private Set<String> roles = LdapUtil.authorize(id);
+                private final Principal principal = () -> id;
+                @Override
+                public Principal getPrincipal() {
+                    return principal;
+                }
+                @Override
+                public Set<String> getRoles() { return roles; }
+            };
         }
         return account;
     }
@@ -50,17 +63,14 @@ public class DefaultAuthenticator extends AuthenticatorBase<DefaultAuth> {
         IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
         if (users.containsKey(id)) {
             return new Account() {
-
+                private Set<String> roles = Collections.emptySet();
                 private final Principal principal = () -> id;
                 @Override
                 public Principal getPrincipal() {
                     return principal;
                 }
                 @Override
-                public Set<String> getRoles() {
-                    return Collections.emptySet();
-                }
-
+                public Set<String> getRoles() { return roles; }
             };
         }
         return null;
