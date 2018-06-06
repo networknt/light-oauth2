@@ -512,6 +512,33 @@ public class Oauth2CodeGetHandlerTest {
 
     }
 
+    @Test
+    public void testMarketPlaceClient() throws Exception {
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6881"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        try {
+            ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath("/oauth2/code?response_type=code&client_id=f71a9df8-79db-4f30-9b28-d3ea90c83cf7&user_type=employee&redirect_uri=http://localhost:8080/authorization");
+            request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("jduke", "theduke"));
+            connection.sendRequest(request, client.createClientCallback(reference, latch));
+            latch.await();
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(statusCode, 302);
+        } catch (Exception e) {
+            logger.error("Exception: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+    }
+
 
     protected static String getAuthHeader(final HttpString prefix, final HeaderValues values) {
         for (String current : values) {
