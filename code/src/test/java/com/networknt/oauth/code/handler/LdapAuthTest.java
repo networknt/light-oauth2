@@ -26,7 +26,7 @@ public class LdapAuthTest {
         env.put(Context.PROVIDER_URL, ldapURI);
         if(ldapURI.toUpperCase().startsWith("LDAPS://")) {
             env.put(Context.SECURITY_PROTOCOL, "ssl");
-            env.put("java.naming.ldap.factory.socket", "com.networknt.oauth.code.handler.LdapSSLSocketFactory");
+            env.put("java.naming.ldap.factory.socket", "com.networknt.oauth.code.ldap.LdapSSLSocketFactory");
         }
         env.put(Context.SECURITY_PRINCIPAL, "uid=oauth,ou=users,dc=undertow,dc=io");
         env.put(Context.SECURITY_CREDENTIALS, "theoauth");
@@ -61,7 +61,7 @@ public class LdapAuthTest {
         env.put(Context.PROVIDER_URL, ldapURI);
         if(ldapURI.toUpperCase().startsWith("LDAPS://")) {
             env.put(Context.SECURITY_PROTOCOL, "ssl");
-            env.put("java.naming.ldap.factory.socket", "com.networknt.oauth.code.handler.LdapSSLSocketFactory");
+            env.put("java.naming.ldap.factory.socket", "com.networknt.oauth.code.ldap.LdapSSLSocketFactory");
         }
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
         env.put(Context.SECURITY_PRINCIPAL, dn);

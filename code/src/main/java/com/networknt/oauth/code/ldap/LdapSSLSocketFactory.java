@@ -1,4 +1,4 @@
-package com.networknt.oauth.code.handler;
+package com.networknt.oauth.code.ldap;
 
 import com.networknt.client.Http2Client;
 import org.slf4j.Logger;

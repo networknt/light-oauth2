@@ -3,8 +3,9 @@ package com.networknt.oauth.code.ldap;
 public class LdapConfig {
     String uri;
     String domain;
-    String dn;
     String ldapPrincipal;
+    String searchFilter;
+    String searchBase;
 
     public String getUri() {
         return uri;
@@ -14,20 +15,10 @@ public class LdapConfig {
         this.uri = uri;
     }
 
-    public String getDomain() {
-        return domain;
-    }
+    public String getDomain() { return domain; }
 
     public void setDomain(String domain) {
         this.domain = domain;
-    }
-
-    public String getDn() {
-        return dn;
-    }
-
-    public void setDn(String dn) {
-        this.dn = dn;
     }
 
     public String getLdapPrincipal() {
@@ -36,5 +27,21 @@ public class LdapConfig {
 
     public void setLdapPrincipal(String ldapPrincipal) {
         this.ldapPrincipal = ldapPrincipal;
+    }
+
+    public String getSearchFilter() {
+        return searchFilter;
+    }
+
+    public void setSearchFilter(String searchFilter) {
+        this.searchFilter = searchFilter;
+    }
+
+    public String getSearchBase() {
+        return searchBase;
+    }
+
+    public void setSearchBase(String searchBase) {
+        this.searchBase = searchBase;
     }
 }
