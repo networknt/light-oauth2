@@ -69,17 +69,14 @@ CREATE TABLE refresh_token (
 );
 
 create table audit_log (
-  log_id VARCHAR NOT NULL,
-  action_dt DATE,
-  service_id VARCHAR NOT NULL,
-  path VARCHAR NOT NULL,
-  method VARCHAR NOT NULL,
-  request_header VARCHAR NOT NULL,
-  request_body VARCHAR,
+  log_id BIGINT, -- system milliseonds from 1970.
+  service_id VARCHAR(32) NOT NULL,
+  endpoint VARCHAR(256) NOT NULL,
+  request_header VARCHAR(4096),
+  request_body VARCHAR(4096),
   response_code INT,
-  response_header VARCHAR NOT NULL,
-  response_body VARCHAR,
-  PRIMARY KEY (log_id)
+  response_header VARCHAR(4096),
+  response_body VARCHAR(4096)
 );
 
 

@@ -75,7 +75,7 @@ CREATE TABLE refresh_token (
 );
 
 create table audit_log (
-  log_id INT, -- system milliseonds from 1970.
+  log_id BIGINT, -- system milliseonds from 1970.
   service_id VARCHAR(32) NOT NULL,
   endpoint VARCHAR(256) NOT NULL,
   request_header VARCHAR(4096),
