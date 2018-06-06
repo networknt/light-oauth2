@@ -29,19 +29,11 @@ public class LdapConfig {
         this.ldapPrincipal = ldapPrincipal;
     }
 
-    public String getSearchFilter() {
-        return searchFilter;
-    }
+    public String getSearchFilter() { return searchFilter; }
 
-    public void setSearchFilter(String searchFilter) {
-        this.searchFilter = searchFilter;
-    }
+    public void setSearchFilter(String searchFilter) { this.searchFilter = searchFilter; }
 
-    public String getSearchBase() {
-        return searchBase;
-    }
+    public String getSearchBase() { return searchBase; }
 
-    public void setSearchBase(String searchBase) {
-        this.searchBase = searchBase;
-    }
+    public void setSearchBase(String searchBase) { this.searchBase = searchBase; }
 }
