@@ -36,7 +36,7 @@ public class LdapUtil {
      * @param password String
      * @return boolean true if authenticated
      */
-    public boolean authenticate(String username, String password) {
+    public static boolean authenticate(String username, String password) {
         try {
             String dn = getUid(username);
             if (dn != null) {
@@ -64,7 +64,7 @@ public class LdapUtil {
      * @return A set of memberOf attributes for the username on LDAP server. You can only call
      * this method if the username has been authenticated with SPNEGO/Kerberos
      */
-    public Set<String> authorize(String username) {
+    public static Set<String> authorize(String username) {
         Set<String> groups = new HashSet();
         DirContext ctx = null;
         try {
@@ -107,7 +107,7 @@ public class LdapUtil {
      * @param password String
      * @return A set of memberOf attributes for the username after authentication.
      */
-    public Set<String> auth(String username, String password) {
+    public static Set<String> auth(String username, String password) {
 
         return null;
     }

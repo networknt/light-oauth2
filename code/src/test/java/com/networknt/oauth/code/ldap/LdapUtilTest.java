@@ -7,21 +7,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.networknt.oauth.code.handler.TestServer;
-import com.networknt.oauth.code.ldap.LdapUtil;
 
 public class LdapUtilTest {
 	@ClassRule
     public static TestServer server = TestServer.getInstance();
     static final Logger logger = LoggerFactory.getLogger(LdapUtilTest.class);
     
-    private static LdapUtil ldapUtil = new LdapUtil();
-	
 	@Test
     public void testAuthentication() throws Exception {
         String user = "jduke";
         String password = "theduke";
         
-        Assert.assertEquals(true, ldapUtil.authenticate(user, password));
+        Assert.assertEquals(true, LdapUtil.authenticate(user, password));
     }
 
 	@Test
@@ -29,7 +26,7 @@ public class LdapUtilTest {
         String user = "jduke";
         String expectedGroups = "cn=just-users,ou=users,dc=undertow,dc=io,cn=best-users,ou=users,dc=undertow,dc=io";
         
-        Assert.assertEquals(expectedGroups, String.join(",", ldapUtil.authorize(user)));
+        Assert.assertEquals(expectedGroups, String.join(",", LdapUtil.authorize(user)));
     }
 	
 	@Test
@@ -38,7 +35,7 @@ public class LdapUtilTest {
         String password = "theduke";
         
         // function returns null always
-        Assert.assertEquals(null, ldapUtil.auth(user, password));
+        Assert.assertEquals(null, LdapUtil.auth(user, password));
     }
 	
 }
