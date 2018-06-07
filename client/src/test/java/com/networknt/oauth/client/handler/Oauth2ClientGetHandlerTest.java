@@ -50,11 +50,13 @@ public class Oauth2ClientGetHandlerTest {
             latch.await();
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            logger.debug("statusCode = " + statusCode);
+            logger.debug("body = " + body);
             Assert.assertEquals(200, statusCode);
             if(statusCode == 200) {
                 // make sure that there are two services in the result.
                 List<com.networknt.oauth.cache.model.Client> clients = Config.getInstance().getMapper().readValue(body, new TypeReference<List<com.networknt.oauth.cache.model.Client>>(){});
-                Assert.assertTrue(clients.size() >= 1 && clients.size() <= 5);
+                Assert.assertTrue(clients.size() >= 1 && clients.size() <= 10);
                 // make sure that the first is AACT0001
                 // Assert.assertEquals("PetStore Web Server", clients.get(0).getClientName());
                 // make sure that client_secret is null.
