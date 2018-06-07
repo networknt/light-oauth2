@@ -1,0 +1,6 @@
+protocol: https
+host: api.github.com
+pathPrefix: ''
+owner: 
+repo: 
+path: 
