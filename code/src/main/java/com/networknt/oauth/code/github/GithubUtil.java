@@ -24,11 +24,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * This is the utility to access github.com api. Before calling this, you need to download the certificate from
  * api.github.com and import it into the client.truststore
  *
- * openssl s_client -showcerts -connect api.github.com:443 </dev/null 2>/dev/null|openssl x509 -outform PEM >github.pem
- *
- * keytool -v -import -file github.pem -alias githubcrt -keystore client.truststore
- *
- *
  */
 public class GithubUtil {
 	private final static Logger logger = LoggerFactory.getLogger(GithubUtil.class);

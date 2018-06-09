@@ -1,4 +1,4 @@
-package github;
+package com.networknt.oauth.code.github;
 
 import java.util.Set;
 
@@ -6,8 +6,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.networknt.oauth.code.github.GithubUtil;
 
 public class GithubUtilTest {
     static final Logger logger = LoggerFactory.getLogger(GithubUtilTest.class);
