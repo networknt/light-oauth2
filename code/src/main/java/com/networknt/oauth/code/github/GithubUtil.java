@@ -1,5 +1,18 @@
 package com.networknt.oauth.code.github;
 
+import com.networknt.client.Http2Client;
+import com.networknt.config.Config;
+import com.networknt.exception.ClientException;
+import io.undertow.client.ClientConnection;
+import io.undertow.client.ClientRequest;
+import io.undertow.client.ClientResponse;
+import io.undertow.util.Headers;
+import io.undertow.util.Methods;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xnio.IoUtils;
+import org.xnio.OptionMap;
+
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Map;
@@ -7,21 +20,16 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xnio.IoUtils;
-import org.xnio.OptionMap;
-
-import com.networknt.client.Http2Client;
-import com.networknt.config.Config;
-import com.networknt.exception.ClientException;
-
-import io.undertow.client.ClientConnection;
-import io.undertow.client.ClientRequest;
-import io.undertow.client.ClientResponse;
-import io.undertow.util.Headers;
-import io.undertow.util.Methods;
-
+/**
+ * This is the utility to access github.com api. Before calling this, you need to download the certificate from
+ * api.github.com and import it into the client.truststore
+ *
+ * openssl s_client -showcerts -connect api.github.com:443 </dev/null 2>/dev/null|openssl x509 -outform PEM >github.pem
+ *
+ * keytool -v -import -file github.pem -alias githubcrt -keystore client.truststore
+ *
+ *
+ */
 public class GithubUtil {
 	private final static Logger logger = LoggerFactory.getLogger(GithubUtil.class);
 	private final static String CONFIG_GITHUB = "github";
@@ -34,12 +42,12 @@ public class GithubUtil {
 	private final static String githubToken = (String) secret.get(GITHUB_TOKEN);
 
 	/**
+	 * Get the user roles from github.com repository.
 	 *
-	 * @param username
-	 *            String
+	 * @param username String username
 	 * @return A set of group attributes for the username on github DB. You can
 	 *         only call this method if the username has been authenticated
-	 * @throws ClientException 
+	 * @throws ClientException ClientException
 	 */
 	public static Set<String> authorize(String username) throws Exception {
 		Set<String> groups = new HashSet<String>();
@@ -55,77 +63,23 @@ public class GithubUtil {
         try {
         	final ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(contentsURL);
 			request.getRequestHeaders().put(Headers.AUTHORIZATION, "token " + githubToken);
-			
-			connection.sendRequest(request, client.createClientCallback(reference, latch)); 
+			request.getRequestHeaders().put(Headers.HOST, "localhost");
+			request.getRequestHeaders().put(Headers.ACCEPT, "application/vnd.github.v3.raw");
+			request.getRequestHeaders().put(Headers.CACHE_CONTROL, "no-cache");
+			request.getRequestHeaders().put(Headers.USER_AGENT, "light-oauth2");
+			connection.sendRequest(request, client.createClientCallback(reference, latch));
 			latch.await(); 
-			/*
-			connection.sendRequest(request, new ClientCallback<ClientExchange>() {
-				@Override
-				public void completed(ClientExchange result) {
-					new StringReadChannelListener(Http2Client.POOL) {
-
-						@Override
-						protected void stringDone(String string) {
-							logger.info("getToken response = " + string);
-                            latch.countDown();
-						}
-
-						@Override
-						protected void error(IOException e) {
-							logger.error("IOException:", e);
-                            latch.countDown();
-						}
-					}.setup(result.getResponseChannel());
-				}
-
-				@Override
-				public void failed(IOException e) {
-					logger.error("IOException:", e);
-                    latch.countDown();
-				}
-			});*/
         } catch (Exception e) {
             logger.error("Exception: ", e);
             throw new ClientException(e);
         } finally {
             IoUtils.safeClose(connection);
         }
-        
-		/*
-		HttpClient client = HttpClientBuilder.create().build();
-		HttpGet request = new HttpGet(apiURL + contentsURL);
+		int statusCode = reference.get().getResponseCode();
+		System.out.println("statusCode = " + statusCode);
+		String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+		System.out.println("testHttp2Get: statusCode = " + statusCode + " body = " + body);
 
-		// add request header
-		request.setHeader("Authorization", "token " + githubToken);
-		// Execute request
-		HttpResponse response = null;
-		try {
-			response = client.execute(request);
-
-			int returnCode = response.getStatusLine().getStatusCode();
-			if (returnCode == 200) {
-				String responseString = new BasicResponseHandler().handleResponse(response);
-				JSONParser parser = new JSONParser();
-				JSONObject json = (JSONObject) parser.parse(responseString);
-				String content = json.get("content").toString();
-				content = new String(Base64.decodeBase64(content.getBytes()));
-				// Get groups
-				JSONArray metadata = new JSONArray(content);
-				for (int i = 0; i < metadata.length(); i++) {
-					org.json.JSONObject itemArr = (org.json.JSONObject) metadata.get(i);
-					if (itemArr.get("github_username").toString().equals(username)) {
-						if (logger.isDebugEnabled())
-							logger.debug(username + " is part of group(s): " + itemArr.get("groups").toString());
-						groups.add(itemArr.get("groups").toString());
-					}
-				}
-			} else {
-				return null;
-			}
-		} catch (Exception e) {
-			logger.error("Failed to authorize user " + username, e);
-			return null;
-		}*/
 		return groups;
 	}
 
