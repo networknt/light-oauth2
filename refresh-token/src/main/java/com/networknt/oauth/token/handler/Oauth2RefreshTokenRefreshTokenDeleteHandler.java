@@ -13,7 +13,7 @@ import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Oauth2RefreshTokenRefreshTokenDeleteHandler extends AuditInfoHandler implements HttpHandler {
+public class Oauth2RefreshTokenRefreshTokenDeleteHandler extends RefreshTokenAuditHandler implements HttpHandler {
     private static final String REFRESH_TOKEN_NOT_FOUND = "ERR12029";
 
     private static Logger logger = LoggerFactory.getLogger(Oauth2RefreshTokenRefreshTokenDeleteHandler.class);
@@ -29,18 +29,7 @@ public class Oauth2RefreshTokenRefreshTokenDeleteHandler extends AuditInfoHandle
         } else {
             tokens.delete(refreshToken);
         }
-        // TODO change the if condition to configuable
-        if (true ) {
-            AuditInfo auditInfo = new AuditInfo();
-            auditInfo.setServiceId(Oauth2Service.REFRESHTOKEN);
-            auditInfo.setEndpoint(exchange.getHostName() + exchange.getRelativePath());
-            auditInfo.setRequestHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestHeaders()));
-            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestCookies()));
-            auditInfo.setResponseHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseHeaders()));
-            auditInfo.setResponseBody(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseCookies()));
-            saveAudit(auditInfo);
-        }
-
+        processAudit(exchange);
 
     }
 

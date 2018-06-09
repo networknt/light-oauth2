@@ -99,7 +99,7 @@ public class RefreshTokenMapStore implements MapStore<String, RefreshToken> {
         try (Connection connection = ds.getConnection(); PreparedStatement stmt = connection.prepareStatement(loadall)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    keys.add(rs.getString("user_id"));
+                    keys.add(rs.getString("refresh_token"));
                 }
             }
         } catch (SQLException e) {

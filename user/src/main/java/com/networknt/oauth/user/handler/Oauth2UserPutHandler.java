@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Date;
 import java.util.Map;
 
-public class Oauth2UserPutHandler implements HttpHandler {
+public class Oauth2UserPutHandler extends UserAuditHandler implements HttpHandler {
     static final String USER_NOT_FOUND = "ERR12013";
     static Logger logger = LoggerFactory.getLogger(Oauth2UserPostHandler.class);
     @SuppressWarnings("unchecked")
@@ -35,5 +35,6 @@ public class Oauth2UserPutHandler implements HttpHandler {
             user.setUpdateDt(new Date(System.currentTimeMillis()));
             users.set(userId, user);
         }
+        processAudit(exchange);
     }
 }

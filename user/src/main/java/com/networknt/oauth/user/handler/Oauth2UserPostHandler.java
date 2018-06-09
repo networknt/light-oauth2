@@ -18,7 +18,7 @@ import java.sql.Date;
 import java.util.Map;
 import java.util.Set;
 
-public class Oauth2UserPostHandler implements HttpHandler {
+public class Oauth2UserPostHandler extends UserAuditHandler implements HttpHandler {
     private static final String PASSWORD_OR_PASSWORDCONFIRM_EMPTY = "ERR12011";
     private static final String PASSWORD_PASSWORDCONFIRM_NOT_MATCH = "ERR12012";
     private static final String USER_ID_EXISTS = "ERR12020";
@@ -40,6 +40,7 @@ public class Oauth2UserPostHandler implements HttpHandler {
             Status status = new Status(EMAIL_EXISTS, email);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
 
@@ -73,5 +74,6 @@ public class Oauth2UserPostHandler implements HttpHandler {
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
         }
+        processAudit(exchange);
     }
 }

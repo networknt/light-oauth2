@@ -23,7 +23,7 @@ import java.util.*;
  *
  * @author Steve Hu
  */
-public class Oauth2ServiceServiceIdEndpointGetHandler implements HttpHandler {
+public class Oauth2ServiceServiceIdEndpointGetHandler extends ServiceAuditHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2ServiceServiceIdEndpointGetHandler.class);
     static final String SERVICE_ENDPOINT_NOT_FOUND = "ERR12042";
 
@@ -38,9 +38,11 @@ public class Oauth2ServiceServiceIdEndpointGetHandler implements HttpHandler {
             Status status = new Status(SERVICE_ENDPOINT_NOT_FOUND, serviceId);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(values));
+        processAudit(exchange);
     }
 }

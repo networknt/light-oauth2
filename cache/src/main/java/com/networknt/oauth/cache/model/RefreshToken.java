@@ -19,7 +19,7 @@ public class RefreshToken implements IdentifiedDataSerializable {
 
   private String scope = null;
 
-  public RefreshToken RefreshToken(String refreshToken) {
+  public RefreshToken refreshToken(String refreshToken) {
     this.refreshToken = refreshToken;
     return this;
   }

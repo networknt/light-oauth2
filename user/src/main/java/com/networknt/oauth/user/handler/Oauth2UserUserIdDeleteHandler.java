@@ -9,7 +9,7 @@ import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Oauth2UserUserIdDeleteHandler implements HttpHandler {
+public class Oauth2UserUserIdDeleteHandler extends UserAuditHandler implements HttpHandler {
     static final String USER_NOT_FOUND = "ERR12013";
     static Logger logger = LoggerFactory.getLogger(Oauth2UserUserIdDeleteHandler.class);
     @Override
@@ -23,5 +23,6 @@ public class Oauth2UserUserIdDeleteHandler implements HttpHandler {
         } else {
             users.delete(userId);
         }
+        processAudit(exchange);
     }
 }

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class Oauth2CodePostHandler implements HttpHandler {
+public class Oauth2CodePostHandler extends CodeAuditHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2CodeGetHandler.class);
     static final String CLIENT_NOT_FOUND = "ERR12014";
 
@@ -84,6 +84,8 @@ public class Oauth2CodePostHandler implements HttpHandler {
             exchange.setStatusCode(StatusCodes.FOUND);
             exchange.getResponseHeaders().put(Headers.LOCATION, redirectUri);
             exchange.endExchange();
+            processAudit(exchange);
+
         }
     }
 }

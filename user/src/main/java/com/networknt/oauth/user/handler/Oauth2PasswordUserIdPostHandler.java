@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class Oauth2PasswordUserIdPostHandler implements HttpHandler {
+public class Oauth2PasswordUserIdPostHandler extends UserAuditHandler implements HttpHandler {
     static final String INCORRECT_PASSWORD = "ERR12016";
     static final String PASSWORD_PASSWORDCONFIRM_NOT_MATCH = "ERR12012";
     static final String USER_NOT_FOUND = "ERR12013";
@@ -53,6 +53,7 @@ public class Oauth2PasswordUserIdPostHandler implements HttpHandler {
                 exchange.setStatusCode(status.getStatusCode());
                 exchange.getResponseSender().send(status.toString());
             }
+            processAudit(exchange);
         }
     }
 }

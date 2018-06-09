@@ -28,6 +28,11 @@ public enum Oauth2Service {
   SERVICE,
 
   /**
+   * Authorize.
+   */
+  AUTHORIZE,
+
+  /**
    * TOKEN.
    */
   TOKEN,

@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Steve Hu
  */
-public class Oauth2ServiceServiceIdDeleteHandler implements HttpHandler {
+public class Oauth2ServiceServiceIdDeleteHandler extends ServiceAuditHandler implements HttpHandler {
     static final String SERVICE_NOT_FOUND = "ERR12015";
     static Logger logger = LoggerFactory.getLogger(Oauth2ServiceServiceIdGetHandler.class);
     @Override
@@ -32,5 +32,6 @@ public class Oauth2ServiceServiceIdDeleteHandler implements HttpHandler {
             serviceEndpoints.delete(serviceId);
             services.delete(serviceId);
         }
+        processAudit(exchange);
     }
 }

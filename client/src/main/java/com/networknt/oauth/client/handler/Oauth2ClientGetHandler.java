@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 
-public class Oauth2ClientGetHandler implements HttpHandler {
+public class Oauth2ClientGetHandler  extends ClientAuditHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2ClientGetHandler.class);
 
     @Override
@@ -44,5 +44,6 @@ public class Oauth2ClientGetHandler implements HttpHandler {
         }
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(results));
+        processAudit(exchange);
     }
 }

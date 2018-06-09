@@ -11,7 +11,7 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Oauth2ServiceServiceIdGetHandler implements HttpHandler {
+public class Oauth2ServiceServiceIdGetHandler extends ServiceAuditHandler implements HttpHandler {
     static Logger logger = LoggerFactory.getLogger(Oauth2ServiceServiceIdGetHandler.class);
     static final String SERVICE_NOT_FOUND = "ERR12015";
     @SuppressWarnings("unchecked")
@@ -26,9 +26,11 @@ public class Oauth2ServiceServiceIdGetHandler implements HttpHandler {
             Status status = new Status(SERVICE_NOT_FOUND, serviceId);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(service));
+        processAudit(exchange);
     }
 }

@@ -1,18 +1,24 @@
 package com.networknt.oauth.client.handler;
 
 import com.hazelcast.core.IMap;
+import com.networknt.config.Config;
+import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
+import com.networknt.oauth.cache.model.AuditInfo;
 import com.networknt.oauth.cache.model.Client;
+import com.networknt.oauth.cache.model.Oauth2Service;
 import com.networknt.status.Status;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Oauth2ClientClientIdDeleteHandler implements HttpHandler {
+public class Oauth2ClientClientIdDeleteHandler  extends ClientAuditHandler implements HttpHandler {
     static final String CLIENT_NOT_FOUND = "ERR12014";
 
     static Logger logger = LoggerFactory.getLogger(Oauth2ClientClientIdDeleteHandler.class);
+
+
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         String clientId = exchange.getQueryParameters().get("clientId").getFirst();
@@ -25,5 +31,7 @@ public class Oauth2ClientClientIdDeleteHandler implements HttpHandler {
         } else {
             clients.delete(clientId);
         }
+        processAudit(exchange);
     }
+
 }
