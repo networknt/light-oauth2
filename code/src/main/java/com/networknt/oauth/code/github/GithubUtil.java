@@ -63,10 +63,10 @@ public class GithubUtil {
         try {
         	final ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(contentsURL);
 			request.getRequestHeaders().put(Headers.AUTHORIZATION, "token " + githubToken);
-			request.getRequestHeaders().put(Headers.HOST, "localhost");
+			request.getRequestHeaders().put(Headers.HOST, "api.github.com");
 			request.getRequestHeaders().put(Headers.ACCEPT, "application/vnd.github.v3.raw");
 			request.getRequestHeaders().put(Headers.CACHE_CONTROL, "no-cache");
-			request.getRequestHeaders().put(Headers.USER_AGENT, "light-oauth2");
+			request.getRequestHeaders().put(Headers.USER_AGENT, "stevehu");
 			connection.sendRequest(request, client.createClientCallback(reference, latch));
 			latch.await(); 
         } catch (Exception e) {
