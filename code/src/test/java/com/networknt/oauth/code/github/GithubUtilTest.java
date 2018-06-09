@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 public class GithubUtilTest {
     static final Logger logger = LoggerFactory.getLogger(GithubUtilTest.class);
 	
-	@Test
+	//@Test
     public void testAuthorization() throws Exception {
         String user = "ahmed1";
         
