@@ -10,6 +10,14 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * This is the cache of the previous token when create a new access token from a refresh token.
+ *
+ * csrf is always regenerated
+ * custom claims are retrieved from client cache
+ * userType and user roles are retrieved from user cache
+ * @author Steve Hu
+ */
 public class RefreshToken implements IdentifiedDataSerializable {
   private String refreshToken = null;
 
