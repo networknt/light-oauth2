@@ -352,12 +352,12 @@ public class Oauth2TokenPostHandler implements HttpHandler {
             RefreshToken token = tokens.remove(refreshToken);
             if(token != null) {
                 String userId = token.getUserId();
+                String userType = token.getUserType();
+                String roles = token.getRoles();
                 String clientId = token.getClientId();
                 String oldScope = token.getScope();
 
                 if(client.getClientId().equals(clientId)) {
-                    IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
-                    User user = users.get(userId);
                     if(scope == null) {
                         scope = oldScope; // use the previous scope when access token is generated
                     } else {
@@ -374,7 +374,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                         if(customClaim != null && customClaim.length() > 0) {
                             customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
                         }
-                        jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), user.getRoles(), csrf, customMap));
+                        jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, userType, roles, csrf, customMap));
                     } catch (Exception e) {
                         throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                     }
@@ -383,6 +383,8 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                     RefreshToken newToken = new RefreshToken();
                     newToken.setRefreshToken(newRefreshToken);
                     newToken.setUserId(userId);
+                    newToken.setUserType(userType);
+                    newToken.setRoles(roles);
                     newToken.setClientId(client.getClientId());
                     newToken.setScope(scope);
                     tokens.put(refreshToken, newToken);
@@ -457,6 +459,8 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                 RefreshToken token = new RefreshToken();
                 token.setRefreshToken(refreshToken);
                 token.setUserId(userId);
+                token.setUserType(userType);
+                token.setRoles(roles);
                 token.setClientId(client.getClientId());
                 token.setScope(scope);
                 IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
