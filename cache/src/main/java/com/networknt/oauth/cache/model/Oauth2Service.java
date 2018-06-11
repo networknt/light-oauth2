@@ -38,6 +38,11 @@ public enum Oauth2Service {
   TOKEN,
 
   /**
+   * Key.
+   */
+  KEY,
+
+  /**
    * Refesh_token.
    */
   REFRESHTOKEN;

@@ -12,17 +12,17 @@ import org.slf4j.LoggerFactory;
 public class ClientAuditHandler extends AuditInfoHandler {
     static final Logger logger = LoggerFactory.getLogger(ClientAuditHandler.class);
     private final static String CONFIG = "oauth_client";
-    private final static OauthClientConfig config = (OauthClientConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthClientConfig.class);
+    private final static OauthClientConfig oauth_config = (OauthClientConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthClientConfig.class);
 
 
     protected void processAudit(HttpServerExchange exchange) throws Exception{
-        if (config.isEnableAudit() ) {
+        if (oauth_config.isEnableAudit() ) {
             AuditInfo auditInfo = new AuditInfo();
-            auditInfo.setServiceId(Oauth2Service.REFRESHTOKEN);
+            auditInfo.setServiceId(Oauth2Service.CLIENT);
             auditInfo.setEndpoint(exchange.getHostName() + exchange.getRelativePath());
-            auditInfo.setRequestHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestHeaders()));
+            auditInfo.setRequestHeader(exchange.getRequestHeaders().toString());
             auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestCookies()));
-            auditInfo.setResponseHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseHeaders()));
+            auditInfo.setResponseHeader(exchange.getResponseHeaders().toString());
             auditInfo.setResponseBody(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseCookies()));
             saveAudit(auditInfo);
         }
