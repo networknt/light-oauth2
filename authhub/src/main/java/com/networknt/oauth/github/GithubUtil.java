@@ -3,20 +3,22 @@ package com.networknt.oauth.github;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
 import com.networknt.exception.ClientException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
 import io.undertow.util.Headers;
 import io.undertow.util.Methods;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.IoUtils;
 import org.xnio.OptionMap;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -77,11 +79,11 @@ public class GithubUtil {
 		String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
 		System.out.println("testHttp2Get: statusCode = " + statusCode + " body = " + body);
 
-		JSONArray jsonArray = new JSONArray(body);
-		for (int i=0; i < jsonArray.length(); i++){
-			JSONObject jsonObject = jsonArray.getJSONObject(i);
-			if (jsonObject.get("github_username").toString().equals(username)) {
-				logger.info(jsonObject.get("github_username") + " is attached to the following groups: " + jsonObject.get("groups"));
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<GithubMetadata> listMeta = objectMapper.readValue(body, new TypeReference<List<GithubMetadata>>(){});
+		for (GithubMetadata meta : listMeta) {
+			if (meta.github_username.equals(username)) {
+				logger.info(meta.github_username + " is attached to the following primary group: " + meta.groups.primary + " and secondary groups: " + Arrays.toString(meta.groups.secondary));
 			}
 		}
 		
