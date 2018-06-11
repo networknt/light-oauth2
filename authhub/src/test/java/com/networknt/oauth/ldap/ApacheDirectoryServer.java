@@ -1,4 +1,4 @@
-package com.networknt.oauth.code.handler;
+package com.networknt.oauth.ldap;
 
 import com.networknt.oauth.spnego.KerberosKDCUtil;
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
@@ -31,6 +31,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Utility class to start up a test KDC backed by a directory server.
@@ -137,9 +139,9 @@ public class ApacheDirectoryServer {
                         baos.write(second);
                         baos.write(substitute.toByteArray()); // Terminator never found.
                     }
-                    String toReplace = new String(substitute.toByteArray(), StandardCharsets.UTF_8);
+                    String toReplace = new String(substitute.toByteArray(), UTF_8);
                     if (mappings.containsKey(toReplace)) {
-                        baos.write(mappings.get(toReplace).getBytes());
+                        baos.write(mappings.get(toReplace).getBytes(UTF_8));
                     } else {
                         throw new IllegalArgumentException(String.format("No mapping found for '%s'", toReplace));
                     }

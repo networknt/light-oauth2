@@ -30,7 +30,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.networknt.client.oauth.OauthHelper.encodeCredentials;
-import static com.networknt.oauth.code.spnego.KerberosKDCUtil.login;
+import static com.networknt.oauth.spnego.KerberosKDCUtil.login;
 import static io.undertow.util.Headers.*;
 import static org.junit.Assert.*;
 

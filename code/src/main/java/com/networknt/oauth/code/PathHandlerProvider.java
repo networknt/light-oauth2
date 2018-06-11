@@ -4,9 +4,9 @@ import com.networknt.health.HealthGetHandler;
 import com.networknt.info.ServerInfoGetHandler;
 import com.networknt.oauth.code.handler.Oauth2CodeGetHandler;
 import com.networknt.oauth.code.handler.Oauth2CodePostHandler;
-import com.networknt.oauth.code.security.LightBasicAuthenticationMechanism;
-import com.networknt.oauth.code.security.LightGSSAPIAuthenticationMechanism;
-import com.networknt.oauth.code.security.LightIdentityManager;
+import com.networknt.oauth.security.LightBasicAuthenticationMechanism;
+import com.networknt.oauth.security.LightGSSAPIAuthenticationMechanism;
+import com.networknt.oauth.security.LightIdentityManager;
 import com.networknt.server.HandlerProvider;
 import io.undertow.Handlers;
 import io.undertow.security.api.AuthenticationMechanism;
@@ -30,7 +30,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.networknt.oauth.code.spnego.KerberosKDCUtil.login;
+import static com.networknt.oauth.spnego.KerberosKDCUtil.login;
 
 public class PathHandlerProvider implements HandlerProvider {
 

@@ -1,0 +1,12 @@
+singletons:
+# Authenticator implementation mapping
+- com.networknt.oauth.auth.Authenticator<com.networknt.oauth.auth.DefaultAuth>:
+  - com.networknt.oauth.auth.DefaultAuthenticator
+- com.networknt.oauth.auth.Authenticator<com.networknt.oauth.auth.MarketPlaceAuth>:
+  - com.networknt.oauth.auth.MarketPlaceAuthenticator
+- javax.sql.DataSource:
+  - com.zaxxer.hikari.HikariDataSource:
+      DriverClassName: org.h2.jdbcx.JdbcDataSource
+      jdbcUrl: jdbc:h2:~/test
+      username: sa
+      password: sa
