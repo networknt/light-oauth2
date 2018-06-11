@@ -1,0 +1,4 @@
+# default config yml file for authorize service
+---
+enableAudit: false
+
