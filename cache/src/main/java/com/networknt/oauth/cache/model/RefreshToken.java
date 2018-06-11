@@ -10,10 +10,22 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * This is the cache of the previous token when create a new access token from a refresh token.
+ *
+ * csrf is always regenerated
+ * custom claims are retrieved from client cache
+ * userType and user roles are retrieved from user cache
+ * @author Steve Hu
+ */
 public class RefreshToken implements IdentifiedDataSerializable {
   private String refreshToken = null;
 
   private String userId = null;
+
+  private String userType = null;
+
+  private String roles = null;
 
   private String clientId = null;
 
@@ -48,6 +60,40 @@ public class RefreshToken implements IdentifiedDataSerializable {
   public void setUserId(String userId) {
     this.userId = userId;
   }
+
+
+  public RefreshToken userType(String userType) {
+    this.userType = userType;
+    return this;
+  }
+
+
+  @ApiModelProperty(example = "null", required = true, value = "user type")
+  @JsonProperty("userType")
+  public String getUserType() {
+    return userType;
+  }
+  public void setUserType(String userType) {
+    this.userType = userType;
+  }
+
+
+
+  public RefreshToken roles(String roles) {
+    this.roles = roles;
+    return this;
+  }
+
+
+  @ApiModelProperty(example = "null", value = "user roles")
+  @JsonProperty("roles")
+  public String getRoles() {
+    return roles;
+  }
+  public void setRoles(String roles) {
+    this.roles = roles;
+  }
+
 
   public RefreshToken clientId(String clientId) {
     this.clientId = clientId;
@@ -90,6 +136,8 @@ public class RefreshToken implements IdentifiedDataSerializable {
     RefreshToken token = (RefreshToken) o;
     return Objects.equals(refreshToken, token.refreshToken) &&
         Objects.equals(userId, token.userId) &&
+        Objects.equals(userType, token.userType) &&
+        Objects.equals(roles, token.roles) &&
         Objects.equals(clientId, token.clientId) &&
         Objects.equals(scope, token.scope);
 
@@ -97,7 +145,7 @@ public class RefreshToken implements IdentifiedDataSerializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(refreshToken, userId, clientId, scope);
+    return Objects.hash(refreshToken, userId, userType, roles, clientId, scope);
   }
 
   @Override
@@ -107,6 +155,8 @@ public class RefreshToken implements IdentifiedDataSerializable {
     
     sb.append("    refreshToken: ").append(toIndentedString(refreshToken)).append("\n");
     sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
+    sb.append("    userType: ").append(toIndentedString(userType)).append("\n");
+    sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
     sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
     sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
     sb.append("}");
@@ -132,6 +182,8 @@ public class RefreshToken implements IdentifiedDataSerializable {
   public void readData(ObjectDataInput in) throws IOException {
     this.refreshToken = in.readUTF();
     this.userId = in.readUTF();
+    this.userType = in.readUTF();
+    this.roles = in.readUTF();
     this.clientId = in.readUTF();
     this.scope = in.readUTF();
   }
@@ -140,6 +192,8 @@ public class RefreshToken implements IdentifiedDataSerializable {
   public void writeData(ObjectDataOutput out) throws IOException {
     out.writeUTF(this.refreshToken);
     out.writeUTF(this.userId);
+    out.writeUTF(this.userType);
+    out.writeUTF(this.roles);
     out.writeUTF(this.clientId);
     out.writeUTF(this.scope);
   }

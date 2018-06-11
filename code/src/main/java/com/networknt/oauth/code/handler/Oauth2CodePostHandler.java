@@ -13,10 +13,7 @@ import io.undertow.util.StatusCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class Oauth2CodePostHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2CodeGetHandler.class);
@@ -62,8 +59,12 @@ public class Oauth2CodePostHandler implements HttpHandler {
                 */
             final SecurityContext context = exchange.getSecurityContext();
             String userId = context.getAuthenticatedAccount().getPrincipal().getName();
+            Set<String> roles = context.getAuthenticatedAccount().getRoles();
             Map<String, String> codeMap = new HashMap<>();
             codeMap.put("userId", userId);
+            if(roles != null && !roles.isEmpty()) {
+                codeMap.put("roles", String.join(" ", roles));
+            }
             // generate auth code
             String code = Util.getUUID();
             String redirectUri = params.get("redirect_uri");

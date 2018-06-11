@@ -1,15 +1,12 @@
 package com.networknt.oauth.code;
 
-import com.hazelcast.core.IMap;
 import com.networknt.health.HealthGetHandler;
 import com.networknt.info.ServerInfoGetHandler;
-import com.networknt.oauth.cache.CacheStartupHookProvider;
-import com.networknt.oauth.cache.model.User;
-import com.networknt.oauth.code.handler.MapIdentityManager;
 import com.networknt.oauth.code.handler.Oauth2CodeGetHandler;
 import com.networknt.oauth.code.handler.Oauth2CodePostHandler;
-import com.networknt.oauth.code.security.LightBasicAuthenticationMechanism;
-import com.networknt.oauth.code.security.LightGSSAPIAuthenticationMechanism;
+import com.networknt.oauth.security.LightBasicAuthenticationMechanism;
+import com.networknt.oauth.security.LightGSSAPIAuthenticationMechanism;
+import com.networknt.oauth.security.LightIdentityManager;
 import com.networknt.server.HandlerProvider;
 import io.undertow.Handlers;
 import io.undertow.security.api.AuthenticationMechanism;
@@ -20,10 +17,8 @@ import io.undertow.security.handlers.AuthenticationConstraintHandler;
 import io.undertow.security.handlers.AuthenticationMechanismsHandler;
 import io.undertow.security.handlers.SecurityInitialHandler;
 import io.undertow.security.idm.IdentityManager;
-import io.undertow.security.impl.BasicAuthenticationMechanism;
 import io.undertow.security.impl.CachedAuthenticatedSessionMechanism;
 import io.undertow.security.impl.FormAuthenticationMechanism;
-import io.undertow.security.impl.GSSAPIAuthenticationMechanism;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.session.InMemorySessionManager;
 import io.undertow.server.session.SessionAttachmentHandler;
@@ -35,14 +30,13 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.networknt.oauth.code.spnego.KerberosKDCUtil.login;
+import static com.networknt.oauth.spnego.KerberosKDCUtil.login;
 
 public class PathHandlerProvider implements HandlerProvider {
 
     @Override
     public HttpHandler getHandler() {
-        IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
-        final IdentityManager basicIdentityManager = new MapIdentityManager(users);
+        final IdentityManager basicIdentityManager = new LightIdentityManager();
 
         HttpHandler handler = Handlers.routing()
             .add(Methods.GET, "/health", new HealthGetHandler())

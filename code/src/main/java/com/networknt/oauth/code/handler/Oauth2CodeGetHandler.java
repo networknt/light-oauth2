@@ -15,10 +15,7 @@ import io.undertow.util.StatusCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 
 /**
@@ -62,8 +59,12 @@ public class Oauth2CodeGetHandler implements HttpHandler {
             String code = Util.getUUID();
             final SecurityContext context = exchange.getSecurityContext();
             String userId = context.getAuthenticatedAccount().getPrincipal().getName();
+            Set<String> roles = context.getAuthenticatedAccount().getRoles();
             Map<String, String> codeMap = new HashMap<>();
             codeMap.put("userId", userId);
+            if(roles != null && !roles.isEmpty()) {
+                codeMap.put("roles", String.join(" ", roles));
+            }
             String scope = params.get("scope");
             if(scope != null) {
                 codeMap.put("scope", scope);

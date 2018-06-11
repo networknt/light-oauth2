@@ -163,8 +163,12 @@ public class Oauth2TokenPostHandler implements HttpHandler {
         if(client != null) {
             Map<String, String> codeMap = (Map<String, String>)CacheStartupHookProvider.hz.getMap("codes").remove(code);
             String userId = codeMap.get("userId");
+            // get userType and roles from code map as there are some authenticators doesn't support user_profile table.
+            String userType = codeMap.get("userType");
+            String roles = codeMap.get("roles");
             String uri = codeMap.get("redirectUri");
             String scope = codeMap.get("scope");
+            if(logger.isDebugEnabled()) logger.debug("variable from codeMap cache userId = " + userId + " redirectUri = " + redirectUri + " scope = " + scope + " userType = " + userType + " roles = " + roles);
 
             // PKCE
             String codeChallenge = codeMap.get(OAuth2Constants.CODE_CHALLENGE);
@@ -182,8 +186,6 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                         }
                     }
                 }
-                IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
-                User user = users.get(userId);
                 if(scope == null) {
                     scope = client.getScope();
                 } else {
@@ -235,7 +237,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                     if(customClaim != null && customClaim.length() > 0) {
                         customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
                     }
-                    jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), csrf, customMap));
+                    jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, userType, roles, csrf, customMap));
                 } catch (Exception e) {
                     throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                 }
@@ -244,6 +246,8 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                 RefreshToken token = new RefreshToken();
                 token.setRefreshToken(refreshToken);
                 token.setUserId(userId);
+                token.setUserType(userType);
+                token.setRoles(roles);
                 token.setClientId(client.getClientId());
                 token.setScope(scope);
                 IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
@@ -298,7 +302,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                                 if(customClaim != null && customClaim.length() > 0) {
                                     customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
                                 }
-                                String jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), null, customMap));
+                                String jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), user.getRoles(), null, customMap));
                                 // generate a refresh token and associate it with userId and clientId
                                 String refreshToken = UUID.randomUUID().toString();
                                 RefreshToken token = new RefreshToken();
@@ -348,12 +352,12 @@ public class Oauth2TokenPostHandler implements HttpHandler {
             RefreshToken token = tokens.remove(refreshToken);
             if(token != null) {
                 String userId = token.getUserId();
+                String userType = token.getUserType();
+                String roles = token.getRoles();
                 String clientId = token.getClientId();
                 String oldScope = token.getScope();
 
                 if(client.getClientId().equals(clientId)) {
-                    IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
-                    User user = users.get(userId);
                     if(scope == null) {
                         scope = oldScope; // use the previous scope when access token is generated
                     } else {
@@ -370,7 +374,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                         if(customClaim != null && customClaim.length() > 0) {
                             customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
                         }
-                        jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), csrf, customMap));
+                        jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, userType, roles, csrf, customMap));
                     } catch (Exception e) {
                         throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                     }
@@ -379,6 +383,8 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                     RefreshToken newToken = new RefreshToken();
                     newToken.setRefreshToken(newRefreshToken);
                     newToken.setUserId(userId);
+                    newToken.setUserType(userType);
+                    newToken.setRoles(roles);
                     newToken.setClientId(client.getClientId());
                     newToken.setScope(scope);
                     tokens.put(refreshToken, newToken);
@@ -440,9 +446,10 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                     throw new ApiException(new Status(USER_TYPE_REQUIRED_FOR_CLIENT_AUTHENTICATED_USER_GRANT_TYPE));
 
                 }
+                String roles = (String)formMap.remove("roles");
                 String jwt;
                 try {
-                    jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, userType, null, formMap));
+                    jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, userType, roles, null, formMap));
                 } catch (Exception e) {
                     throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                 }
@@ -452,6 +459,8 @@ public class Oauth2TokenPostHandler implements HttpHandler {
                 RefreshToken token = new RefreshToken();
                 token.setRefreshToken(refreshToken);
                 token.setUserId(userId);
+                token.setUserType(userType);
+                token.setRoles(roles);
                 token.setClientId(client.getClientId());
                 token.setScope(scope);
                 IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
@@ -529,14 +538,21 @@ public class Oauth2TokenPostHandler implements HttpHandler {
         return claims;
     }
 
-    private JwtClaims mockAcClaims(String clientId, String scopeString, String userId, String userType, String csrf, Map<String, Object> formMap) {
+    private JwtClaims mockAcClaims(String clientId, String scopeString, String userId, String userType, String roleString, String csrf, Map<String, Object> formMap) {
         JwtClaims claims = JwtIssuer.getDefaultJwtClaims();
         claims.setClaim("user_id", userId);
         claims.setClaim("user_type", userType);
         claims.setClaim("client_id", clientId);
         if(csrf != null) claims.setClaim("csrf", csrf);
-        List<String> scope = Arrays.asList(scopeString.split("\\s+"));
-        claims.setStringListClaim("scope", scope); // multi-valued claims work too and will end up as a JSON array
+        if(scopeString != null && scopeString.trim().length() > 0) {
+            List<String> scope = Arrays.asList(scopeString.split("\\s+"));
+            claims.setStringListClaim("scope", scope); // multi-valued claims work too and will end up as a JSON array
+        }
+        if(roleString != null && roleString.trim().length() > 0) {
+            List<String> roles = Arrays.asList(roleString.split("\\s+"));
+            claims.setStringListClaim("roles", roles); // multi-valued claims work too and will end up as a JSON array
+        }
+
         if(formMap != null) {
             for(Map.Entry<String, Object> entry : formMap.entrySet()) {
                 claims.setClaim(entry.getKey(), entry.getValue());

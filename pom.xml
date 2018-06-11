@@ -86,6 +86,7 @@
         <module>key</module>
         <module>refresh-token</module>
         <module>authorize</module>
+        <module>authhub</module>
     </modules>
 
     <repositories>
@@ -101,6 +102,11 @@
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>oauth2-cache</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>oauth2-authhub</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

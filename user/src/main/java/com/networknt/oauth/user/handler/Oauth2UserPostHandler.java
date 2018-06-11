@@ -54,7 +54,6 @@ public class Oauth2UserPostHandler implements HttpHandler {
                 user.setPasswordConfirm(null);
                 String userId = user.getUserId();
                 if(users.get(userId) == null) {
-                    user.setCreateDt(new Date(System.currentTimeMillis()));
                     users.set(userId, user);
                 } else {
                     Status status = new Status(USER_ID_EXISTS, userId);
