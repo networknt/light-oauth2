@@ -8,6 +8,8 @@ import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
 import io.undertow.util.Headers;
 import io.undertow.util.Methods;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.IoUtils;
@@ -75,6 +77,14 @@ public class GithubUtil {
 		String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
 		System.out.println("testHttp2Get: statusCode = " + statusCode + " body = " + body);
 
+		JSONArray jsonArray = new JSONArray(body);
+		for (int i=0; i < jsonArray.length(); i++){
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+			if (jsonObject.get("github_username").toString().equals(username)) {
+				logger.info(jsonObject.get("github_username") + " is attached to the following groups: " + jsonObject.get("groups"));
+			}
+		}
+		
 		return groups;
 	}
 
