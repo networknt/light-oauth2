@@ -6,16 +6,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.IMap;
 import com.networknt.config.Config;
 import com.networknt.exception.ApiException;
+import com.networknt.oauth.auth.Authenticator;
+import com.networknt.oauth.auth.DefaultAuth;
 import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.OAuth2Constants;
 import com.networknt.oauth.cache.model.*;
+import com.networknt.oauth.security.LightPasswordCredential;
 import com.networknt.oauth.token.helper.HttpAuth;
 import com.networknt.security.JwtConfig;
 import com.networknt.security.JwtIssuer;
+import com.networknt.service.SingletonServiceFactory;
 import com.networknt.status.Status;
 import com.networknt.utility.CodeVerifierUtil;
 import com.networknt.utility.HashUtil;
+import io.undertow.security.idm.Account;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormData;
@@ -64,6 +69,7 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements HttpHand
     private static final String CODE_VERIFIER_MISSING = "ERR12040";
     private static final String CODE_VERIFIER_FAILED = "ERR12041";
     private static final String INVALID_CODE_CHALLENGE_METHOD = "ERR12033";
+    private static final String CLIENT_AUTHENTICATE_CLASS_NOT_FOUND = "ERR10043";
 
     static JwtConfig config = (JwtConfig)Config.getInstance().getJsonObjectConfig("jwt", JwtConfig.class);
     private final static String CONFIG = "oauth_token";
@@ -271,6 +277,8 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements HttpHand
     private Map<String, Object> handlePassword(HttpServerExchange exchange, Map<String, Object> formMap) throws ApiException {
         String userId = (String)formMap.get("username");
         String scope = (String)formMap.get("scope");
+        String userType = (String)formMap.get("user_type");
+        String roles = (String)formMap.get("roles");
         if(logger.isDebugEnabled()) logger.debug("userId = " + userId + " scope = " + scope);
         char[] password = null;
         if(formMap.get("password") != null) {
@@ -282,29 +290,42 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements HttpHand
             // authenticate user with credentials
             if(userId != null) {
                 if(password != null) {
-                    IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
-                    User user = users.get(userId);
-                    // match password
-                    try {
-                        if(HashUtil.validatePassword(password, user.getPassword())) {
-                            Arrays.fill(password, ' ');
-                            // make sure that client is trusted
-                            if(client.getClientType() == Client.ClientTypeEnum.TRUSTED) {
-                                if(scope == null) {
-                                    scope = client.getScope(); // use the default scope defined in client if scope is not passed in
-                                } else {
-                                    // make sure scope is in scope defined in client.
-                                    if(!matchScope(scope, client.getScope())) {
-                                        throw new ApiException(new Status(MISMATCH_SCOPE, scope, client.getScope()));
-                                    }
-                                }
+                    // make sure that the client is trusted.
+                    if(client.getClientType() == Client.ClientTypeEnum.TRUSTED) {
+                        if (scope == null) {
+                            scope = client.getScope(); // use the default scope defined in client if scope is not passed in
+                        } else {
+                            // make sure scope is in scope defined in client.
+                            if (!matchScope(scope, client.getScope())) {
+                                throw new ApiException(new Status(MISMATCH_SCOPE, scope, client.getScope()));
+                            }
+                        }
+
+                        // authenticate user with different authenticators.
+                        String clientAuthClass = client.getAuthenticateClass();
+                        Class clazz = DefaultAuth.class;
+                        if(clientAuthClass != null && clientAuthClass.trim().length() > 0) {
+                            try {
+                                clazz = Class.forName(clientAuthClass);
+                            } catch (ClassNotFoundException e) {
+                                logger.error("Authenticate Class " + clientAuthClass + " not found.", e);
+                                throw new ApiException(new Status(CLIENT_AUTHENTICATE_CLASS_NOT_FOUND, clientAuthClass));
+                            }
+                        }
+                        Authenticator authenticator = SingletonServiceFactory.getBean(Authenticator.class, clazz);
+
+                        Account account = authenticator.authenticate(userId, new LightPasswordCredential(password, clientAuthClass, userType));
+                        if(account == null) {
+                            throw new ApiException(new Status(INCORRECT_PASSWORD));
+                        } else {
+                            try {
                                 Map<String, Object> customMap = null;
                                 // assume that the custom_claim is in format of json map string.
                                 String customClaim = client.getCustomClaim();
                                 if(customClaim != null && customClaim.length() > 0) {
                                     customMap = Config.getInstance().getMapper().readValue(customClaim, new TypeReference<Map<String, Object>>(){});
                                 }
-                                String jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, user.getUserType().toString(), user.getRoles(), null, customMap));
+                                String jwt = JwtIssuer.getJwt(mockAcClaims(client.getClientId(), scope, userId, userType, roles, null, customMap));
                                 // generate a refresh token and associate it with userId and clientId
                                 String refreshToken = UUID.randomUUID().toString();
                                 RefreshToken token = new RefreshToken();
@@ -321,14 +342,13 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements HttpHand
                                 resMap.put("expires_in", config.getExpiredInMinutes()*60);
                                 resMap.put("refresh_token", refreshToken);
                                 return resMap;
-                            } else {
-                                throw new ApiException(new Status(NOT_TRUSTED_CLIENT));
+                            } catch (Exception e) {
+                                logger.error("Exception:", e);
+                                throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
                             }
-                        } else {
-                            throw new ApiException(new Status(INCORRECT_PASSWORD));
                         }
-                    } catch (NoSuchAlgorithmException | InvalidKeySpecException | JoseException | IOException e) {
-                        throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
+                    } else {
+                        throw new ApiException(new Status(NOT_TRUSTED_CLIENT));
                     }
                 } else {
                     throw new ApiException(new Status(PASSWORD_REQUIRED));
