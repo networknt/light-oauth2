@@ -18,7 +18,7 @@ import java.util.*;
 public class RefreshTokenMapStore implements MapStore<String, RefreshToken> {
     static final Logger logger = LoggerFactory.getLogger(RefreshTokenMapStore.class);
     static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
-    private static final String insert = "INSERT INTO refresh_token (user_id, client_id, scope, refresh_token) VALUES (?, ?, ?, ?)";
+    private static final String insert = "INSERT INTO refresh_token (user_id, user_type, roles, client_id, scope, refresh_token) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String delete = "DELETE FROM refresh_token WHERE refresh_token = ?";
     private static final String select = "SELECT * FROM refresh_token WHERE refresh_token = ?";
     private static final String update = "UPDATE refresh_token SET  scope=? WHERE refresh_token = ?";
@@ -42,9 +42,11 @@ public class RefreshTokenMapStore implements MapStore<String, RefreshToken> {
         if(load(key) == null) {
             try (Connection connection = ds.getConnection(); PreparedStatement stmt = connection.prepareStatement(insert)) {
                 stmt.setString(1, token.getUserId());
-                stmt.setString(2, token.getClientId());
-                stmt.setString(3, token.getScope());
-                stmt.setString(4, token.getRefreshToken());
+                stmt.setString(2, token.getUserType());
+                stmt.setString(3, token.getRoles());
+                stmt.setString(4, token.getClientId());
+                stmt.setString(5, token.getScope());
+                stmt.setString(6, token.getRefreshToken());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logger.error("Exception:", e);
@@ -76,6 +78,8 @@ public class RefreshTokenMapStore implements MapStore<String, RefreshToken> {
                     token = new RefreshToken();
                     token.setRefreshToken(key);
                     token.setUserId(rs.getString("user_id"));
+                    token.setUserType(rs.getString("user_type"));
+                    token.setRoles(rs.getString("roles"));
                     token.setClientId(rs.getString("client_id"));
                     token.setScope(rs.getString("scope"));
                 }

@@ -83,6 +83,8 @@ ENGINE=INNODB;
 
 CREATE TABLE refresh_token (
   user_id VARCHAR(36) NOT NULL,
+  user_type VARCHAR(36),
+  roles VARCHAR(2048),
   client_id VARCHAR(36) NOT NULL,
   scope VARCHAR(64) NOT NULL,
   refresh_token VARCHAR(256) NOT NULL,

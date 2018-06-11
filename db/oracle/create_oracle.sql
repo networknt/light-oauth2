@@ -70,6 +70,8 @@ CREATE TABLE client_service (
 
 CREATE TABLE refresh_token (
   user_id VARCHAR2(36) NOT NULL,
+  user_type VARCHAR2(36),
+  roles VARCHAR2(2048),
   client_id VARCHAR2(36) NOT NULL,
   scope VARCHAR2(64) NOT NULL,
   refresh_token VARCHAR2(256) NOT NULL,

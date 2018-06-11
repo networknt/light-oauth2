@@ -45,10 +45,12 @@ create table service (
 
 
 CREATE TABLE refresh_token (
-  user_id VARCHAR2(36) NOT NULL,
-  client_id VARCHAR2(36) NOT NULL,
-  scope VARCHAR2(64) NOT NULL,
-  refresh_token VARCHAR2(256) NOT NULL,
+  user_id VARCHAR NOT NULL,
+  user_type VARCHAR,
+  roles VARCHAR,
+  client_id VARCHAR NOT NULL,
+  scope VARCHAR NOT NULL,
+  refresh_token VARCHAR NOT NULL,
   PRIMARY KEY (user_id, client_id, refresh_token),
   FOREIGN KEY (user_id) REFERENCES user_profile(user_id),
   FOREIGN KEY (client_id) REFERENCES client(client_id)
@@ -56,13 +58,13 @@ CREATE TABLE refresh_token (
 
 create table audit_log (
   log_id BIGINT, -- system milliseonds from 1970.
-  service_id VARCHAR(32) NOT NULL,
-  endpoint VARCHAR(256) NOT NULL,
-  request_header VARCHAR(4096),
-  request_body VARCHAR(4096),
+  service_id VARCHAR NOT NULL,
+  endpoint VARCHAR NOT NULL,
+  request_header VARCHAR,
+  request_body VARCHAR,
   response_code INT,
-  response_header VARCHAR(4096),
-  response_body VARCHAR(4096)
+  response_header VARCHAR,
+  response_body VARCHAR
 );
 
 INSERT INTO user_profile(user_id, user_type, first_name, last_name, email, roles, password) VALUES('admin', 'admin', 'admin', 'admin', 'admin@networknt.com', 'user admin', '1000:5b39342c202d37372c203132302c202d3132302c2034372c2032332c2034352c202d34342c202d31362c2034372c202d35392c202d35362c2039302c202d352c202d38322c202d32385d:949e6fcf9c4bb8a3d6a8c141a3a9182a572fb95fe8ccdc93b54ba53df8ef2e930f7b0348590df0d53f242ccceeae03aef6d273a34638b49c559ada110ec06992');
