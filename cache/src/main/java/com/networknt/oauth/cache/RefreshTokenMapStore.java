@@ -21,7 +21,7 @@ public class RefreshTokenMapStore implements MapStore<String, RefreshToken> {
     private static final String insert = "INSERT INTO refresh_token (user_id, client_id, scope, refresh_token) VALUES (?, ?, ?, ?)";
     private static final String delete = "DELETE FROM refresh_token WHERE refresh_token = ?";
     private static final String select = "SELECT * FROM refresh_token WHERE refresh_token = ?";
-    private static final String update = "UPDATE refresh_token SET user_id=?, first_name=?, last_name=?, email=?, password=? WHERE refresh_token = ?";
+    private static final String update = "UPDATE refresh_token SET  scope=? WHERE refresh_token = ?";
     private static final String loadall = "SELECT refresh_token FROM refresh_token";
 
 
@@ -52,18 +52,7 @@ public class RefreshTokenMapStore implements MapStore<String, RefreshToken> {
             }
         } else {
             /* there shouldn't have update by token
-            try (Connection connection = ds.getConnection(); PreparedStatement stmt = connection.prepareStatement(update)) {
-                stmt.setString(1, user.getUserType().toString());
-                stmt.setString(2, user.getFirstName());
-                stmt.setString(3, user.getLastName());
-                stmt.setString(4, user.getEmail());
-                stmt.setString(5, user.getPassword());
-                stmt.setString(6, user.getUserId());
-                stmt.executeUpdate();
-            } catch (SQLException e) {
-                logger.error("Exception:", e);
-                throw new RuntimeException(e);
-            }
+
             */
         }
     }
@@ -110,7 +99,7 @@ public class RefreshTokenMapStore implements MapStore<String, RefreshToken> {
         try (Connection connection = ds.getConnection(); PreparedStatement stmt = connection.prepareStatement(loadall)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    keys.add(rs.getString("user_id"));
+                    keys.add(rs.getString("refresh_token"));
                 }
             }
         } catch (SQLException e) {

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Date;
 import java.util.Map;
 
-public class Oauth2ServicePostHandler implements HttpHandler {
+public class Oauth2ServicePostHandler extends ServiceAuditHandler implements HttpHandler {
     static Logger logger = LoggerFactory.getLogger(Oauth2ServicePostHandler.class);
     static final String SERVICE_ID_EXISTS = "ERR12018";
     static final String USER_NOT_FOUND = "ERR12013";
@@ -37,6 +37,7 @@ public class Oauth2ServicePostHandler implements HttpHandler {
                     Status status = new Status(USER_NOT_FOUND, ownerId);
                     exchange.setStatusCode(status.getStatusCode());
                     exchange.getResponseSender().send(status.toString());
+                    processAudit(exchange);
                     return;
                 }
             }
@@ -46,5 +47,6 @@ public class Oauth2ServicePostHandler implements HttpHandler {
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
         }
+        processAudit(exchange);
     }
 }

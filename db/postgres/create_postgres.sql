@@ -66,17 +66,17 @@ CREATE TABLE client_service (
 );
 
 CREATE TABLE refresh_token (
-  user_id VARCHAR2(36) NOT NULL,
-  client_id VARCHAR2(36) NOT NULL,
-  scope VARCHAR2(64) NOT NULL,
-  refresh_token VARCHAR2(1024) NOT NULL,
+  user_id VARCHAR(36) NOT NULL,
+  client_id VARCHAR(36) NOT NULL,
+  scope VARCHAR(64) NOT NULL,
+  refresh_token VARCHAR(256) NOT NULL,
   PRIMARY KEY (user_id, client_id, refresh_token),
-  FOREIGN KEY (user_id) REFERENCES user_profile(service_id),
+  FOREIGN KEY (user_id) REFERENCES user_profile(user_id),
   FOREIGN KEY (client_id) REFERENCES client(client_id)
 );
 
 create table audit_log (
-  log_id INT, -- system milliseonds from 1970.
+  log_id BIGINT, -- system milliseonds from 1970.
   service_id VARCHAR(32) NOT NULL,
   endpoint VARCHAR(256) NOT NULL,
   request_header VARCHAR(4096),

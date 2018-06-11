@@ -1,9 +1,13 @@
 package com.networknt.oauth.authorize.handler;
 
 import com.hazelcast.core.IMap;
+import com.networknt.config.Config;
+import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.OAuth2Constants;
+import com.networknt.oauth.cache.model.AuditInfo;
 import com.networknt.oauth.cache.model.Client;
+import com.networknt.oauth.cache.model.Oauth2Service;
 import com.networknt.status.Status;
 import com.networknt.utility.CodeVerifierUtil;
 import com.networknt.utility.Util;
@@ -28,13 +32,15 @@ import java.util.regex.Matcher;
  * go to db to get it. It must be something added recently and not in cache yet.
  *
  */
-public class Oauth2AuthorizeGetHandler implements HttpHandler {
+public class Oauth2AuthorizeGetHandler extends AuditInfoHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2AuthorizeGetHandler.class);
     static final String CLIENT_NOT_FOUND = "ERR12014";
     static final String INVALID_CODE_CHALLENGE_METHOD = "ERR12033";
     static final String CODE_CHALLENGE_TOO_SHORT = "ERR12034";
     static final String CODE_CHALLENGE_TOO_LONG = "ERR12035";
     static final String INVALID_CODE_CHALLENGE_FORMAT = "ERR12036";
+    private final static String CONFIG = "oauth_authorize";
+    private final static OauthAuthConfig config = (OauthAuthConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthAuthConfig.class);
 
     @SuppressWarnings("unchecked")
     @Override
@@ -89,6 +95,7 @@ public class Oauth2AuthorizeGetHandler implements HttpHandler {
                         Status status = new Status(INVALID_CODE_CHALLENGE_METHOD, codeChallengeMethod);
                         exchange.setStatusCode(status.getStatusCode());
                         exchange.getResponseSender().send(status.toString());
+                        processAudit(exchange);
                         return;
                     }
                 } else {
@@ -101,12 +108,14 @@ public class Oauth2AuthorizeGetHandler implements HttpHandler {
                     Status status = new Status(CODE_CHALLENGE_TOO_SHORT, codeChallenge);
                     exchange.setStatusCode(status.getStatusCode());
                     exchange.getResponseSender().send(status.toString());
+                    processAudit(exchange);
                     return;
                 }
                 if(codeChallenge.length() > CodeVerifierUtil.MAX_CODE_VERIFIER_LENGTH) {
                     Status status = new Status(CODE_CHALLENGE_TOO_LONG, codeChallenge);
                     exchange.setStatusCode(status.getStatusCode());
                     exchange.getResponseSender().send(status.toString());
+                    processAudit(exchange);
                     return;
                 }
                 // check the format
@@ -115,6 +124,7 @@ public class Oauth2AuthorizeGetHandler implements HttpHandler {
                     Status status = new Status(INVALID_CODE_CHALLENGE_FORMAT, codeChallenge);
                     exchange.setStatusCode(status.getStatusCode());
                     exchange.getResponseSender().send(status.toString());
+                    processAudit(exchange);
                     return;
                 }
                 // put the code challenge and method into the codes map.
@@ -133,6 +143,20 @@ public class Oauth2AuthorizeGetHandler implements HttpHandler {
             exchange.setStatusCode(StatusCodes.FOUND);
             exchange.getResponseHeaders().put(Headers.LOCATION, redirectUri);
             exchange.endExchange();
+            processAudit(exchange);
+        }
+    }
+
+    private void processAudit(HttpServerExchange exchange) throws Exception {
+        if (config.isEnableAudit() ) {
+            AuditInfo auditInfo = new AuditInfo();
+            auditInfo.setServiceId(Oauth2Service.REFRESHTOKEN);
+            auditInfo.setEndpoint(exchange.getHostName() + exchange.getRelativePath());
+            auditInfo.setRequestHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestHeaders()));
+            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestCookies()));
+            auditInfo.setResponseHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseHeaders()));
+            auditInfo.setResponseBody(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseCookies()));
+            saveAudit(auditInfo);
         }
     }
 }

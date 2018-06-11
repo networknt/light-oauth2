@@ -25,7 +25,7 @@ import java.util.regex.Matcher;
  * go to db to get it. It must be something added recently and not in cache yet.
  *
  */
-public class Oauth2CodeGetHandler implements HttpHandler {
+public class Oauth2CodeGetHandler extends CodeAuditHandler  implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2CodeGetHandler.class);
     static final String CLIENT_NOT_FOUND = "ERR12014";
     static final String INVALID_CODE_CHALLENGE_METHOD = "ERR12033";
@@ -90,6 +90,7 @@ public class Oauth2CodeGetHandler implements HttpHandler {
                         Status status = new Status(INVALID_CODE_CHALLENGE_METHOD, codeChallengeMethod);
                         exchange.setStatusCode(status.getStatusCode());
                         exchange.getResponseSender().send(status.toString());
+                        processAudit(exchange);
                         return;
                     }
                 } else {
@@ -102,12 +103,14 @@ public class Oauth2CodeGetHandler implements HttpHandler {
                     Status status = new Status(CODE_CHALLENGE_TOO_SHORT, codeChallenge);
                     exchange.setStatusCode(status.getStatusCode());
                     exchange.getResponseSender().send(status.toString());
+                    processAudit(exchange);
                     return;
                 }
                 if(codeChallenge.length() > CodeVerifierUtil.MAX_CODE_VERIFIER_LENGTH) {
                     Status status = new Status(CODE_CHALLENGE_TOO_LONG, codeChallenge);
                     exchange.setStatusCode(status.getStatusCode());
                     exchange.getResponseSender().send(status.toString());
+                    processAudit(exchange);
                     return;
                 }
                 // check the format
@@ -116,6 +119,7 @@ public class Oauth2CodeGetHandler implements HttpHandler {
                     Status status = new Status(INVALID_CODE_CHALLENGE_FORMAT, codeChallenge);
                     exchange.setStatusCode(status.getStatusCode());
                     exchange.getResponseSender().send(status.toString());
+                    processAudit(exchange);
                     return;
                 }
                 // put the code challenge and method into the codes map.
@@ -134,6 +138,7 @@ public class Oauth2CodeGetHandler implements HttpHandler {
             exchange.setStatusCode(StatusCodes.FOUND);
             exchange.getResponseHeaders().put(Headers.LOCATION, redirectUri);
             exchange.endExchange();
+            processAudit(exchange);
         }
     }
 }

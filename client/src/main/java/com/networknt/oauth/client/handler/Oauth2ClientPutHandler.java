@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Date;
 import java.util.Map;
 
-public class Oauth2ClientPutHandler implements HttpHandler {
+public class Oauth2ClientPutHandler  extends ClientAuditHandler implements HttpHandler {
     static Logger logger = LoggerFactory.getLogger(Oauth2ClientPutHandler.class);
     static final String CLIENT_NOT_FOUND = "ERR12014";
     static final String USER_NOT_FOUND = "ERR12013";
@@ -43,6 +43,7 @@ public class Oauth2ClientPutHandler implements HttpHandler {
                     Status status = new Status(USER_NOT_FOUND, ownerId);
                     exchange.setStatusCode(status.getStatusCode());
                     exchange.getResponseSender().send(status.toString());
+                    processAudit(exchange);
                     return;
                 }
             }
@@ -50,5 +51,6 @@ public class Oauth2ClientPutHandler implements HttpHandler {
             client.setClientSecret(originalClient.getClientSecret());
             clients.set(clientId, client);
         }
+        processAudit(exchange);
     }
 }

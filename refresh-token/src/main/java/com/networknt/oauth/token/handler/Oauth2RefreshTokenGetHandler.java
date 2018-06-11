@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Deque;
 
-public class Oauth2RefreshTokenGetHandler implements HttpHandler {
+public class Oauth2RefreshTokenGetHandler extends RefreshTokenAuditHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2RefreshTokenGetHandler.class);
 
     @Override
@@ -36,5 +36,6 @@ public class Oauth2RefreshTokenGetHandler implements HttpHandler {
 
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(values));
+        processAudit(exchange);
     }
 }

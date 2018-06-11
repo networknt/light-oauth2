@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  *
  * @author Steve Hu
  */
-public class Oauth2ClientClientIdServiceServiceIdPostHandler implements HttpHandler {
+public class Oauth2ClientClientIdServiceServiceIdPostHandler  extends ClientAuditHandler implements HttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2ClientClientIdServiceServiceIdPostHandler.class);
     private static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
     private static final String insert = "INSERT INTO client_service (client_id, service_id, endpoint) VALUES (?, ?, ?)";
@@ -49,6 +49,7 @@ public class Oauth2ClientClientIdServiceServiceIdPostHandler implements HttpHand
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
             if(logger.isDebugEnabled()) logger.debug("Could not find clientId " + clientId);
+            processAudit(exchange);
             return;
         }
 
@@ -59,6 +60,7 @@ public class Oauth2ClientClientIdServiceServiceIdPostHandler implements HttpHand
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
             if(logger.isDebugEnabled()) logger.debug("Could not find serviceId " + serviceId);
+            processAudit(exchange);
             return;
         }
         List<String> endpoints = (List)exchange.getAttachment(BodyHandler.REQUEST_BODY);
@@ -117,5 +119,6 @@ public class Oauth2ClientClientIdServiceServiceIdPostHandler implements HttpHand
         }
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(result));
+        processAudit(exchange);
     }
 }

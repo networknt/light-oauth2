@@ -24,7 +24,7 @@ import java.util.Deque;
  * a new one each request.
  * TODO implement above once people report performance issue.
  */
-public class Oauth2UserGetHandler implements HttpHandler {
+public class Oauth2UserGetHandler extends UserAuditHandler implements HttpHandler {
     static Logger logger = LoggerFactory.getLogger(Oauth2UserGetHandler.class);
 
     @SuppressWarnings("unchecked")
@@ -48,5 +48,6 @@ public class Oauth2UserGetHandler implements HttpHandler {
         }
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(values));
+        processAudit(exchange);
     }
 }

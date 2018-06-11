@@ -29,7 +29,7 @@ import java.util.Map;
  *
  * @author Steve Hu
  */
-public class Oauth2ClientClientIdServiceServiceIdGetHandler implements HttpHandler {
+public class Oauth2ClientClientIdServiceServiceIdGetHandler  extends ClientAuditHandler implements HttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2ClientClientIdServiceServiceIdGetHandler.class);
     private static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
     private static final String select = "SELECT * FROM client_service WHERE client_id = ? AND service_id = ?";
@@ -46,6 +46,7 @@ public class Oauth2ClientClientIdServiceServiceIdGetHandler implements HttpHandl
             Status status = new Status(CLIENT_NOT_FOUND, clientId);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
 
@@ -55,6 +56,7 @@ public class Oauth2ClientClientIdServiceServiceIdGetHandler implements HttpHandl
             Status status = new Status(SERVICE_NOT_FOUND, serviceId);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
 
@@ -74,5 +76,6 @@ public class Oauth2ClientClientIdServiceServiceIdGetHandler implements HttpHandl
 
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(endpoints));
+        processAudit(exchange);
     }
 }

@@ -18,7 +18,7 @@ import java.sql.Date;
 import java.util.Map;
 import java.util.UUID;
 
-public class Oauth2ClientPostHandler implements HttpHandler {
+public class Oauth2ClientPostHandler  extends ClientAuditHandler implements HttpHandler {
 
     static Logger logger = LoggerFactory.getLogger(Oauth2ClientPostHandler.class);
     static final String CLIENT_ID_EXISTS = "ERR12019";
@@ -46,6 +46,7 @@ public class Oauth2ClientPostHandler implements HttpHandler {
                     Status status = new Status(USER_NOT_FOUND, ownerId);
                     exchange.setStatusCode(status.getStatusCode());
                     exchange.getResponseSender().send(status.toString());
+                    processAudit(exchange);
                     return;
                 }
             }
@@ -59,5 +60,6 @@ public class Oauth2ClientPostHandler implements HttpHandler {
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
         }
+        processAudit(exchange);
     }
 }

@@ -11,10 +11,11 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Oauth2ClientClientIdGetHandler implements HttpHandler {
+public class Oauth2ClientClientIdGetHandler  extends ClientAuditHandler implements HttpHandler {
     static final String CLIENT_NOT_FOUND = "ERR12014";
 
     static Logger logger = LoggerFactory.getLogger(Oauth2ClientClientIdGetHandler.class);
+
     @SuppressWarnings("unchecked")
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
@@ -33,5 +34,6 @@ public class Oauth2ClientClientIdGetHandler implements HttpHandler {
         c.setClientSecret(null);
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(c));
+        processAudit(exchange);
     }
 }

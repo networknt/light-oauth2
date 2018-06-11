@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  *
  * @author Steve Hu
  */
-public class Oauth2ClientClientIdServiceDeleteHandler implements HttpHandler {
+public class Oauth2ClientClientIdServiceDeleteHandler  extends ClientAuditHandler implements HttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2ClientClientIdServiceServiceIdGetHandler.class);
     private static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
     private static final String delete = "DELETE FROM client_service WHERE client_id = ?";
@@ -47,6 +47,7 @@ public class Oauth2ClientClientIdServiceDeleteHandler implements HttpHandler {
             Status status = new Status(CLIENT_NOT_FOUND, clientId);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
 
@@ -89,6 +90,6 @@ public class Oauth2ClientClientIdServiceDeleteHandler implements HttpHandler {
         }
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(result));
-
+        processAudit(exchange);
     }
 }

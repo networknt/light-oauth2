@@ -3,8 +3,11 @@ package com.networknt.oauth.key.handler;
 import com.hazelcast.core.IMap;
 import com.networknt.config.Config;
 import com.networknt.exception.ApiException;
+import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
+import com.networknt.oauth.cache.model.AuditInfo;
 import com.networknt.oauth.cache.model.Client;
+import com.networknt.oauth.cache.model.Oauth2Service;
 import com.networknt.status.Status;
 import com.networknt.utility.HashUtil;
 import io.undertow.server.HttpHandler;
@@ -28,7 +31,7 @@ import java.util.Map;
 import static io.undertow.util.Headers.AUTHORIZATION;
 import static io.undertow.util.Headers.BASIC;
 
-public class Oauth2KeyKeyIdGetHandler implements HttpHandler {
+public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements HttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2KeyKeyIdGetHandler.class);
 
     static final String CONFIG_SECURITY = "security";
@@ -46,6 +49,8 @@ public class Oauth2KeyKeyIdGetHandler implements HttpHandler {
     private static final String LOWERCASE_BASIC_PREFIX = BASIC_PREFIX.toLowerCase(Locale.ENGLISH);
     private static final int PREFIX_LENGTH = BASIC_PREFIX.length();
     private static final String COLON = ":";
+    private final static String CONFIG = "oauth_key";
+    private final static OauthKeyConfig config = (OauthKeyConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthKeyConfig.class);
 
     @SuppressWarnings("unchecked")
     @Override
@@ -59,12 +64,14 @@ public class Oauth2KeyKeyIdGetHandler implements HttpHandler {
             Status status = new Status(MISSING_AUTHORIZATION_HEADER);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
         if(authHeader == null) {
             Status status = new Status(MISSING_AUTHORIZATION_HEADER);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
         String clientId = authenticate(authHeader);
@@ -95,9 +102,10 @@ public class Oauth2KeyKeyIdGetHandler implements HttpHandler {
                 Status status = new Status(INVALID_KEY_ID, keyId);
                 exchange.setStatusCode(status.getStatusCode());
                 exchange.getResponseSender().send(status.toString());
-                return;
+
             }
         }
+        processAudit(exchange);
     }
 
     @SuppressWarnings("unchecked")
@@ -133,5 +141,18 @@ public class Oauth2KeyKeyIdGetHandler implements HttpHandler {
             }
         }
         return result;
+    }
+
+    private void processAudit(HttpServerExchange exchange) throws Exception {
+        if (config.isEnableAudit() ) {
+            AuditInfo auditInfo = new AuditInfo();
+            auditInfo.setServiceId(Oauth2Service.REFRESHTOKEN);
+            auditInfo.setEndpoint(exchange.getHostName() + exchange.getRelativePath());
+            auditInfo.setRequestHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestHeaders()));
+            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestCookies()));
+            auditInfo.setResponseHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseHeaders()));
+            auditInfo.setResponseBody(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseCookies()));
+            saveAudit(auditInfo);
+        }
     }
 }

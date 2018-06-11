@@ -11,7 +11,7 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Oauth2UserUserIdGetHandler implements HttpHandler {
+public class Oauth2UserUserIdGetHandler extends UserAuditHandler implements HttpHandler {
     static final String USER_NOT_FOUND = "ERR12013";
     static Logger logger = LoggerFactory.getLogger(Oauth2UserUserIdGetHandler.class);
     @SuppressWarnings("unchecked")
@@ -26,11 +26,13 @@ public class Oauth2UserUserIdGetHandler implements HttpHandler {
             Status status = new Status(USER_NOT_FOUND, userId);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
         // remove password here
         user.setPassword(null);
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(user));
+        processAudit(exchange);
     }
 }

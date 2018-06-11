@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  *
  * @author Steve Hu
  */
-public class Oauth2ClientClientIdServiceServiceIdDeleteHandler implements HttpHandler {
+public class Oauth2ClientClientIdServiceServiceIdDeleteHandler  extends ClientAuditHandler implements HttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2ClientClientIdServiceServiceIdGetHandler.class);
     private static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
     private static final String delete = "DELETE FROM client_service WHERE client_id = ? AND service_id = ?";
@@ -48,6 +48,7 @@ public class Oauth2ClientClientIdServiceServiceIdDeleteHandler implements HttpHa
             Status status = new Status(CLIENT_NOT_FOUND, clientId);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
 
@@ -57,6 +58,7 @@ public class Oauth2ClientClientIdServiceServiceIdDeleteHandler implements HttpHa
             Status status = new Status(SERVICE_NOT_FOUND, serviceId);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
 
@@ -99,5 +101,6 @@ public class Oauth2ClientClientIdServiceServiceIdDeleteHandler implements HttpHa
         }
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(result));
+        processAudit(exchange);
     }
 }

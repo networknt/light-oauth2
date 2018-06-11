@@ -6,11 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.IMap;
 import com.networknt.config.Config;
 import com.networknt.exception.ApiException;
+import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.OAuth2Constants;
-import com.networknt.oauth.cache.model.Client;
-import com.networknt.oauth.cache.model.RefreshToken;
-import com.networknt.oauth.cache.model.User;
+import com.networknt.oauth.cache.model.*;
 import com.networknt.oauth.token.helper.HttpAuth;
 import com.networknt.security.JwtConfig;
 import com.networknt.security.JwtIssuer;
@@ -34,7 +33,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.regex.Matcher;
 
-public class Oauth2TokenPostHandler implements HttpHandler {
+public class Oauth2TokenPostHandler extends AuditInfoHandler implements HttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2TokenPostHandler.class);
 
     private static final String UNABLE_TO_PARSE_FORM_DATA = "ERR12000";
@@ -67,7 +66,8 @@ public class Oauth2TokenPostHandler implements HttpHandler {
     private static final String INVALID_CODE_CHALLENGE_METHOD = "ERR12033";
 
     static JwtConfig config = (JwtConfig)Config.getInstance().getJsonObjectConfig("jwt", JwtConfig.class);
-
+    private final static String CONFIG = "oauth_token";
+    private final static OauthTokenConfig tokenConfig = (OauthTokenConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthTokenConfig.class);
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         ObjectMapper mapper = Config.getInstance().getMapper();
@@ -88,6 +88,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
             Status status = new Status(UNABLE_TO_PARSE_FORM_DATA, e.getMessage());
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
         try {
@@ -115,6 +116,7 @@ public class Oauth2TokenPostHandler implements HttpHandler {
             exchange.setStatusCode(e.getStatus().getStatusCode());
             exchange.getResponseSender().send(e.getStatus().toString());
         }
+        processAudit(exchange);
     }
 
     @SuppressWarnings("unchecked")
@@ -577,5 +579,18 @@ public class Oauth2TokenPostHandler implements HttpHandler {
             }
         }
         return matched;
+    }
+
+    private void processAudit(HttpServerExchange exchange) throws Exception {
+        if (tokenConfig.isEnableAudit() ) {
+            AuditInfo auditInfo = new AuditInfo();
+            auditInfo.setServiceId(Oauth2Service.REFRESHTOKEN);
+            auditInfo.setEndpoint(exchange.getHostName() + exchange.getRelativePath());
+            auditInfo.setRequestHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestHeaders()));
+            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestCookies()));
+            auditInfo.setResponseHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseHeaders()));
+            auditInfo.setResponseBody(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseCookies()));
+            saveAudit(auditInfo);
+        }
     }
 }

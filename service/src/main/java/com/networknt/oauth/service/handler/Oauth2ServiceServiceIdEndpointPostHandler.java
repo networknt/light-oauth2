@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author Steve Hu
  */
-public class Oauth2ServiceServiceIdEndpointPostHandler implements HttpHandler {
+public class Oauth2ServiceServiceIdEndpointPostHandler extends ServiceAuditHandler implements HttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2ServiceServiceIdEndpointPostHandler.class);
     static final String SERVICE_NOT_FOUND = "ERR12015";
 
@@ -41,6 +41,7 @@ public class Oauth2ServiceServiceIdEndpointPostHandler implements HttpHandler {
             Status status = new Status(SERVICE_NOT_FOUND, serviceId);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
 
@@ -50,5 +51,6 @@ public class Oauth2ServiceServiceIdEndpointPostHandler implements HttpHandler {
             list.add(Config.getInstance().getMapper().convertValue(m, ServiceEndpoint.class));
         }
         serviceEndpoints.set(serviceId, list);
+        processAudit(exchange);
     }
 }

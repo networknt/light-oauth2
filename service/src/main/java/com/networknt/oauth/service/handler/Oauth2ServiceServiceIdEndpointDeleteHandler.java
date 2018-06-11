@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Steve Hu
  */
-public class Oauth2ServiceServiceIdEndpointDeleteHandler implements HttpHandler {
+public class Oauth2ServiceServiceIdEndpointDeleteHandler extends ServiceAuditHandler implements HttpHandler {
     private static Logger logger = LoggerFactory.getLogger(Oauth2ServiceServiceIdEndpointDeleteHandler.class);
     private static final String SERVICE_ENDPOINT_NOT_FOUND = "ERR12042";
 
@@ -33,6 +33,6 @@ public class Oauth2ServiceServiceIdEndpointDeleteHandler implements HttpHandler 
         } else {
             serviceEndpoints.delete(serviceId);
         }
-
+        processAudit(exchange);
     }
 }

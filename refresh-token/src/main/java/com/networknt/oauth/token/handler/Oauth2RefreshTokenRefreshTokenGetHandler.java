@@ -11,7 +11,7 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Oauth2RefreshTokenRefreshTokenGetHandler implements HttpHandler {
+public class Oauth2RefreshTokenRefreshTokenGetHandler extends RefreshTokenAuditHandler implements HttpHandler {
     private static final String REFRESH_TOKEN_NOT_FOUND = "ERR12029";
 
     private static Logger logger = LoggerFactory.getLogger(Oauth2RefreshTokenRefreshTokenGetHandler.class);
@@ -27,9 +27,10 @@ public class Oauth2RefreshTokenRefreshTokenGetHandler implements HttpHandler {
             Status status = new Status(REFRESH_TOKEN_NOT_FOUND, refreshToken);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
-            return;
+        } else {
+            exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
+            exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(token));
         }
-        exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
-        exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(token));
+        processAudit(exchange);
     }
 }

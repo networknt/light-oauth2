@@ -28,7 +28,7 @@ import java.util.Map;
  *
  * @author Steve Hu
  */
-public class Oauth2ClientClientIdServiceGetHandler implements HttpHandler {
+public class Oauth2ClientClientIdServiceGetHandler  extends ClientAuditHandler implements HttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2ClientClientIdServiceGetHandler.class);
     private static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
     private static final String select = "SELECT * FROM client_service WHERE client_id = ? ORDER BY service_id";
@@ -44,6 +44,7 @@ public class Oauth2ClientClientIdServiceGetHandler implements HttpHandler {
             Status status = new Status(CLIENT_NOT_FOUND, clientId);
             exchange.setStatusCode(status.getStatusCode());
             exchange.getResponseSender().send(status.toString());
+            processAudit(exchange);
             return;
         }
 
@@ -70,5 +71,6 @@ public class Oauth2ClientClientIdServiceGetHandler implements HttpHandler {
 
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(serviceEndpoints));
+        processAudit(exchange);
     }
 }
