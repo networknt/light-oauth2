@@ -835,6 +835,64 @@ public class Oauth2TokenPostHandlerTest {
         RefreshToken token = new RefreshToken();
         token.setRefreshToken("86c0a39f-0789-4b71-9fed-d99fe6dc9281");
         token.setUserId("admin");
+        token.setUserType("employee");
+        token.setClientId("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d");
+        token.setScope("petstore.r petstore.w");
+        CacheStartupHookProvider.hz.getMap("tokens").put("86c0a39f-0789-4b71-9fed-d99fe6dc9281", token);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "refresh_token");
+        params.put("refresh_token", "86c0a39f-0789-4b71-9fed-d99fe6dc9281");
+        String s = Http2Client.getFormDataString(params);
+
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(200, statusCode);
+            if(statusCode == 200) {
+                logger.debug("body = " + body);
+                Map map = Config.getInstance().getMapper().readValue(body, new TypeReference<Map<String, Object>>(){});
+                String refreshToken = (String)map.get("refresh_token");
+                Assert.assertNotEquals("86c0a39f-0789-4b71-9fed-d99fe6dc9281", refreshToken);
+            }
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+    }
+
+    @Test
+    public void testRefreshTokenWithRoles() throws Exception {
+        // setup refresh token map for userId and clientId
+        RefreshToken token = new RefreshToken();
+        token.setRefreshToken("86c0a39f-0789-4b71-9fed-d99fe6dc9281");
+        token.setUserId("admin");
+        token.setUserType("employee");
+        token.setRoles("user admin");
         token.setClientId("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d");
         token.setScope("petstore.r petstore.w");
         CacheStartupHookProvider.hz.getMap("tokens").put("86c0a39f-0789-4b71-9fed-d99fe6dc9281", token);
@@ -1077,7 +1135,61 @@ public class Oauth2TokenPostHandlerTest {
         // setup codes map for userId but not redirectUri
         Map<String, String> codeMap = new HashMap<>();
         codeMap.put("userId", "admin");
+        codeMap.put("userType", "employee");
         codeMap.put("redirectUri", "http://localhost:8080/authorization");
+        CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
+        params.put("csrf", Util.getUUID());
+        String s = Http2Client.getFormDataString(params);
+
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("f7d42348-c647-4efb-a52d-4c5787421e72", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            Assert.assertEquals(200, statusCode);
+            logger.debug("response body = " + body); // here we can get the access token and verify if transit in the payload in jwt.io.
+            Assert.assertTrue(body.indexOf("access_token") > 0);
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+    }
+
+    @Test
+    public void testAuthorizationCodeWithRoles() throws Exception {
+        // setup codes map for userId but not redirectUri
+        Map<String, String> codeMap = new HashMap<>();
+        codeMap.put("userId", "admin");
+        codeMap.put("redirectUri", "http://localhost:8080/authorization");
+        codeMap.put("userType", "employee");
+        codeMap.put("roles", "user admin");
         CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
 
         Map<String, String> params = new HashMap<>();

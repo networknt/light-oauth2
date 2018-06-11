@@ -32,7 +32,6 @@ public class Oauth2UserPutHandler extends UserAuditHandler implements HttpHandle
         } else {
             // as password is not in the return value, chances are password is not in the user object
             user.setPassword(u.getPassword());
-            user.setUpdateDt(new Date(System.currentTimeMillis()));
             users.set(userId, user);
         }
         processAudit(exchange);

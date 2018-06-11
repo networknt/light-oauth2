@@ -10,7 +10,6 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.util.Objects;
 
 
@@ -64,9 +63,7 @@ public class User implements IdentifiedDataSerializable {
 
   private String passwordConfirm = null;
 
-  private Date createDt = null;
-
-  private Date updateDt = null;
+  private String roles = null;
 
   public User userId(String userId) {
     this.userId = userId;
@@ -173,34 +170,20 @@ public class User implements IdentifiedDataSerializable {
     this.passwordConfirm = passwordConfirm;
   }
 
-  public User createDt(Date createDt) {
-    this.createDt = createDt;
+
+  public User roles(String roles) {
+    this.roles = roles;
     return this;
   }
 
-  
-  @ApiModelProperty(example = "null", value = "create date time")
-  @JsonProperty("createDt")
-  public Date getCreateDt() {
-    return createDt;
-  }
-  public void setCreateDt(Date createDt) {
-    this.createDt = createDt;
-  }
 
-  public User updateDt(Date updateDt) {
-    this.updateDt = updateDt;
-    return this;
+  @ApiModelProperty(example = "null", value = "user roles")
+  @JsonProperty("roles")
+  public String getRoles() {
+    return roles;
   }
-
-  
-  @ApiModelProperty(example = "null", value = "update date time")
-  @JsonProperty("updateDt")
-  public Date getUpdateDt() {
-    return updateDt;
-  }
-  public void setUpdateDt(Date updateDt) {
-    this.updateDt = updateDt;
+  public void setRoles(String roles) {
+    this.roles = roles;
   }
 
 
@@ -220,13 +203,12 @@ public class User implements IdentifiedDataSerializable {
         Objects.equals(email, user.email) &&
         Objects.equals(password, user.password) &&
         Objects.equals(passwordConfirm, user.passwordConfirm) &&
-        Objects.equals(createDt, user.createDt) &&
-        Objects.equals(updateDt, user.updateDt);
+        Objects.equals(roles, user.roles);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(userId, userType, firstName, lastName, email, password, passwordConfirm, createDt, updateDt);
+    return Objects.hash(userId, userType, firstName, lastName, email, password, passwordConfirm, roles);
   }
 
   @Override
@@ -241,8 +223,7 @@ public class User implements IdentifiedDataSerializable {
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("    passwordConfirm: ").append(toIndentedString(passwordConfirm)).append("\n");
-    sb.append("    createDt: ").append(toIndentedString(createDt)).append("\n");
-    sb.append("    updateDt: ").append(toIndentedString(updateDt)).append("\n");
+    sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -270,8 +251,7 @@ public class User implements IdentifiedDataSerializable {
     this.lastName = in.readUTF();
     this.email = in.readUTF();
     this.password = in.readUTF();
-    this.createDt = in.readObject();
-    this.updateDt = in.readObject();
+    this.roles = in.readUTF();
   }
 
   @Override
@@ -282,8 +262,7 @@ public class User implements IdentifiedDataSerializable {
     out.writeUTF(this.lastName);
     out.writeUTF(this.email);
     out.writeUTF(this.password);
-    out.writeObject(this.createDt);
-    out.writeObject(this.updateDt);
+    out.writeUTF(this.roles);
   }
 
   @JsonIgnore

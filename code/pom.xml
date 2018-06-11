@@ -18,6 +18,10 @@
         </dependency>
         <dependency>
             <groupId>com.networknt</groupId>
+            <artifactId>oauth2-authhub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
             <artifactId>config</artifactId>
         </dependency>
         <dependency>

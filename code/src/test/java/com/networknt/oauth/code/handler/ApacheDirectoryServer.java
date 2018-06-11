@@ -1,6 +1,6 @@
 package com.networknt.oauth.code.handler;
 
-import com.networknt.oauth.code.spnego.KerberosKDCUtil;
+import com.networknt.oauth.spnego.KerberosKDCUtil;
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.ldif.LdifEntry;
 import org.apache.directory.api.ldap.model.ldif.LdifReader;
