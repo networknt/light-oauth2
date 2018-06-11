@@ -1,5 +1,6 @@
 package com.networknt.oauth.code;
 
+import com.networknt.config.Config;
 import com.networknt.health.HealthGetHandler;
 import com.networknt.info.ServerInfoGetHandler;
 import com.networknt.oauth.code.handler.Oauth2CodeGetHandler;
@@ -24,15 +25,21 @@ import io.undertow.server.session.InMemorySessionManager;
 import io.undertow.server.session.SessionAttachmentHandler;
 import io.undertow.server.session.SessionCookieConfig;
 import io.undertow.util.Methods;
+import org.jose4j.base64url.SimplePEMEncoder;
 
 import javax.security.auth.Subject;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.networknt.oauth.spnego.KerberosKDCUtil.login;
 
 public class PathHandlerProvider implements HandlerProvider {
+    private static final String SPNEGO_SERVICE_PASSWORD = "spnegoServicePassword";
+    private static final String SECRET_CONFIG = "secret";
+    private static final Map<String, Object> secret = Config.getInstance().getJsonMapConfig(SECRET_CONFIG);
+    private static final String spnegoServicePassword = (String)secret.get(SPNEGO_SERVICE_PASSWORD);
 
     @Override
     public HttpHandler getHandler() {
@@ -75,7 +82,7 @@ public class PathHandlerProvider implements HandlerProvider {
     private class SubjectFactory implements GSSAPIServerSubjectFactory {
         @Override
         public Subject getSubjectForHost(String hostName) throws GeneralSecurityException {
-            return login("HTTP/" + hostName, "servicepwd".toCharArray());
+            return login("HTTP/" + hostName, spnegoServicePassword.toCharArray());
         }
     }
 }
