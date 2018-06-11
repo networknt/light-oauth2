@@ -51,9 +51,9 @@ public class GithubUtil {
 	public static Set<String> authorize(String username) throws Exception {
 		Set<String> groups = new HashSet<String>();
 
-		String apiURL = config.protocol + "://" + config.host + config.pathPrefix;
-		String contentsURL = "/repos/" + config.owner + "/" + config.repo + "/contents/" + config.path;
-
+		String apiURL = config.protocol + "://" + config.host;
+		String contentsURL = config.pathPrefix + "/repos/" + config.owner + "/" + config.repo + "/contents/" + config.path;
+		
 		final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
         
@@ -62,7 +62,7 @@ public class GithubUtil {
         try {
         	final ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(contentsURL);
 			request.getRequestHeaders().put(Headers.AUTHORIZATION, "token " + githubToken);
-			request.getRequestHeaders().put(Headers.HOST, "api.github.com");
+			request.getRequestHeaders().put(Headers.HOST, config.host);
 			request.getRequestHeaders().put(Headers.ACCEPT, "application/vnd.github.v3.raw");
 			request.getRequestHeaders().put(Headers.CACHE_CONTROL, "no-cache");
 			request.getRequestHeaders().put(Headers.USER_AGENT, "stevehu");
@@ -79,11 +79,13 @@ public class GithubUtil {
 		String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
 		System.out.println("testHttp2Get: statusCode = " + statusCode + " body = " + body);
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		List<GithubMetadata> listMeta = objectMapper.readValue(body, new TypeReference<List<GithubMetadata>>(){});
-		for (GithubMetadata meta : listMeta) {
-			if (meta.github_username.equals(username)) {
-				logger.info(meta.github_username + " is attached to the following primary group: " + meta.groups.primary + " and secondary groups: " + Arrays.toString(meta.groups.secondary));
+		if (statusCode == 200) {
+			ObjectMapper objectMapper = new ObjectMapper();
+			List<GithubMetadata> listMeta = objectMapper.readValue(body, new TypeReference<List<GithubMetadata>>(){});
+			for (GithubMetadata meta : listMeta) {
+				if (meta.github_username.equals(username)) {
+					logger.info(meta.github_username + " is attached to the following primary group: " + meta.groups.primary + " and secondary groups: " + Arrays.toString(meta.groups.secondary));
+				}
 			}
 		}
 		
