@@ -75,6 +75,20 @@
                         "type": "string"
                     },
                     {
+                        "name": "user_type",
+                        "in": "query",
+                        "description": "The type of user that drives authentication and authorization",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "roles",
+                        "in": "query",
+                        "description": "User roles concat with a space for fine-grained authorization",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
                         "name": "state",
                         "in": "query",
                         "description": "to prevent cross-site request forgery",

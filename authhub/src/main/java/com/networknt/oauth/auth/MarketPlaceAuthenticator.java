@@ -1,5 +1,6 @@
 package com.networknt.oauth.auth;
 
+import com.networknt.oauth.github.GithubUtil;
 import com.networknt.oauth.ldap.LdapUtil;
 import com.networknt.oauth.security.LightPasswordCredential;
 import io.undertow.security.idm.Account;
@@ -8,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.Principal;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -38,18 +38,22 @@ public class MarketPlaceAuthenticator extends AuthenticatorBase<MarketPlaceAuth>
             boolean authenticated = LdapUtil.authenticate(id, new String(password));
             if(authenticated) {
                 // get role from db and construct an account object to return.
-                Account account = new Account() {
-                    private final Principal principal = () -> id;
-                    @Override
-                    public Principal getPrincipal() {
-                        return principal;
-                    }
-                    @Override
-                    public Set<String> getRoles() {
-                        // TODO authorization for marketplace database?
-                        return Collections.emptySet();
-                    }
-                };
+            	Account account = null;
+            	try{ 
+	                account = new Account() {
+	                	private Set<String> roles = GithubUtil.authorize(id);
+	                    private final Principal principal = () -> id;
+	                    @Override
+	                    public Principal getPrincipal() {
+	                        return principal;
+	                    }
+	                    @Override
+	                    public Set<String> getRoles() { return roles; }
+	                };
+              } catch (Exception e) {
+                logger.error("Exception: ", e);
+                return null;
+              }
                 return account;
             } else {
                 logger.error("Failed to authenticate user '" + id + "' with LDAP");

@@ -80,6 +80,18 @@
                         "in": "formData"
                     },
                     {
+                        "name": "user_type",
+                        "description": "mandatory user type in password grant type",
+                        "type": "string",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "roles",
+                        "description": "optional user roles in password grant type",
+                        "type": "string",
+                        "in": "formData"
+                    },
+                    {
                         "name": "scope",
                         "description": "used by all flows to specify scope in the access token",
                         "type": "string",
