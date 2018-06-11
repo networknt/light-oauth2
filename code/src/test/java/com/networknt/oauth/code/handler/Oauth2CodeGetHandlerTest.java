@@ -512,7 +512,7 @@ public class Oauth2CodeGetHandlerTest {
 
     }
 
-    @Test
+    //@Test
     public void testMarketPlaceClient() throws Exception {
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
