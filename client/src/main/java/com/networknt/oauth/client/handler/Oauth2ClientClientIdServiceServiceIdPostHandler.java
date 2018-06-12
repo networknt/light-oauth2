@@ -35,6 +35,7 @@ public class Oauth2ClientClientIdServiceServiceIdPostHandler  extends ClientAudi
     private static final String insert = "INSERT INTO client_service (client_id, service_id, endpoint) VALUES (?, ?, ?)";
     private static final String delete = "DELETE FROM client_service WHERE client_id = ? AND service_id = ?";
     private static final String scope = "SELECT DISTINCT scope FROM client_service s, service_endpoint e WHERE s.service_id = e.service_id AND s.endpoint = e.endpoint AND client_id = ?";
+    private static final String update = "UPDATE client SET scope = ? WHERE client_id = ?";
     private static final String CLIENT_NOT_FOUND = "ERR12014";
     private static final String SERVICE_NOT_FOUND = "ERR12015";
 
@@ -111,6 +112,17 @@ public class Oauth2ClientClientIdServiceServiceIdPostHandler  extends ClientAudi
                 result.put("old_scope", client.getScope());
                 client.setScope(s);
                 result.put("new_scope", s);
+
+                try (PreparedStatement stmt = connection.prepareStatement(update)) {
+                    stmt.setString(1, s);
+                    stmt.setString(2, clientId);
+                    stmt.executeUpdate();
+                } catch (SQLException e) {
+                    logger.error("Exception:", e);
+                    connection.rollback();
+                    throw new RuntimeException(e);
+                }
+
                 connection.commit();
             } catch (SQLException e) {
                 logger.error("SQLException:", e);

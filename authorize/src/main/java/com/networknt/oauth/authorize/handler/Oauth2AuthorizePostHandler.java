@@ -1,6 +1,7 @@
 package com.networknt.oauth.authorize.handler;
 
 import com.hazelcast.core.IMap;
+import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
 import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
@@ -26,7 +27,7 @@ public class Oauth2AuthorizePostHandler extends AuditInfoHandler implements Http
     static final Logger logger = LoggerFactory.getLogger(Oauth2AuthorizeGetHandler.class);
     static final String CLIENT_NOT_FOUND = "ERR12014";
     private final static String CONFIG = "oauth_authorize";
-    private final static OauthAuthConfig config = (OauthAuthConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthAuthConfig.class);
+    private final static OauthAuthConfig oauth_config = (OauthAuthConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthAuthConfig.class);
 
     static final String DEFAULT_AUTHENTICATE_CLASS = "com.networknt.oauth.code.auth.FormAuthentication";
     @SuppressWarnings("unchecked")
@@ -96,13 +97,14 @@ public class Oauth2AuthorizePostHandler extends AuditInfoHandler implements Http
 
 
     public void processAudit(HttpServerExchange exchange) throws Exception {
-        if (config.isEnableAudit() ) {
+        if (oauth_config.isEnableAudit() ) {
             AuditInfo auditInfo = new AuditInfo();
-            auditInfo.setServiceId(Oauth2Service.REFRESHTOKEN);
+            auditInfo.setServiceId(Oauth2Service.AUTHORIZE);
             auditInfo.setEndpoint(exchange.getHostName() + exchange.getRelativePath());
-            auditInfo.setRequestHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestHeaders()));
-            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestCookies()));
-            auditInfo.setResponseHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseHeaders()));
+            auditInfo.setRequestHeader(exchange.getRequestHeaders().toString());
+            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getAttachment(BodyHandler.REQUEST_BODY)));
+            auditInfo.setResponseCode(exchange.getStatusCode());
+            auditInfo.setResponseHeader(exchange.getResponseHeaders().toString());
             auditInfo.setResponseBody(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseCookies()));
             saveAudit(auditInfo);
         }

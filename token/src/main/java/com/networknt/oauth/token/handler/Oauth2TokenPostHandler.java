@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.IMap;
+import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
 import com.networknt.exception.ApiException;
 import com.networknt.oauth.auth.Authenticator;
@@ -73,7 +74,7 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements HttpHand
 
     static JwtConfig config = (JwtConfig)Config.getInstance().getJsonObjectConfig("jwt", JwtConfig.class);
     private final static String CONFIG = "oauth_token";
-    private final static OauthTokenConfig tokenConfig = (OauthTokenConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthTokenConfig.class);
+    private final static OauthTokenConfig oauth_config = (OauthTokenConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthTokenConfig.class);
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         ObjectMapper mapper = Config.getInstance().getMapper();
@@ -602,13 +603,14 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements HttpHand
     }
 
     private void processAudit(HttpServerExchange exchange) throws Exception {
-        if (tokenConfig.isEnableAudit() ) {
+        if (oauth_config.isEnableAudit() ) {
             AuditInfo auditInfo = new AuditInfo();
-            auditInfo.setServiceId(Oauth2Service.REFRESHTOKEN);
+            auditInfo.setServiceId(Oauth2Service.TOKEN);
             auditInfo.setEndpoint(exchange.getHostName() + exchange.getRelativePath());
-            auditInfo.setRequestHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestHeaders()));
-            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestCookies()));
-            auditInfo.setResponseHeader(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseHeaders()));
+            auditInfo.setRequestHeader(exchange.getRequestHeaders().toString());
+            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getAttachment(BodyHandler.REQUEST_BODY)));
+            auditInfo.setResponseCode(exchange.getStatusCode());
+            auditInfo.setResponseHeader(exchange.getResponseHeaders().toString());
             auditInfo.setResponseBody(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseCookies()));
             saveAudit(auditInfo);
         }

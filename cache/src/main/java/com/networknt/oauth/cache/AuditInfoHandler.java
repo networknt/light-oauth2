@@ -26,7 +26,7 @@ public class AuditInfoHandler {
             stmt.setString(3, auditInfo.getEndpoint());
             stmt.setString(4, auditInfo.getRequestHeader());
             stmt.setString(5, auditInfo.getRequestBody());
-            stmt.setInt(6, auditInfo.getResponseCode());
+            stmt.setInt(6, auditInfo.getResponseCode()==null? 0: auditInfo.getResponseCode());
             stmt.setString(7, auditInfo.getResponseHeader());
             stmt.setString(8, auditInfo.getResponseBody());
             stmt.executeUpdate();
