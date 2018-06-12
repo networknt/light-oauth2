@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.IMap;
+import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
 import com.networknt.exception.ApiException;
 import com.networknt.oauth.auth.Authenticator;
@@ -607,7 +608,8 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements HttpHand
             auditInfo.setServiceId(Oauth2Service.TOKEN);
             auditInfo.setEndpoint(exchange.getHostName() + exchange.getRelativePath());
             auditInfo.setRequestHeader(exchange.getRequestHeaders().toString());
-            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestCookies()));
+            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getAttachment(BodyHandler.REQUEST_BODY)));
+            auditInfo.setResponseCode(exchange.getStatusCode());
             auditInfo.setResponseHeader(exchange.getResponseHeaders().toString());
             auditInfo.setResponseBody(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseCookies()));
             saveAudit(auditInfo);

@@ -1,5 +1,6 @@
 package com.networknt.oauth.client.handler;
 
+import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
 import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.model.AuditInfo;
@@ -21,7 +22,8 @@ public class ClientAuditHandler extends AuditInfoHandler {
             auditInfo.setServiceId(Oauth2Service.CLIENT);
             auditInfo.setEndpoint(exchange.getHostName() + exchange.getRelativePath());
             auditInfo.setRequestHeader(exchange.getRequestHeaders().toString());
-            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getRequestCookies()));
+            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getAttachment(BodyHandler.REQUEST_BODY)));
+            auditInfo.setResponseCode(exchange.getStatusCode());
             auditInfo.setResponseHeader(exchange.getResponseHeaders().toString());
             auditInfo.setResponseBody(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseCookies()));
             saveAudit(auditInfo);
