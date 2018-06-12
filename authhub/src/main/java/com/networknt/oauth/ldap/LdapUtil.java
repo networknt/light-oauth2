@@ -124,7 +124,6 @@ public class LdapUtil {
             env.put(Context.SECURITY_PROTOCOL, "ssl");
             env.put("java.naming.ldap.factory.socket", "com.networknt.oauth.ldap.LdapSSLSocketFactory");
         }
-        env.put(Context.INITIAL_CONTEXT_FACTORY, contextFactory);
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
         env.put(Context.SECURITY_PRINCIPAL, config.ldapPrincipal);
         env.put(Context.SECURITY_CREDENTIALS, ldapCredential);
