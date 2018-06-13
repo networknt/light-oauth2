@@ -3,6 +3,7 @@ package com.networknt.oauth.client.handler;
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.oauth.cache.model.User;
@@ -18,7 +19,7 @@ import java.sql.Date;
 import java.util.Map;
 import java.util.UUID;
 
-public class Oauth2ClientPostHandler  extends ClientAuditHandler implements HttpHandler {
+public class Oauth2ClientPostHandler  extends ClientAuditHandler implements LightHttpHandler {
 
     static Logger logger = LoggerFactory.getLogger(Oauth2ClientPostHandler.class);
     static final String CLIENT_ID_EXISTS = "ERR12019";
@@ -43,9 +44,7 @@ public class Oauth2ClientPostHandler  extends ClientAuditHandler implements Http
             if(ownerId != null) {
                 IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
                 if(!users.containsKey(ownerId)) {
-                    Status status = new Status(USER_NOT_FOUND, ownerId);
-                    exchange.setStatusCode(status.getStatusCode());
-                    exchange.getResponseSender().send(status.toString());
+                    setExchangeStatus(exchange, USER_NOT_FOUND, ownerId);
                     processAudit(exchange);
                     return;
                 }
@@ -56,9 +55,7 @@ public class Oauth2ClientPostHandler  extends ClientAuditHandler implements Http
             c.setClientSecret(clientSecret);
             exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(c));
         } else {
-            Status status = new Status(CLIENT_ID_EXISTS, clientId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, CLIENT_ID_EXISTS, clientId);
         }
         processAudit(exchange);
     }

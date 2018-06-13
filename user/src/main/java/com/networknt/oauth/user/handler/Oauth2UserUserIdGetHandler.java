@@ -2,6 +2,7 @@ package com.networknt.oauth.user.handler;
 
 import com.hazelcast.core.IMap;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.User;
 import com.networknt.status.Status;
@@ -11,7 +12,7 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Oauth2UserUserIdGetHandler extends UserAuditHandler implements HttpHandler {
+public class Oauth2UserUserIdGetHandler extends UserAuditHandler implements LightHttpHandler {
     static final String USER_NOT_FOUND = "ERR12013";
     static Logger logger = LoggerFactory.getLogger(Oauth2UserUserIdGetHandler.class);
     @SuppressWarnings("unchecked")
@@ -23,9 +24,7 @@ public class Oauth2UserUserIdGetHandler extends UserAuditHandler implements Http
         User user = users.get(userId);
 
         if(user == null) {
-            Status status = new Status(USER_NOT_FOUND, userId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, USER_NOT_FOUND, userId);
             processAudit(exchange);
             return;
         }

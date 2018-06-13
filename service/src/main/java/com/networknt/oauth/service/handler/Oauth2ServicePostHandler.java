@@ -3,6 +3,7 @@ package com.networknt.oauth.service.handler;
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Service;
 import com.networknt.oauth.cache.model.User;
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Date;
 import java.util.Map;
 
-public class Oauth2ServicePostHandler extends ServiceAuditHandler implements HttpHandler {
+public class Oauth2ServicePostHandler extends ServiceAuditHandler implements LightHttpHandler {
     static Logger logger = LoggerFactory.getLogger(Oauth2ServicePostHandler.class);
     static final String SERVICE_ID_EXISTS = "ERR12018";
     static final String USER_NOT_FOUND = "ERR12013";
@@ -34,18 +35,14 @@ public class Oauth2ServicePostHandler extends ServiceAuditHandler implements Htt
             if(ownerId != null) {
                 IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
                 if(!users.containsKey(ownerId)) {
-                    Status status = new Status(USER_NOT_FOUND, ownerId);
-                    exchange.setStatusCode(status.getStatusCode());
-                    exchange.getResponseSender().send(status.toString());
+                    setExchangeStatus(exchange, USER_NOT_FOUND, ownerId);
                     processAudit(exchange);
                     return;
                 }
             }
             services.set(serviceId, service);
         } else {
-            Status status = new Status(SERVICE_ID_EXISTS, serviceId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, SERVICE_ID_EXISTS, serviceId);
         }
         processAudit(exchange);
     }

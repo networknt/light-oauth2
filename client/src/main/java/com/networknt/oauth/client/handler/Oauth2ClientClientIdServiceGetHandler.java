@@ -3,6 +3,7 @@ package com.networknt.oauth.client.handler;
 
 import com.hazelcast.core.IMap;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.service.SingletonServiceFactory;
@@ -28,7 +29,7 @@ import java.util.Map;
  *
  * @author Steve Hu
  */
-public class Oauth2ClientClientIdServiceGetHandler  extends ClientAuditHandler implements HttpHandler {
+public class Oauth2ClientClientIdServiceGetHandler  extends ClientAuditHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2ClientClientIdServiceGetHandler.class);
     private static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
     private static final String select = "SELECT * FROM client_service WHERE client_id = ? ORDER BY service_id";
@@ -41,9 +42,7 @@ public class Oauth2ClientClientIdServiceGetHandler  extends ClientAuditHandler i
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         Client client = clients.get(clientId);
         if(client == null) {
-            Status status = new Status(CLIENT_NOT_FOUND, clientId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, CLIENT_NOT_FOUND, clientId);
             processAudit(exchange);
             return;
         }

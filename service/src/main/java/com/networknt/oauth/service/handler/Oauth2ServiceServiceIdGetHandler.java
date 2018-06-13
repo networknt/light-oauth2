@@ -2,6 +2,7 @@ package com.networknt.oauth.service.handler;
 
 import com.hazelcast.core.IMap;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Service;
 import com.networknt.status.Status;
@@ -11,7 +12,7 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Oauth2ServiceServiceIdGetHandler extends ServiceAuditHandler implements HttpHandler {
+public class Oauth2ServiceServiceIdGetHandler extends ServiceAuditHandler implements LightHttpHandler {
     static Logger logger = LoggerFactory.getLogger(Oauth2ServiceServiceIdGetHandler.class);
     static final String SERVICE_NOT_FOUND = "ERR12015";
     @SuppressWarnings("unchecked")
@@ -23,9 +24,7 @@ public class Oauth2ServiceServiceIdGetHandler extends ServiceAuditHandler implem
         Service service = services.get(serviceId);
 
         if(service == null) {
-            Status status = new Status(SERVICE_NOT_FOUND, serviceId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, SERVICE_NOT_FOUND, serviceId);
             processAudit(exchange);
             return;
         }

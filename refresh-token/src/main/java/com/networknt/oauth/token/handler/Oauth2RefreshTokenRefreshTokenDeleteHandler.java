@@ -2,6 +2,7 @@ package com.networknt.oauth.token.handler;
 
 import com.hazelcast.core.IMap;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.AuditInfo;
@@ -13,7 +14,7 @@ import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Oauth2RefreshTokenRefreshTokenDeleteHandler extends RefreshTokenAuditHandler implements HttpHandler {
+public class Oauth2RefreshTokenRefreshTokenDeleteHandler extends RefreshTokenAuditHandler implements LightHttpHandler {
     private static final String REFRESH_TOKEN_NOT_FOUND = "ERR12029";
 
     private static Logger logger = LoggerFactory.getLogger(Oauth2RefreshTokenRefreshTokenDeleteHandler.class);
@@ -23,14 +24,10 @@ public class Oauth2RefreshTokenRefreshTokenDeleteHandler extends RefreshTokenAud
         if(logger.isDebugEnabled()) logger.debug("refreshToken = " + refreshToken);
         IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
         if(tokens.get(refreshToken) == null) {
-            Status status = new Status(REFRESH_TOKEN_NOT_FOUND, refreshToken);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, REFRESH_TOKEN_NOT_FOUND, refreshToken);
         } else {
             tokens.delete(refreshToken);
         }
         processAudit(exchange);
-
     }
-
 }

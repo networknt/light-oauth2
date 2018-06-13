@@ -4,11 +4,13 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.query.PagingPredicate;
 import com.hazelcast.query.impl.predicates.LikePredicate;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Service;
 import com.networknt.oauth.cache.model.ServiceComparator;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Deque;
 
-public class Oauth2ServiceGetHandler extends ServiceAuditHandler implements HttpHandler {
+public class Oauth2ServiceGetHandler extends ServiceAuditHandler implements LightHttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2ServiceGetHandler.class);
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
@@ -34,7 +36,7 @@ public class Oauth2ServiceGetHandler extends ServiceAuditHandler implements Http
         pagingPredicate.setPage(page);
         Collection<Service> values = services.values(pagingPredicate);
 
-        exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
+        exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(values));
         processAudit(exchange);
     }

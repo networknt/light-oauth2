@@ -5,6 +5,7 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.query.PagingPredicate;
 import com.hazelcast.query.impl.predicates.LikePredicate;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Service;
 import com.networknt.oauth.cache.model.ServiceComparator;
@@ -23,7 +24,7 @@ import java.util.*;
  *
  * @author Steve Hu
  */
-public class Oauth2ServiceServiceIdEndpointGetHandler extends ServiceAuditHandler implements HttpHandler {
+public class Oauth2ServiceServiceIdEndpointGetHandler extends ServiceAuditHandler implements LightHttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2ServiceServiceIdEndpointGetHandler.class);
     static final String SERVICE_ENDPOINT_NOT_FOUND = "ERR12042";
 
@@ -35,9 +36,7 @@ public class Oauth2ServiceServiceIdEndpointGetHandler extends ServiceAuditHandle
         List<ServiceEndpoint> values = serviceEndpoints.get(serviceId);
 
         if(values == null || values.size() == 0) {
-            Status status = new Status(SERVICE_ENDPOINT_NOT_FOUND, serviceId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, SERVICE_ENDPOINT_NOT_FOUND, serviceId);
             processAudit(exchange);
             return;
         }

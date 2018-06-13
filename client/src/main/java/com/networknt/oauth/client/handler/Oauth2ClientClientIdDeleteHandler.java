@@ -2,6 +2,7 @@ package com.networknt.oauth.client.handler;
 
 import com.hazelcast.core.IMap;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.AuditInfo;
@@ -13,7 +14,7 @@ import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Oauth2ClientClientIdDeleteHandler  extends ClientAuditHandler implements HttpHandler {
+public class Oauth2ClientClientIdDeleteHandler  extends ClientAuditHandler implements LightHttpHandler {
     static final String CLIENT_NOT_FOUND = "ERR12014";
 
     static Logger logger = LoggerFactory.getLogger(Oauth2ClientClientIdDeleteHandler.class);
@@ -25,9 +26,7 @@ public class Oauth2ClientClientIdDeleteHandler  extends ClientAuditHandler imple
 
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         if(clients.get(clientId) == null) {
-            Status status = new Status(CLIENT_NOT_FOUND, clientId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, CLIENT_NOT_FOUND, clientId);
         } else {
             clients.delete(clientId);
         }

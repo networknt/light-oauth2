@@ -9,6 +9,7 @@ import com.networknt.oauth.cache.model.User;
 import com.networknt.oauth.cache.model.UserComparator;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public class Oauth2UserGetHandler extends UserAuditHandler implements HttpHandle
         for (User value : values) {
             value.setPassword(null);
         }
-        exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
+        exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/json");
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(values));
         processAudit(exchange);
     }

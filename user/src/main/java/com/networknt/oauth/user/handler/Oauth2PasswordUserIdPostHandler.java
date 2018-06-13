@@ -2,6 +2,7 @@ package com.networknt.oauth.user.handler;
 
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.User;
 import com.networknt.status.Status;
@@ -13,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class Oauth2PasswordUserIdPostHandler extends UserAuditHandler implements HttpHandler {
+public class Oauth2PasswordUserIdPostHandler extends UserAuditHandler implements LightHttpHandler {
     static final String INCORRECT_PASSWORD = "ERR12016";
     static final String PASSWORD_PASSWORDCONFIRM_NOT_MATCH = "ERR12012";
     static final String USER_NOT_FOUND = "ERR12013";
@@ -34,14 +35,12 @@ public class Oauth2PasswordUserIdPostHandler extends UserAuditHandler implements
         IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
         User user = users.get(userId);
         if(user == null) {
-            Status status = new Status(USER_NOT_FOUND, userId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, USER_NOT_FOUND, userId);
+            processAudit(exchange);
         } else {
             if(!HashUtil.validatePassword(password, user.getPassword())) {
-                Status status = new Status(INCORRECT_PASSWORD);
-                exchange.setStatusCode(status.getStatusCode());
-                exchange.getResponseSender().send(status.toString());
+                setExchangeStatus(exchange, INCORRECT_PASSWORD);
+                processAudit(exchange);
                 return;
             }
             if(newPassword.equals(newPasswordConfirm)) {
@@ -49,9 +48,7 @@ public class Oauth2PasswordUserIdPostHandler extends UserAuditHandler implements
                 user.setPassword(hashedPass);
                 users.set(userId, user);
             } else {
-                Status status = new Status(PASSWORD_PASSWORDCONFIRM_NOT_MATCH, newPassword, newPasswordConfirm);
-                exchange.setStatusCode(status.getStatusCode());
-                exchange.getResponseSender().send(status.toString());
+                setExchangeStatus(exchange, PASSWORD_PASSWORDCONFIRM_NOT_MATCH, newPassword, newPasswordConfirm);
             }
             processAudit(exchange);
         }

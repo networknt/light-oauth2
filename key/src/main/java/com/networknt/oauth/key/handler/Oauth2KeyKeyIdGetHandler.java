@@ -4,6 +4,7 @@ import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
 import com.networknt.exception.ApiException;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.AuditInfo;
@@ -15,6 +16,7 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.FlexBase64;
 import io.undertow.util.HeaderValues;
+import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
@@ -32,7 +34,7 @@ import java.util.Map;
 import static io.undertow.util.Headers.AUTHORIZATION;
 import static io.undertow.util.Headers.BASIC;
 
-public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements HttpHandler {
+public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements LightHttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2KeyKeyIdGetHandler.class);
 
     static final String CONFIG_SECURITY = "security";
@@ -62,16 +64,12 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements HttpH
         if(values != null) {
             authHeader = values.getFirst();
         } else {
-            Status status = new Status(MISSING_AUTHORIZATION_HEADER);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, MISSING_AUTHORIZATION_HEADER);
             processAudit(exchange);
             return;
         }
         if(authHeader == null) {
-            Status status = new Status(MISSING_AUTHORIZATION_HEADER);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, MISSING_AUTHORIZATION_HEADER);
             processAudit(exchange);
             return;
         }
@@ -91,19 +89,13 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements HttpH
                 String content = Config.getInstance().getStringFromFile(filename);
                 if(logger.isDebugEnabled()) logger.debug("certificate = " + content);
                 if(content != null) {
-                    exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/text");
+                    exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/text");
                     exchange.getResponseSender().send(content);
                 } else {
-                    logger.info("Certificate " + Encode.forJava(filename) + " not found.");
-                    Status status = new Status(KEY_NOT_FOUND, keyId);
-                    exchange.setStatusCode(status.getStatusCode());
-                    exchange.getResponseSender().send(status.toString());
+                    setExchangeStatus(exchange, KEY_NOT_FOUND, keyId);
                 }
             } else {
-                Status status = new Status(INVALID_KEY_ID, keyId);
-                exchange.setStatusCode(status.getStatusCode());
-                exchange.getResponseSender().send(status.toString());
-
+                setExchangeStatus(exchange, INVALID_KEY_ID, keyId);
             }
         }
         processAudit(exchange);

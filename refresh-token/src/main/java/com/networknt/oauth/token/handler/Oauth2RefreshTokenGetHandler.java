@@ -4,6 +4,7 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.query.PagingPredicate;
 import com.hazelcast.query.impl.predicates.LikePredicate;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.RefreshToken;
 import com.networknt.oauth.cache.model.RefreshTokenComparator;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Deque;
 
-public class Oauth2RefreshTokenGetHandler extends RefreshTokenAuditHandler implements HttpHandler {
+public class Oauth2RefreshTokenGetHandler extends RefreshTokenAuditHandler implements LightHttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2RefreshTokenGetHandler.class);
 
     @Override

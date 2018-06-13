@@ -4,6 +4,7 @@ package com.networknt.oauth.client.handler;
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.oauth.cache.model.Service;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
  *
  * @author Steve Hu
  */
-public class Oauth2ClientClientIdServiceServiceIdPostHandler  extends ClientAuditHandler implements HttpHandler {
+public class Oauth2ClientClientIdServiceServiceIdPostHandler  extends ClientAuditHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2ClientClientIdServiceServiceIdPostHandler.class);
     private static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
     private static final String insert = "INSERT INTO client_service (client_id, service_id, endpoint) VALUES (?, ?, ?)";
@@ -47,10 +48,7 @@ public class Oauth2ClientClientIdServiceServiceIdPostHandler  extends ClientAudi
         Client client = clients.get(clientId);
 
         if(client == null) {
-            Status status = new Status(CLIENT_NOT_FOUND, clientId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
-            if(logger.isDebugEnabled()) logger.debug("Could not find clientId " + clientId);
+            setExchangeStatus(exchange, CLIENT_NOT_FOUND, clientId);
             processAudit(exchange);
             return;
         }
@@ -58,10 +56,7 @@ public class Oauth2ClientClientIdServiceServiceIdPostHandler  extends ClientAudi
         String serviceId = exchange.getQueryParameters().get("serviceId").getFirst();
         IMap<String, Service> services = CacheStartupHookProvider.hz.getMap("services");
         if(services.get(serviceId) == null) {
-            Status status = new Status(SERVICE_NOT_FOUND, serviceId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
-            if(logger.isDebugEnabled()) logger.debug("Could not find serviceId " + serviceId);
+            setExchangeStatus(exchange, SERVICE_NOT_FOUND, serviceId);
             processAudit(exchange);
             return;
         }

@@ -4,6 +4,7 @@ package com.networknt.oauth.service.handler;
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Service;
 import com.networknt.oauth.cache.model.ServiceEndpoint;
@@ -25,7 +26,7 @@ import java.util.Map;
  *
  * @author Steve Hu
  */
-public class Oauth2ServiceServiceIdEndpointPostHandler extends ServiceAuditHandler implements HttpHandler {
+public class Oauth2ServiceServiceIdEndpointPostHandler extends ServiceAuditHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2ServiceServiceIdEndpointPostHandler.class);
     static final String SERVICE_NOT_FOUND = "ERR12015";
 
@@ -38,9 +39,7 @@ public class Oauth2ServiceServiceIdEndpointPostHandler extends ServiceAuditHandl
         // ensure that the serviceId exists
         IMap<String, Service> services = CacheStartupHookProvider.hz.getMap("services");
         if(services.get(serviceId) == null) {
-            Status status = new Status(SERVICE_NOT_FOUND, serviceId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, SERVICE_NOT_FOUND, serviceId);
             processAudit(exchange);
             return;
         }

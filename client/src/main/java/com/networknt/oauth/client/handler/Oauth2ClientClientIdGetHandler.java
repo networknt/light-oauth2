@@ -2,6 +2,7 @@ package com.networknt.oauth.client.handler;
 
 import com.hazelcast.core.IMap;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.status.Status;
@@ -11,7 +12,7 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Oauth2ClientClientIdGetHandler  extends ClientAuditHandler implements HttpHandler {
+public class Oauth2ClientClientIdGetHandler  extends ClientAuditHandler implements LightHttpHandler {
     static final String CLIENT_NOT_FOUND = "ERR12014";
 
     static Logger logger = LoggerFactory.getLogger(Oauth2ClientClientIdGetHandler.class);
@@ -25,9 +26,8 @@ public class Oauth2ClientClientIdGetHandler  extends ClientAuditHandler implemen
         Client client = clients.get(clientId);
 
         if(client == null) {
-            Status status = new Status(CLIENT_NOT_FOUND, clientId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, CLIENT_NOT_FOUND, clientId);
+            processAudit(exchange);
             return;
         }
         Client c = Client.copyClient(client);

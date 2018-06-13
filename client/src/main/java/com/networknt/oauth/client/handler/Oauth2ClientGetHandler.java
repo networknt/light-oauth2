@@ -4,6 +4,7 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.query.PagingPredicate;
 import com.hazelcast.query.impl.predicates.LikePredicate;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.oauth.cache.model.ClientComparator;
@@ -18,7 +19,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 
-public class Oauth2ClientGetHandler  extends ClientAuditHandler implements HttpHandler {
+public class Oauth2ClientGetHandler  extends ClientAuditHandler implements LightHttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2ClientGetHandler.class);
 
     @Override

@@ -7,6 +7,7 @@ import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
 import com.networknt.exception.ApiException;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.auth.Authenticator;
 import com.networknt.oauth.auth.DefaultAuth;
 import com.networknt.oauth.cache.AuditInfoHandler;
@@ -39,7 +40,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.regex.Matcher;
 
-public class Oauth2TokenPostHandler extends AuditInfoHandler implements HttpHandler {
+public class Oauth2TokenPostHandler extends AuditInfoHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2TokenPostHandler.class);
 
     private static final String UNABLE_TO_PARSE_FORM_DATA = "ERR12000";
@@ -92,9 +93,8 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements HttpHand
                 }
             }
         } catch (Exception e) {
-            Status status = new Status(UNABLE_TO_PARSE_FORM_DATA, e.getMessage());
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            logger.error("Exception:", e);
+            setExchangeStatus(exchange, UNABLE_TO_PARSE_FORM_DATA, e.getMessage());
             processAudit(exchange);
             return;
         }
@@ -111,16 +111,15 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements HttpHand
             } else if("client_authenticated_user".equals(grantType)) {
                 exchange.getResponseSender().send(mapper.writeValueAsString(handleClientAuthenticatedUser(exchange, formMap)));
             } else {
-                Status status = new Status(UNSUPPORTED_GRANT_TYPE, grantType);
-                exchange.setStatusCode(status.getStatusCode());
-                exchange.getResponseSender().send(status.toString());
+                setExchangeStatus(exchange, UNSUPPORTED_GRANT_TYPE, grantType);
             }
         } catch (JsonProcessingException e) {
-            Status status = new Status(JSON_PROCESSING_EXCEPTION, e.getMessage());
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            logger.error("JsonProcessingException:", e);
+            setExchangeStatus(exchange, JSON_PROCESSING_EXCEPTION, e.getMessage());
         } catch (ApiException e) {
+            logger.error("ApiException", e);
             exchange.setStatusCode(e.getStatus().getStatusCode());
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
             exchange.getResponseSender().send(e.getStatus().toString());
         }
         processAudit(exchange);

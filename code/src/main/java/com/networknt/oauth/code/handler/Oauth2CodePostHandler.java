@@ -1,6 +1,7 @@
 package com.networknt.oauth.code.handler;
 
 import com.hazelcast.core.IMap;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.status.Status;
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class Oauth2CodePostHandler extends CodeAuditHandler implements HttpHandler {
+public class Oauth2CodePostHandler extends CodeAuditHandler implements LightHttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2CodeGetHandler.class);
     static final String CLIENT_NOT_FOUND = "ERR12014";
 
@@ -41,9 +42,8 @@ public class Oauth2CodePostHandler extends CodeAuditHandler implements HttpHandl
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         Client client = clients.get(clientId);
         if(client == null) {
-            Status status = new Status(CLIENT_NOT_FOUND, clientId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, CLIENT_NOT_FOUND, clientId);
+            processAudit(exchange);
         } else {
                 /*
                 String clazz = (String)client.get("authenticateClass");
@@ -86,7 +86,6 @@ public class Oauth2CodePostHandler extends CodeAuditHandler implements HttpHandl
             exchange.getResponseHeaders().put(Headers.LOCATION, redirectUri);
             exchange.endExchange();
             processAudit(exchange);
-
         }
     }
 }

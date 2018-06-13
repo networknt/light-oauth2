@@ -5,6 +5,7 @@ import com.hazelcast.query.Predicate;
 import com.hazelcast.query.SqlPredicate;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.User;
 import com.networknt.status.Status;
@@ -18,7 +19,7 @@ import java.sql.Date;
 import java.util.Map;
 import java.util.Set;
 
-public class Oauth2UserPostHandler extends UserAuditHandler implements HttpHandler {
+public class Oauth2UserPostHandler extends UserAuditHandler implements LightHttpHandler {
     private static final String PASSWORD_OR_PASSWORDCONFIRM_EMPTY = "ERR12011";
     private static final String PASSWORD_PASSWORDCONFIRM_NOT_MATCH = "ERR12012";
     private static final String USER_ID_EXISTS = "ERR12020";
@@ -37,9 +38,7 @@ public class Oauth2UserPostHandler extends UserAuditHandler implements HttpHandl
         Predicate predicate = new SqlPredicate(String.format("email = %s", email));
         Set<User> set = (Set<User>) users.values(predicate);
         if(set != null && set.size() > 0) {
-            Status status = new Status(EMAIL_EXISTS, email);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, EMAIL_EXISTS, email);
             processAudit(exchange);
             return;
         }
@@ -57,21 +56,15 @@ public class Oauth2UserPostHandler extends UserAuditHandler implements HttpHandl
                 if(users.get(userId) == null) {
                     users.set(userId, user);
                 } else {
-                    Status status = new Status(USER_ID_EXISTS, userId);
-                    exchange.setStatusCode(status.getStatusCode());
-                    exchange.getResponseSender().send(status.toString());
+                    setExchangeStatus(exchange, USER_ID_EXISTS, userId);
                 }
             } else {
                 // password and passwordConfirm not match.
-                Status status = new Status(PASSWORD_PASSWORDCONFIRM_NOT_MATCH, password, passwordConfirm);
-                exchange.setStatusCode(status.getStatusCode());
-                exchange.getResponseSender().send(status.toString());
+                setExchangeStatus(exchange, PASSWORD_PASSWORDCONFIRM_NOT_MATCH, password, passwordConfirm);
             }
         } else {
             // error password or passwordConform is empty
-            Status status = new Status(PASSWORD_OR_PASSWORDCONFIRM_EMPTY, password, passwordConfirm);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, PASSWORD_OR_PASSWORDCONFIRM_EMPTY, password, passwordConfirm);
         }
         processAudit(exchange);
     }

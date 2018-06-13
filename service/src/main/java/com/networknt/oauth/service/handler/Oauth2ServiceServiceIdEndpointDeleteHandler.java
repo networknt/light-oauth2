@@ -2,6 +2,7 @@
 package com.networknt.oauth.service.handler;
 
 import com.hazelcast.core.IMap;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.ServiceEndpoint;
 import com.networknt.status.Status;
@@ -17,7 +18,7 @@ import java.util.List;
  *
  * @author Steve Hu
  */
-public class Oauth2ServiceServiceIdEndpointDeleteHandler extends ServiceAuditHandler implements HttpHandler {
+public class Oauth2ServiceServiceIdEndpointDeleteHandler extends ServiceAuditHandler implements LightHttpHandler {
     private static Logger logger = LoggerFactory.getLogger(Oauth2ServiceServiceIdEndpointDeleteHandler.class);
     private static final String SERVICE_ENDPOINT_NOT_FOUND = "ERR12042";
 
@@ -27,9 +28,7 @@ public class Oauth2ServiceServiceIdEndpointDeleteHandler extends ServiceAuditHan
         if(logger.isDebugEnabled()) logger.debug("Delete service endpoint for serviceId " + serviceId);
         IMap<String, List<ServiceEndpoint>> serviceEndpoints = CacheStartupHookProvider.hz.getMap("serviceEndpoints");
         if(serviceEndpoints.get(serviceId) == null || serviceEndpoints.get(serviceId).size() == 0) {
-            Status status = new Status(SERVICE_ENDPOINT_NOT_FOUND, serviceId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, SERVICE_ENDPOINT_NOT_FOUND, serviceId);
         } else {
             serviceEndpoints.delete(serviceId);
         }

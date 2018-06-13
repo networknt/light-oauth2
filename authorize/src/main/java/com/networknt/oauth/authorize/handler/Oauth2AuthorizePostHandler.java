@@ -3,6 +3,7 @@ package com.networknt.oauth.authorize.handler;
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.AuditInfo;
@@ -23,7 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class Oauth2AuthorizePostHandler extends AuditInfoHandler implements HttpHandler {
+public class Oauth2AuthorizePostHandler extends AuditInfoHandler implements LightHttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2AuthorizeGetHandler.class);
     static final String CLIENT_NOT_FOUND = "ERR12014";
     private final static String CONFIG = "oauth_authorize";
@@ -51,9 +52,8 @@ public class Oauth2AuthorizePostHandler extends AuditInfoHandler implements Http
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         Client client = clients.get(clientId);
         if(client == null) {
-            Status status = new Status(CLIENT_NOT_FOUND, clientId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, CLIENT_NOT_FOUND, clientId);
+            processAudit(exchange);
         } else {
                 /*
                 String clazz = (String)client.get("authenticateClass");

@@ -3,6 +3,7 @@ package com.networknt.oauth.client.handler;
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.oauth.cache.model.User;
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Date;
 import java.util.Map;
 
-public class Oauth2ClientPutHandler  extends ClientAuditHandler implements HttpHandler {
+public class Oauth2ClientPutHandler  extends ClientAuditHandler implements LightHttpHandler {
     static Logger logger = LoggerFactory.getLogger(Oauth2ClientPutHandler.class);
     static final String CLIENT_NOT_FOUND = "ERR12014";
     static final String USER_NOT_FOUND = "ERR12013";
@@ -31,9 +32,7 @@ public class Oauth2ClientPutHandler  extends ClientAuditHandler implements HttpH
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         Client originalClient = clients.get(clientId);
         if(originalClient == null) {
-            Status status = new Status(CLIENT_NOT_FOUND, clientId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, CLIENT_NOT_FOUND, clientId);
         } else {
             // make sure the owner_id exists in users map.
             String ownerId = client.getOwnerId();

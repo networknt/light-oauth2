@@ -3,6 +3,7 @@ package com.networknt.oauth.user.handler;
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.User;
 import com.networknt.status.Status;
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Date;
 import java.util.Map;
 
-public class Oauth2UserPutHandler extends UserAuditHandler implements HttpHandler {
+public class Oauth2UserPutHandler extends UserAuditHandler implements LightHttpHandler {
     static final String USER_NOT_FOUND = "ERR12013";
     static Logger logger = LoggerFactory.getLogger(Oauth2UserPostHandler.class);
     @SuppressWarnings("unchecked")
@@ -26,9 +27,7 @@ public class Oauth2UserPutHandler extends UserAuditHandler implements HttpHandle
         IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
         User u = users.get(userId);
         if(u == null) {
-            Status status = new Status(USER_NOT_FOUND, userId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, USER_NOT_FOUND, userId);
         } else {
             // as password is not in the return value, chances are password is not in the user object
             user.setPassword(u.getPassword());

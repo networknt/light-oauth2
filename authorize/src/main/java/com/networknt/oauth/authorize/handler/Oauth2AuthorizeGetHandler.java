@@ -3,6 +3,7 @@ package com.networknt.oauth.authorize.handler;
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
+import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.OAuth2Constants;
@@ -33,7 +34,7 @@ import java.util.regex.Matcher;
  * go to db to get it. It must be something added recently and not in cache yet.
  *
  */
-public class Oauth2AuthorizeGetHandler extends AuditInfoHandler implements HttpHandler {
+public class Oauth2AuthorizeGetHandler extends AuditInfoHandler implements LightHttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2AuthorizeGetHandler.class);
     static final String CLIENT_NOT_FOUND = "ERR12014";
     static final String INVALID_CODE_CHALLENGE_METHOD = "ERR12033";
@@ -62,9 +63,8 @@ public class Oauth2AuthorizeGetHandler extends AuditInfoHandler implements HttpH
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         Client client = clients.get(clientId);
         if(client == null) {
-            Status status = new Status(CLIENT_NOT_FOUND, clientId);
-            exchange.setStatusCode(status.getStatusCode());
-            exchange.getResponseSender().send(status.toString());
+            setExchangeStatus(exchange, CLIENT_NOT_FOUND, clientId);
+            processAudit(exchange);
         } else {
             String code = Util.getUUID();
             final SecurityContext context = exchange.getSecurityContext();
@@ -93,9 +93,7 @@ public class Oauth2AuthorizeGetHandler extends AuditInfoHandler implements HttpH
                     // plain or S256
                     if (!codeChallengeMethod.equals(CodeVerifierUtil.CODE_CHALLENGE_METHOD_S256) &&
                             !codeChallengeMethod.equals(CodeVerifierUtil.CODE_CHALLENGE_METHOD_PLAIN)) {
-                        Status status = new Status(INVALID_CODE_CHALLENGE_METHOD, codeChallengeMethod);
-                        exchange.setStatusCode(status.getStatusCode());
-                        exchange.getResponseSender().send(status.toString());
+                        setExchangeStatus(exchange, INVALID_CODE_CHALLENGE_METHOD, codeChallengeMethod);
                         processAudit(exchange);
                         return;
                     }
@@ -106,25 +104,19 @@ public class Oauth2AuthorizeGetHandler extends AuditInfoHandler implements HttpH
                 }
                 // validate codeChallenge.
                 if(codeChallenge.length() < CodeVerifierUtil.MIN_CODE_VERIFIER_LENGTH) {
-                    Status status = new Status(CODE_CHALLENGE_TOO_SHORT, codeChallenge);
-                    exchange.setStatusCode(status.getStatusCode());
-                    exchange.getResponseSender().send(status.toString());
+                    setExchangeStatus(exchange, CODE_CHALLENGE_TOO_SHORT, codeChallenge);
                     processAudit(exchange);
                     return;
                 }
                 if(codeChallenge.length() > CodeVerifierUtil.MAX_CODE_VERIFIER_LENGTH) {
-                    Status status = new Status(CODE_CHALLENGE_TOO_LONG, codeChallenge);
-                    exchange.setStatusCode(status.getStatusCode());
-                    exchange.getResponseSender().send(status.toString());
+                    setExchangeStatus(exchange, CODE_CHALLENGE_TOO_LONG, codeChallenge);
                     processAudit(exchange);
                     return;
                 }
                 // check the format
                 Matcher m = CodeVerifierUtil.VALID_CODE_CHALLENGE_PATTERN.matcher(codeChallenge);
                 if(!m.matches()) {
-                    Status status = new Status(INVALID_CODE_CHALLENGE_FORMAT, codeChallenge);
-                    exchange.setStatusCode(status.getStatusCode());
-                    exchange.getResponseSender().send(status.toString());
+                    setExchangeStatus(exchange, INVALID_CODE_CHALLENGE_FORMAT, codeChallenge);
                     processAudit(exchange);
                     return;
                 }
