@@ -45,6 +45,7 @@ public class Oauth2ClientClientIdServiceServiceIdPostHandler  extends ClientAudi
         String clientId = exchange.getQueryParameters().get("clientId").getFirst();
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         Client client = clients.get(clientId);
+
         if(client == null) {
             Status status = new Status(CLIENT_NOT_FOUND, clientId);
             exchange.setStatusCode(status.getStatusCode());
@@ -109,21 +110,14 @@ public class Oauth2ClientClientIdServiceServiceIdPostHandler  extends ClientAudi
                         .filter(st -> !st.isEmpty())
                         .collect(Collectors.joining(" "));
                 // update client scope in cache and db
-                result.put("old_scope", client.getScope());
+
                 client.setScope(s);
+                clients.set(clientId, client);
+
+                result.put("old_scope", client.getScope());
                 result.put("new_scope", s);
-
-                try (PreparedStatement stmt = connection.prepareStatement(update)) {
-                    stmt.setString(1, s);
-                    stmt.setString(2, clientId);
-                    stmt.executeUpdate();
-                } catch (SQLException e) {
-                    logger.error("Exception:", e);
-                    connection.rollback();
-                    throw new RuntimeException(e);
-                }
-
                 connection.commit();
+
             } catch (SQLException e) {
                 logger.error("SQLException:", e);
                 throw new RuntimeException(e);
