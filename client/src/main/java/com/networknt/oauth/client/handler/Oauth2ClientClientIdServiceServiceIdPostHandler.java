@@ -99,19 +99,18 @@ public class Oauth2ClientClientIdServiceServiceIdPostHandler  extends ClientAudi
                         }
                     }
                 }
+                connection.commit();
 
                 String s = Arrays.stream(joiner.toString().split(" "))
                         .distinct()
                         .filter(st -> !st.isEmpty())
                         .collect(Collectors.joining(" "));
                 // update client scope in cache and db
-
+                result.put("old_scope", client.getScope());
                 client.setScope(s);
                 clients.set(clientId, client);
-
-                result.put("old_scope", client.getScope());
                 result.put("new_scope", s);
-                connection.commit();
+
 
             } catch (SQLException e) {
                 logger.error("SQLException:", e);
