@@ -76,7 +76,6 @@ CREATE TABLE refresh_token (
   scope VARCHAR2(64) NOT NULL,
   refresh_token VARCHAR2(256) NOT NULL,
   CONSTRAINT refresh_token_pk PRIMARY KEY (user_id, client_id, refresh_token),
-  CONSTRAINT refresh_token_user_fk FOREIGN KEY (user_id) REFERENCES user_profile(user_id),
   CONSTRAINT refresh_token_client_fk FOREIGN KEY (client_id) REFERENCES client(client_id)
 );
 
