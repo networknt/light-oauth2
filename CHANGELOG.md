@@ -1,5 +1,34 @@
 # Change Log
 
+## [1.5.15](https://github.com/networknt/light-oauth2/tree/1.5.15) (2018-06-18)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.14...1.5.15)
+
+**Implemented enhancements:**
+
+- move refresh token to database for longer expiration [\#96](https://github.com/networknt/light-oauth2/issues/96)
+
+**Closed issues:**
+
+- refresh\_token table should not be dependent on user\_profile [\#117](https://github.com/networknt/light-oauth2/issues/117)
+- switch to default setExchangeStatus method for errors [\#116](https://github.com/networknt/light-oauth2/issues/116)
+- add SPNEGO service password to secret.yml  [\#115](https://github.com/networknt/light-oauth2/issues/115)
+- disable marketplace authentication until we find a testing repo [\#114](https://github.com/networknt/light-oauth2/issues/114)
+- move service specific config files to config folder under resources [\#113](https://github.com/networknt/light-oauth2/issues/113)
+- update swagger specification to add user\_type and roles in code, authorize and token [\#112](https://github.com/networknt/light-oauth2/issues/112)
+- token service: AT  does not contain endpoint scopes [\#111](https://github.com/networknt/light-oauth2/issues/111)
+- add user\_type and roles to refresh\_token table [\#110](https://github.com/networknt/light-oauth2/issues/110)
+- split authentication and authorization to a separate module authhub [\#109](https://github.com/networknt/light-oauth2/issues/109)
+- update resource owner password grant type with customized auth [\#108](https://github.com/networknt/light-oauth2/issues/108)
+- support user roles from code, user and token service [\#107](https://github.com/networknt/light-oauth2/issues/107)
+- get roles from github [\#106](https://github.com/networknt/light-oauth2/issues/106)
+- add a generic LightIdentityManager and move LDAP to a utility [\#105](https://github.com/networknt/light-oauth2/issues/105)
+- add LDAP test case to try different LDAP servers [\#104](https://github.com/networknt/light-oauth2/issues/104)
+- enable authenticate\_class in client and cache [\#103](https://github.com/networknt/light-oauth2/issues/103)
+- add LDAP authentication and authorization [\#102](https://github.com/networknt/light-oauth2/issues/102)
+- create a new credential with client\_id and user\_type [\#100](https://github.com/networknt/light-oauth2/issues/100)
+- add SPNEGO support for the code module [\#98](https://github.com/networknt/light-oauth2/issues/98)
+- audit all activities on each microservice [\#63](https://github.com/networknt/light-oauth2/issues/63)
+
 ## [1.5.14](https://github.com/networknt/light-oauth2/tree/1.5.14) (2018-05-20)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.13...1.5.14)
 
