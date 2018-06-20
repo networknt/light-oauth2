@@ -87,6 +87,7 @@
         <module>refresh-token</module>
         <module>authorize</module>
         <module>authhub</module>
+        <module>oauth-provider</module>
     </modules>
 
     <repositories>

@@ -112,6 +112,16 @@ public class CacheStartupHookProvider implements StartupHookProvider {
 
         config.addMapConfig(userConfig);
 
+        // provider map distributed.
+        MapConfig providerConfig = new MapConfig();
+        providerConfig.setName("providers");
+        providerConfig.setBackupCount(1);
+        providerConfig.getMapStoreConfig()
+                .setEnabled(true)
+                .setClassName("com.networknt.oauth.cache.ProviderMapStore");
+
+        config.addMapConfig(providerConfig);
+
         hz = Hazelcast.newHazelcastInstance( config );
 
     }
