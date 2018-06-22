@@ -5,7 +5,7 @@
     <parent>
         <artifactId>light-oauth2</artifactId>
         <groupId>com.networknt</groupId>
-        <version>1.5.15</version>
+        <version>1.5.16</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -118,7 +118,22 @@
             <groupId>com.networknt</groupId>
             <artifactId>server</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>openapi-parser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>openapi-meta</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>openapi-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>openapi-validator</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.networknt</groupId>
             <artifactId>swagger-meta</artifactId>

@@ -55,6 +55,7 @@
         <version.light-4j>1.5.16</version.light-4j>
         <version.light-rest-4j>1.5.16</version.light-rest-4j>
         <version.json-schema-validator>0.1.18</version.json-schema-validator>
+        <version.openapi-parser>1.5.16</version.openapi-parser>
         <version.jackson>2.9.5</version.jackson>
         <version.slf4j>1.7.25</version.slf4j>
         <version.jose4j>0.6.3</version.jose4j>
@@ -292,7 +293,26 @@
                 <artifactId>json-schema-validator</artifactId>
                 <version>${version.json-schema-validator}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>openapi-parser</artifactId>
+                <version>${version.openapi-parser}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>openapi-meta</artifactId>
+                <version>${version.light-rest-4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>openapi-security</artifactId>
+                <version>${version.light-rest-4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>openapi-validator</artifactId>
+                <version>${version.light-rest-4j}</version>
+            </dependency>
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-parser</artifactId>
