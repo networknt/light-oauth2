@@ -40,6 +40,19 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.regex.Matcher;
 
+/**
+ * This handler will issue the token based on the information about the client and user. The content
+ * of the token will be depending on the grant type. Also, the format of the token is depending on
+ * the client type. For public client type, the token is by reference token, other client type will
+ * issue the JWT token directly. There is an endpoint in this service to dereference token once the
+ * request comes into the internal network.
+ *
+ * We also introduce a new client type called trusted and limited other grant types except authorization
+ * code and client credentials to be used.
+ *
+ * @author Steve Hu
+ *
+ */
 public class Oauth2TokenPostHandler extends AuditInfoHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2TokenPostHandler.class);
 
