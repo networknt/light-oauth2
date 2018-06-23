@@ -95,6 +95,63 @@ public class Oauth2TokenPostHandlerTest {
         }
     }
 
+    /**
+     * The passed in client type is external and that means the returned access token will be a by-reference
+     * token instead of JWT.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testClientCredentialsExternalClient() throws Exception {
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "client_credentials");
+        String s = Http2Client.getFormDataString(params);
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("78cd9a2e-7690-11e8-adc0-fa7ae01bbebc", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await();
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+        int statusCode = reference.get().getResponseCode();
+        String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+        Assert.assertEquals(200, statusCode);
+        logger.debug("response body = " + body);
+        Map<String, Object> map = Config.getInstance().getMapper().readValue(body, new TypeReference<Map<String, String>>(){});
+        String accessToken = (String)map.get("access_token");
+        // make sure that this token is not in JWT format.
+        Assert.assertTrue(accessToken.indexOf(".") < 0);
+        // make sure that the jwt can be retrieved from this token
+        Map<String, String> referenceMap = (Map<String, String>) CacheStartupHookProvider.hz.getMap("references").get(accessToken);
+        String jwt = referenceMap.get("jwt");
+        String clientId = referenceMap.get("clientId");
+        logger.debug("jwt = " + jwt + " clientId = " + clientId);
+        Assert.assertNotNull(jwt);
+        Assert.assertNotNull(clientId);
+    }
+
     @Test
     public void testClientCredentialsTokenByFormData() throws Exception {
         Map<String, String> params = new HashMap<>();
@@ -885,6 +942,79 @@ public class Oauth2TokenPostHandlerTest {
         }
     }
 
+    /**
+     * The client type passed in is external and the access token returned should be a by-reference
+     * token instead of JWT.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testRefreshTokenExternalClient() throws Exception {
+        // setup refresh token map for userId and clientId
+        RefreshToken token = new RefreshToken();
+        token.setRefreshToken("86c0a39f-0789-4b71-9fed-d99fe6dc9281");
+        token.setUserId("admin");
+        token.setUserType("employee");
+        token.setClientId("78cd9a2e-7690-11e8-adc0-fa7ae01bbebc");
+        token.setScope("petstore.r petstore.w");
+        CacheStartupHookProvider.hz.getMap("tokens").put("86c0a39f-0789-4b71-9fed-d99fe6dc9281", token);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "refresh_token");
+        params.put("refresh_token", "86c0a39f-0789-4b71-9fed-d99fe6dc9281");
+        String s = Http2Client.getFormDataString(params);
+
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("78cd9a2e-7690-11e8-adc0-fa7ae01bbebc", "f6h1FTI8Q3-7UScPZDzfXA"));
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await();
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+        int statusCode = reference.get().getResponseCode();
+        String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+        Assert.assertEquals(200, statusCode);
+        logger.debug("body = " + body);
+        if(statusCode == 200) {
+            Map map = Config.getInstance().getMapper().readValue(body, new TypeReference<Map<String, Object>>(){});
+            String refreshToken = (String)map.get("refresh_token");
+            Assert.assertNotEquals("86c0a39f-0789-4b71-9fed-d99fe6dc9281", refreshToken);
+
+            String accessToken = (String)map.get("access_token");
+            // make sure that this token is not in JWT format.
+            Assert.assertTrue(accessToken.indexOf(".") < 0);
+            // make sure that the jwt can be retrieved from this token
+            Map<String, String> referenceMap = (Map<String, String>) CacheStartupHookProvider.hz.getMap("references").get(accessToken);
+            String jwt = referenceMap.get("jwt");
+            String clientId = referenceMap.get("clientId");
+            logger.debug("jwt = " + jwt + " clientId = " + clientId);
+            Assert.assertNotNull(jwt);
+            Assert.assertNotNull(clientId);
+        }
+    }
+
     @Test
     public void testRefreshTokenWithRoles() throws Exception {
         // setup refresh token map for userId and clientId
@@ -1180,6 +1310,70 @@ public class Oauth2TokenPostHandlerTest {
         } finally {
             IoUtils.safeClose(connection);
         }
+    }
+
+    /**
+     * For external client type, the genreated jwt token is no in the response but only a uuid
+     * once the request comes back to the internal network, a de-reference request must be called
+     * to exchange the uuid to a JWT.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testAuthorizationCodeExternalClient() throws Exception {
+        // setup codes map for userId but not redirectUri
+        Map<String, String> codeMap = new HashMap<>();
+        codeMap.put("userId", "admin");
+        codeMap.put("userType", "employee");
+        codeMap.put("redirectUri", "http://localhost:8080/authorization");
+        CacheStartupHookProvider.hz.getMap("codes").put("code1", codeMap);
+
+        Map<String, String> params = new HashMap<>();
+        params.put("grant_type", "authorization_code");
+        params.put("code", "code1");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
+        params.put("csrf", Util.getUUID());
+        String s = Http2Client.getFormDataString(params);
+
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6882"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/token");
+            request.getRequestHeaders().put(Headers.HOST, "localhost");
+            request.getRequestHeaders().put(Headers.AUTHORIZATION, "Basic " + encodeCredentials("78cd9a2e-7690-11e8-adc0-fa7ae01bbebc", "f6h1FTI8Q3-7UScPZDzfXA"));
+            request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/x-www-form-urlencoded");
+            request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+            connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+            latch.await();
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+        int statusCode = reference.get().getResponseCode();
+        String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+        Assert.assertEquals(200, statusCode);
+        logger.debug("response body = " + body);
+        Map<String, Object> map = Config.getInstance().getMapper().readValue(body, new TypeReference<Map<String, String>>(){});
+        String accessToken = (String)map.get("access_token");
+        // make sure that this token is not in JWT format.
+        Assert.assertTrue(accessToken.indexOf(".") < 0);
+        // make sure that the jwt can be retrieved from this token
+        Map<String, String> referenceMap = (Map<String, String>) CacheStartupHookProvider.hz.getMap("references").get(accessToken);
+        String jwt = referenceMap.get("jwt");
+        String clientId = referenceMap.get("clientId");
+        logger.debug("jwt = " + jwt + " clientId = " + clientId);
+        Assert.assertNotNull(jwt);
+        Assert.assertNotNull(clientId);
     }
 
     @Test

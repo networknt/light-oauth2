@@ -3,6 +3,7 @@ package com.networknt.oauth.token.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hazelcast.core.ClientType;
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
@@ -22,19 +23,17 @@ import com.networknt.service.SingletonServiceFactory;
 import com.networknt.status.Status;
 import com.networknt.utility.CodeVerifierUtil;
 import com.networknt.utility.HashUtil;
+import com.networknt.utility.Util;
 import io.undertow.security.idm.Account;
-import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormData;
 import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.server.handlers.form.FormParserFactory;
 import io.undertow.util.Headers;
 import org.jose4j.jwt.JwtClaims;
-import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
@@ -165,6 +164,10 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements LightHtt
                 logger.error("Exception:", e);
                 throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
             }
+            // if the client type is external, save the jwt to reference map and send the reference
+            if(Client.ClientTypeEnum.EXTERNAL == client.getClientType()) {
+                jwt = jwtReference(jwt, client.getDerefClientId());
+            }
             Map<String, Object> resMap = new HashMap<>();
             resMap.put("access_token", jwt);
             resMap.put("token_type", "bearer");
@@ -182,6 +185,7 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements LightHtt
         if(logger.isDebugEnabled()) logger.debug("code = " + code + " redirectUri = " + redirectUri);
         Client client = authenticateClient(exchange, formMap);
         if(client != null) {
+            // authorization code can only be used once for security reason.
             Map<String, String> codeMap = (Map<String, String>)CacheStartupHookProvider.hz.getMap("codes").remove(code);
             String userId = codeMap.get("userId");
             // get userType and roles from code map as there are some authenticators doesn't support user_profile table.
@@ -207,6 +211,7 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements LightHtt
                         }
                     }
                 }
+                // no passed in scope, take the client scope, otherwise, validate the passed in scope
                 if(scope == null) {
                     scope = client.getScope();
                 } else {
@@ -273,6 +278,10 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements LightHtt
                 token.setScope(scope);
                 IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
                 tokens.set(refreshToken, token);
+                // if the client type is external, save the jwt to reference map and send the reference
+                if(Client.ClientTypeEnum.EXTERNAL == client.getClientType()) {
+                    jwt = jwtReference(jwt, client.getDerefClientId());
+                }
                 Map<String, Object> resMap = new HashMap<>();
                 resMap.put("access_token", jwt);
                 resMap.put("token_type", "bearer");
@@ -423,6 +432,10 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements LightHtt
                     newToken.setClientId(client.getClientId());
                     newToken.setScope(scope);
                     tokens.put(refreshToken, newToken);
+                    // if the client type is external, save the jwt to reference map and send the reference
+                    if(Client.ClientTypeEnum.EXTERNAL == client.getClientType()) {
+                        jwt = jwtReference(jwt, client.getDerefClientId());
+                    }
                     Map<String, Object> resMap = new HashMap<>();
                     resMap.put("access_token", jwt);
                     resMap.put("token_type", "bearer");
@@ -626,5 +639,16 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements LightHtt
             auditInfo.setResponseBody(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseCookies()));
             saveAudit(auditInfo);
         }
+    }
+
+    private String jwtReference(String jwt, String clientId) {
+        String uuid = Util.getUUID();
+        Map<String, String> referenceMap = new HashMap<>();
+        referenceMap.put("jwt", jwt);
+        if(clientId != null) {
+            referenceMap.put("clientId", clientId);
+        }
+        CacheStartupHookProvider.hz.getMap("references").set(uuid, referenceMap);
+        return uuid;
     }
 }

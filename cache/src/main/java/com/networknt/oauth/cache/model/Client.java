@@ -10,7 +10,6 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.util.Objects;
 
 public class Client implements IdentifiedDataSerializable {
@@ -26,7 +25,9 @@ public class Client implements IdentifiedDataSerializable {
     
     PUBLIC("public"),
     
-    TRUSTED("trusted");
+    TRUSTED("trusted"),
+
+    EXTERNAL("external");
 
     private final String value;
 
@@ -104,6 +105,8 @@ public class Client implements IdentifiedDataSerializable {
   private String redirectUri = null;
 
   private String authenticateClass = null;
+
+  private String derefClientId = null;
 
   public Client clientId(String clientId) {
     this.clientId = clientId;
@@ -273,6 +276,21 @@ public class Client implements IdentifiedDataSerializable {
   }
 
 
+  public Client derefClientId(String derefClientId) {
+    this.derefClientId = derefClientId;
+    return this;
+  }
+
+
+  @ApiModelProperty(example = "null", value = "de-reference token client id")
+  @JsonProperty("derefClientId")
+  public String getDerefClientId() {
+    return derefClientId;
+  }
+  public void setDerefClientId(String derefClientId) {
+    this.derefClientId = derefClientId;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -292,12 +310,13 @@ public class Client implements IdentifiedDataSerializable {
         Objects.equals(scope, client.scope) &&
         Objects.equals(customClaim, client.customClaim) &&
         Objects.equals(redirectUri, client.redirectUri) &&
+        Objects.equals(derefClientId, client.derefClientId) &&
         Objects.equals(authenticateClass, client.authenticateClass);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(clientId, clientSecret, clientType, clientProfile, clientName, clientDesc, ownerId, scope, customClaim, redirectUri, authenticateClass);
+    return Objects.hash(clientId, clientSecret, clientType, clientProfile, clientName, clientDesc, ownerId, scope, customClaim, redirectUri, authenticateClass, derefClientId);
   }
 
   @Override
@@ -316,6 +335,7 @@ public class Client implements IdentifiedDataSerializable {
     sb.append("    customClaim: ").append(toIndentedString(customClaim)).append("\n");
     sb.append("    redirectUri: ").append(toIndentedString(redirectUri)).append("\n");
     sb.append("    authenticateClass: ").append(toIndentedString(authenticateClass)).append("\n");
+    sb.append("    derefClientId: ").append(toIndentedString(derefClientId)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -347,7 +367,8 @@ public class Client implements IdentifiedDataSerializable {
     this.scope = in.readUTF();
     this.customClaim = in.readUTF();
     this.redirectUri = in.readUTF();
-    this.authenticateClass = in.readObject();
+    this.authenticateClass = in.readUTF();
+    this.derefClientId = in.readUTF();
   }
 
   @Override
@@ -362,7 +383,8 @@ public class Client implements IdentifiedDataSerializable {
     out.writeUTF(this.scope);
     out.writeUTF(this.customClaim);
     out.writeUTF(this.redirectUri);
-    out.writeObject(this.authenticateClass);
+    out.writeUTF(this.authenticateClass);
+    out.writeUTF(this.derefClientId);
   }
 
   @JsonIgnore
@@ -392,6 +414,7 @@ public class Client implements IdentifiedDataSerializable {
     n.setCustomClaim(c.getCustomClaim());
     n.setRedirectUri(c.getRedirectUri());
     n.setAuthenticateClass(c.getAuthenticateClass());
+    n.setDerefClientId(c.getDerefClientId());
     return n;
   }
 }

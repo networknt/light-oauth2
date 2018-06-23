@@ -415,7 +415,8 @@
           "enum": [
             "confidential",
             "public",
-            "trusted"
+            "trusted",
+            "external"
           ]
         },
         "clientProfile": {

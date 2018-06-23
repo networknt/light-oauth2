@@ -80,6 +80,17 @@ public class CacheStartupHookProvider implements StartupHookProvider {
         codeConfig.setNearCacheConfig(codeCacheConfig);
         config.addMapConfig(codeConfig);
 
+        // reference token to jwt mapping
+        MapConfig referenceConfig = new MapConfig();
+        referenceConfig.setName("references");
+        NearCacheConfig referenceCacheConfig = new NearCacheConfig();
+        referenceCacheConfig.setTimeToLiveSeconds(60 * 60 * 1000); // 1 hour TTL
+        referenceCacheConfig.setMaxIdleSeconds(10 * 60 * 1000);    // 10 minutes max idle seconds
+        referenceCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
+        referenceCacheConfig.setCacheLocalEntries(true); // this enables the local caching
+        referenceConfig.setNearCacheConfig(referenceCacheConfig);
+        config.addMapConfig(referenceConfig);
+
         // fresh token map with near cache and evict. A new refresh token will
         // be generated each time refresh token is used. This token only lives
         // for 1 day and it will be removed from the cache automatically.
