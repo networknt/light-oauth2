@@ -48,7 +48,7 @@ public class ServerInfoGetHandlerTest {
         }
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         try {
-            ClientRequest request = new ClientRequest().setPath("/v1/server/info").setMethod(Methods.GET);
+            ClientRequest request = new ClientRequest().setPath("/server/info").setMethod(Methods.GET);
             
             connection.sendRequest(request, client.createClientCallback(reference, latch));
             

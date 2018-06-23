@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public class ProviderAuditHandler extends AuditInfoHandler {
     static final Logger logger = LoggerFactory.getLogger(ProviderAuditHandler.class);
-    private final static String CONFIG = "oauth_client";
+    private final static String CONFIG = "oauth_provider";
     private final static OauthProviderConfig oauth_config = (OauthProviderConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthProviderConfig.class);
 
 

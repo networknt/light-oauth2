@@ -4,6 +4,7 @@ import com.hazelcast.core.IMap;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
+import com.networknt.oauth.cache.model.Provider;
 import com.networknt.oauth.provider.ProviderAuditHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
@@ -17,13 +18,13 @@ public class Oauth2ProviderProviderIdDeleteHandler extends ProviderAuditHandler 
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        String clientId = exchange.getQueryParameters().get("clientId").getFirst();
+        String providerId = exchange.getQueryParameters().get("providerId").getFirst();
 
-        IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
-        if(clients.get(clientId) == null) {
-            setExchangeStatus(exchange, CLIENT_NOT_FOUND, clientId);
+        IMap<String, Provider> providers = CacheStartupHookProvider.hz.getMap("providers");
+        if(providers.get(providerId) == null) {
+            setExchangeStatus(exchange, CLIENT_NOT_FOUND, providerId);
         } else {
-            clients.delete(clientId);
+            providers.delete(providerId);
         }
         processAudit(exchange);
     }

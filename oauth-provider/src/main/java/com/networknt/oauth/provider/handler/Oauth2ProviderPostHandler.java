@@ -5,12 +5,8 @@ import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
-import com.networknt.oauth.cache.model.Client;
 import com.networknt.oauth.cache.model.Provider;
-import com.networknt.oauth.cache.model.User;
 import com.networknt.oauth.provider.ProviderAuditHandler;
-import com.networknt.utility.HashUtil;
-import com.networknt.utility.Util;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +18,6 @@ public class Oauth2ProviderPostHandler extends ProviderAuditHandler implements L
 
     static Logger logger = LoggerFactory.getLogger(Oauth2ProviderPostHandler.class);
     static final String PROVIDER_ID_EXISTS = "ERR12019";
-    static final String USER_NOT_FOUND = "ERR12013";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -32,14 +27,13 @@ public class Oauth2ProviderPostHandler extends ProviderAuditHandler implements L
 
         // generate provider id here
 
-        String providerId = "01";  //todo get the next provider Id
+        String providerId = UUID.randomUUID().toString();
         provider.setProviderId(providerId);
 
 
         IMap<String, Provider> providers = CacheStartupHookProvider.hz.getMap("providers");
         if(providers.get(providerId) == null) {
             providers.set(providerId, provider);
-            // send the client back with client_id and client_secret
 
             exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(provider));
         } else {

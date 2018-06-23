@@ -5,8 +5,8 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 
 public class ProviderDataSerializableFactory implements DataSerializableFactory {
 
-    static final int ID = 2;
-    static final int PROVIDER_TYPE = 2;
+    static final int ID = 6;
+    static final int PROVIDER_TYPE = 6;
 
     @Override
     public IdentifiedDataSerializable create(int typeId) {

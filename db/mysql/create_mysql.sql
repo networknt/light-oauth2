@@ -96,7 +96,7 @@ CREATE TABLE refresh_token (
 ENGINE=INNODB;
 
 CREATE TABLE oauth_provider (
-  provider_id VARCHAR(3) NOT NULL,
+  provider_id VARCHAR(64) NOT NULL,
   endpoint VARCHAR(256) NOT NULL,  -- different framework will have different endpoint format.
   port VARCHAR(6) NOT NULL,
   provider_name VARCHAR(64),

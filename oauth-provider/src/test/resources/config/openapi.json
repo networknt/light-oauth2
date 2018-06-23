@@ -1,10 +1,9 @@
 {"components":{"securitySchemes":{"provider_auth":{"type": "oauth2","description": "This API uses OAuth 2 with the client credential grant flow.","flows":{"clientCredentials":{"tokenUrl": "https://localhost:6882/token","scopes":{"read:provider": "read provider","write:provider": "modify provider","server.info.r":"read server info"}}}}},"schemas":{"Error":{"required":["code",
-          "message"],"properties":{"message":{"type": "string"},"code":{"type": "integer","format": "int32"}}},"Provider":{"required":["providerId",
-          "endpoint"],"properties":{"endpoint":{"type": "string"},"port":{"type": "string"},"providerId":{"type": "string"},"providerName":{"type": "integer","format": "int32"}}}}},"servers": [
+          "message"],"properties":{"message":{"type": "string"},"code":{"type": "integer","format": "int32"}}},"Provider":{"required":["endpoint"],"properties":{"endpoint":{"type": "string"},"port":{"type": "string"},"providerId":{"type": "string"},"providerName":{"type": "string"}}}}},"servers": [
     {
-      "url": "http://light-oauth2.swagger.io/v1"
+      "url": "http://light-oauth2.swagger.io"
     }
-  ],"openapi": "3.0.0","paths":{"/health":{"get":{"responses":{"200":{"description":"successful operation"}},"parameters":[]}},"/provider": {
+  ],"openapi": "3.0.0","paths":{"/health":{"get":{"responses":{"200":{"description":"successful operation"}},"parameters":[]}},"/oauth2/provider": {
       "post": {
         "summary": "Registe a new oauth provider ",
         "operationId": "createProvider",

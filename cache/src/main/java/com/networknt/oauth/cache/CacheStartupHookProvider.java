@@ -23,6 +23,7 @@ public class CacheStartupHookProvider implements StartupHookProvider {
         config.getSerializationConfig().addDataSerializableFactory(3, new ServiceDataSerializableFactory());
         config.getSerializationConfig().addDataSerializableFactory(4, new RefreshTokenDataSerializableFactory());
         config.getSerializationConfig().addDataSerializableFactory(5, new ServiceEndpointDataSerializableFactory());
+        config.getSerializationConfig().addDataSerializableFactory(6, new ProviderDataSerializableFactory());
 
         // service map with near cache.
         MapConfig serviceConfig = new MapConfig();

@@ -37,7 +37,7 @@ public class Oauth2ProviderProviderIdDeleteHandlerTest {
 
     @Test
     public void testOauth2ProviderProviderIdDeleteHandlerTest() throws ClientException, ApiException {
-        /*
+
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
         final ClientConnection connection;
@@ -48,7 +48,7 @@ public class Oauth2ProviderProviderIdDeleteHandlerTest {
         }
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         try {
-            ClientRequest request = new ClientRequest().setPath("/v1/oauth2/provider/providerId").setMethod(Methods.DELETE);
+            ClientRequest request = new ClientRequest().setPath("/oauth2/provider/11111").setMethod(Methods.DELETE);
             
             connection.sendRequest(request, client.createClientCallback(reference, latch));
             
@@ -61,8 +61,9 @@ public class Oauth2ProviderProviderIdDeleteHandlerTest {
         }
         int statusCode = reference.get().getResponseCode();
         String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
-        Assert.assertEquals(200, statusCode);
+        Assert.assertEquals(404, statusCode);  //response:{"statusCode":404,"code":"ERR12014","message":"CLIENT_NOT_FOUND","description":"Client 11111 is not found."}
+
         Assert.assertNotNull(body);
-        */
+
     }
 }

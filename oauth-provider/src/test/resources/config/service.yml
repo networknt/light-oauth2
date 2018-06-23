@@ -54,13 +54,11 @@ singletons:
 - com.networknt.server.HandlerProvider:
   - com.networknt.oauth.provider.PathHandlerProvider
 # StartupHookProvider implementations, there are one to many and they are called in the same sequence defined.
-# - com.networknt.server.StartupHookProvider:
-  # - com.networknt.server.Test1StartupHook
-  # - com.networknt.server.Test2StartupHook
-
+- com.networknt.server.StartupHookProvider:
+  - com.networknt.oauth.cache.CacheStartupHookProvider
 # ShutdownHookProvider implementations, there are one to many and they are called in the same sequence defined.
-# - com.networknt.server.ShutdownHookProvider:
-  # - com.networknt.server.Test1ShutdownHook
+- com.networknt.server.ShutdownHookProvider:
+  - com.networknt.oauth.cache.CacheShutdownHookProvider
 # MiddlewareHandler implementations, the calling sequence is as defined in the request/response chain.
 - com.networknt.handler.MiddlewareHandler:
   # Exception Global exception handler that needs to be called first to wrap all middleware handlers and business handlers
