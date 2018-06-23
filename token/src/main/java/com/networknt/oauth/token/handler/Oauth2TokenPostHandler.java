@@ -52,7 +52,7 @@ import java.util.regex.Matcher;
  * @author Steve Hu
  *
  */
-public class Oauth2TokenPostHandler extends AuditInfoHandler implements LightHttpHandler {
+public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2TokenPostHandler.class);
 
     private static final String UNABLE_TO_PARSE_FORM_DATA = "ERR12000";
@@ -625,20 +625,6 @@ public class Oauth2TokenPostHandler extends AuditInfoHandler implements LightHtt
             }
         }
         return matched;
-    }
-
-    private void processAudit(HttpServerExchange exchange) throws Exception {
-        if (oauth_config.isEnableAudit() ) {
-            AuditInfo auditInfo = new AuditInfo();
-            auditInfo.setServiceId(Oauth2Service.TOKEN);
-            auditInfo.setEndpoint(exchange.getHostName() + exchange.getRelativePath());
-            auditInfo.setRequestHeader(exchange.getRequestHeaders().toString());
-            auditInfo.setRequestBody(Config.getInstance().getMapper().writeValueAsString(exchange.getAttachment(BodyHandler.REQUEST_BODY)));
-            auditInfo.setResponseCode(exchange.getStatusCode());
-            auditInfo.setResponseHeader(exchange.getResponseHeaders().toString());
-            auditInfo.setResponseBody(Config.getInstance().getMapper().writeValueAsString(exchange.getResponseCookies()));
-            saveAudit(auditInfo);
-        }
     }
 
     private String jwtReference(String jwt, String clientId) {
