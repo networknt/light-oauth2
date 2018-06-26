@@ -2,27 +2,27 @@ package com.networknt.oauth.key.handler;
 
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
+
+import com.networknt.client.oauth.KeyRequest;
+import com.networknt.client.oauth.OauthHelper;
 import com.networknt.config.Config;
 import com.networknt.exception.ApiException;
+import com.networknt.exception.ClientException;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
-import com.networknt.oauth.cache.model.AuditInfo;
-import com.networknt.oauth.cache.model.Client;
-import com.networknt.oauth.cache.model.Oauth2Service;
+import com.networknt.oauth.cache.model.*;
 import com.networknt.status.Status;
 import com.networknt.utility.HashUtil;
-import io.undertow.server.HttpHandler;
+
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.FlexBase64;
-import io.undertow.util.HeaderValues;
-import io.undertow.util.Headers;
-import io.undertow.util.HttpString;
-import org.owasp.encoder.Encode;
+import io.undertow.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import java.io.IOException;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +30,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static io.undertow.util.Headers.AUTHORIZATION;
 import static io.undertow.util.Headers.BASIC;
@@ -83,20 +85,34 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
             Map<String, Object> config = Config.getInstance().getJsonMapConfig(CONFIG_SECURITY);
             Map<String, Object> jwtConfig = (Map<String, Object>)config.get(CONFIG_JWT);
             Map<String, Object> certificateConfig = (Map<String, Object>)jwtConfig.get(CONFIG_CERTIFICATE);
-            // find the path for certificate file
-            String filename = (String)certificateConfig.get(keyId);
-            if(filename != null) {
-                String content = Config.getInstance().getStringFromFile(filename);
-                if(logger.isDebugEnabled()) logger.debug("certificate = " + content);
+            // check if the key from provider or not
+            if (getProviderId(keyId)==null || "00".equals(getProviderId(keyId))) {
+                // find the path for certificate file
+                String filename = (String)certificateConfig.get(getKeyId(keyId));
+                if(filename != null) {
+                    String content = Config.getInstance().getStringFromFile(filename);
+                    if(logger.isDebugEnabled()) logger.debug("certificate = " + content);
+                    if(content != null) {
+                        exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/text");
+                        exchange.getResponseSender().send(content);
+                    } else {
+                        setExchangeStatus(exchange, KEY_NOT_FOUND, keyId);
+                    }
+                } else {
+                    setExchangeStatus(exchange, INVALID_KEY_ID, keyId);
+                }
+            } else {
+                // from provider
+                String content = getCertificateFromProvider(authHeader, getProviderId(keyId), getKeyId(keyId));
+                if(logger.isDebugEnabled()) logger.debug("certificate from provider = " + content);
                 if(content != null) {
                     exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/text");
                     exchange.getResponseSender().send(content);
                 } else {
                     setExchangeStatus(exchange, KEY_NOT_FOUND, keyId);
                 }
-            } else {
-                setExchangeStatus(exchange, INVALID_KEY_ID, keyId);
             }
+
         }
         processAudit(exchange);
     }
@@ -136,6 +152,61 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
         return result;
     }
 
+
+    private String getCertificateFromProvider(String authHeader, String providerId, String keyId) throws ApiException {
+        IMap<String, Provider> providers = CacheStartupHookProvider.hz.getMap("providers");
+        Provider provider = providers.get(providerId);
+        String key = null;
+
+        if(provider != null) {
+            String base64Challenge = authHeader.substring(PREFIX_LENGTH);
+            String plainChallenge;
+            try {
+                ByteBuffer decode = FlexBase64.decode(base64Challenge);
+                // assume charset is UTF_8
+                Charset charset = StandardCharsets.UTF_8;
+                plainChallenge = new String(decode.array(), decode.arrayOffset(), decode.limit(), charset);
+                logger.debug("Found basic auth header %s (decoded using charset %s) in %s", plainChallenge, charset, authHeader);
+                int colonPos;
+                if ((colonPos = plainChallenge.indexOf(COLON)) > -1) {
+                    String clientId = plainChallenge.substring(0, colonPos);
+                    String clientSecret = plainChallenge.substring(colonPos + 1);
+
+                    KeyRequest keyRequest = new KeyRequest();
+                    keyRequest.setClientId(clientId);
+                    keyRequest.setClientSecret(clientSecret);
+                    keyRequest.setServerUrl(provider.getServerUrl());
+                    keyRequest.setUri(provider.getUri() + "/00" + keyId);
+                    keyRequest.setEnableHttp2(true);
+                    key = OauthHelper.getKey(keyRequest);
+                }
+            } catch (IOException | ClientException e) {
+                logger.error("Exception:", e);
+                throw new ApiException(new Status(RUNTIME_EXCEPTION));
+            }
+
+        }
+        return key;
+    }
+
+    private String getProviderId(String keyId)  {
+        if ( keyId.length()< 4) {
+            return null;
+        } else {
+            return keyId.substring(0,2);
+        }
+    }
+
+    private String getKeyId(String keyId)  {
+        if (keyId.length()< 4) {
+            return keyId;
+        } else {
+            return keyId.substring(2);
+        }
+    }
+
+
+
     private void processAudit(HttpServerExchange exchange) throws Exception {
         if (oauth_config.isEnableAudit() ) {
             AuditInfo auditInfo = new AuditInfo();
@@ -150,3 +221,4 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
         }
     }
 }
+

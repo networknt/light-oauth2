@@ -17,9 +17,9 @@ import java.util.Objects;
 public class Provider implements IdentifiedDataSerializable {
   private String providerId = null;
 
-  private String endpoint = null;
+  private String serverUrl = null;
 
-  private String port = null;
+  private String uri = null;
 
   private String providerName = null;
 
@@ -41,23 +41,23 @@ public class Provider implements IdentifiedDataSerializable {
 
 
 
-  @ApiModelProperty(example = "null", required = true, value = "endpoint")
-  @JsonProperty("endpoint")
-  public String getEndpoint() {
-    return endpoint;
+  @ApiModelProperty(example = "null", required = true, value = "serverUrl")
+  @JsonProperty("serverUrl")
+  public String getServerUrl() {
+    return serverUrl;
   }
-  public void setEndpoint(String endpoint) {
-    this.endpoint = endpoint;
+  public void setServerUrl(String serverUrl) {
+    this.serverUrl = serverUrl;
   }
 
 
-  @ApiModelProperty(example = "null", required = true, value = "port")
-  @JsonProperty("port")
-  public String getPort() {
-    return port;
+  @ApiModelProperty(example = "null", required = true, value = "uri")
+  @JsonProperty("uri")
+  public String getUri() {
+    return uri;
   }
-  public void setPort(String port) {
-    this.port = port;
+  public void setUri(String uri) {
+    this.uri = uri;
   }
 
 
@@ -81,14 +81,14 @@ public class Provider implements IdentifiedDataSerializable {
     }
     Provider provider = (Provider) o;
     return Objects.equals(providerId, provider.providerId) &&
-        Objects.equals(endpoint, provider.endpoint) &&
-        Objects.equals(port, provider.port);
+            Objects.equals(serverUrl, provider.serverUrl) &&
+            Objects.equals(uri, provider.uri);
 
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(providerId, endpoint, port);
+    return Objects.hash(providerId, serverUrl, uri);
   }
 
   @Override
@@ -97,8 +97,8 @@ public class Provider implements IdentifiedDataSerializable {
     sb.append("class Provider {\n");
 
     sb.append("    providerid: ").append(toIndentedString(providerId)).append("\n");
-    sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
-    sb.append("    port: ").append(toIndentedString(port)).append("\n");
+    sb.append("    serverUrl: ").append(toIndentedString(serverUrl)).append("\n");
+    sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -121,16 +121,16 @@ public class Provider implements IdentifiedDataSerializable {
   @Override
   public void readData(ObjectDataInput in) throws IOException {
     this.providerId = in.readUTF();
-    this.endpoint = in.readUTF();
-    this.port = in.readUTF();
+    this.serverUrl = in.readUTF();
+    this.uri = in.readUTF();
     this.providerName = in.readUTF();
   }
 
   @Override
   public void writeData(ObjectDataOutput out) throws IOException {
     out.writeUTF(this.providerId);
-    out.writeUTF(this.endpoint);
-    out.writeUTF(this.port);
+    out.writeUTF(this.serverUrl);
+    out.writeUTF(this.uri);
     out.writeUTF(this.providerName);
   }
 

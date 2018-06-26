@@ -1,3 +1,4 @@
+
 package com.networknt.oauth.cache;
 
 import com.hazelcast.core.MapStore;
@@ -20,10 +21,10 @@ import java.util.*;
 public class ProviderMapStore implements MapStore<String, Provider> {
     private static final Logger logger = LoggerFactory.getLogger(ProviderMapStore.class);
     private static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
-    private static final String insert = "INSERT INTO oauth_provider (provider_id, endpoint, port, provider_name) VALUES (?, ?, ?, ?)";
+    private static final String insert = "INSERT INTO oauth_provider (provider_id, server_url, uri, provider_name) VALUES (?, ?, ?, ?)";
     private static final String delete = "DELETE FROM oauth_provider WHERE provider_id = ?";
     private static final String select = "SELECT * FROM oauth_provider WHERE provider_id = ?";
-    private static final String update = "UPDATE oauth_provider SET endpoint=?, port=?, provider_name=? WHERE oauth_provider=?";
+    private static final String update = "UPDATE oauth_provider SET server_url=?, uri=?, provider_name=? WHERE oauth_provider=?";
     private static final String loadall = "SELECT provider_id FROM oauth_provider";
 
     @Override
@@ -43,8 +44,8 @@ public class ProviderMapStore implements MapStore<String, Provider> {
         if(load(key) == null) {
             try (Connection connection = ds.getConnection(); PreparedStatement stmt = connection.prepareStatement(insert)) {
                 stmt.setString(1, provider.getProviderId());
-                stmt.setString(2, provider.getEndpoint());
-                stmt.setString(3, provider.getPort());
+                stmt.setString(2, provider.getServerUrl());
+                stmt.setString(3, provider.getUri());
                 stmt.setString(4, provider.getProviderName());
 
                 stmt.executeUpdate();
@@ -53,7 +54,7 @@ public class ProviderMapStore implements MapStore<String, Provider> {
                 throw new RuntimeException(e);
             }
         } else {
-           //should be no update
+            //should be no update
         }
     }
     @Override
@@ -75,8 +76,8 @@ public class ProviderMapStore implements MapStore<String, Provider> {
                 if (rs.next()) {
                     provider = new Provider();
                     provider.setProviderId(key);
-                    provider.setEndpoint(rs.getString("endpoint"));
-                    provider.setPort(rs.getString("port"));
+                    provider.setServerUrl(rs.getString("server_url"));
+                    provider.setUri(rs.getString("uri"));
                     provider.setProviderName(rs.getString("provider_name"));
                 }
             }
@@ -110,3 +111,4 @@ public class ProviderMapStore implements MapStore<String, Provider> {
     }
 
 }
+
