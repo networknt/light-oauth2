@@ -12,7 +12,6 @@ DROP TABLE IF EXISTS client;
 DROP TABLE IF EXISTS user_profile;
 DROP TABLE IF EXISTS refresh_token;
 DROP TABLE IF EXISTS oauth_provider;
-DROP TABLE IF EXISTS key_provider_id;
 DROP TABLE IF EXISTS audit_log;
 
 
@@ -96,19 +95,14 @@ CREATE TABLE refresh_token (
 ENGINE=INNODB;
 
 CREATE TABLE oauth_provider (
-  provider_id VARCHAR(64) NOT NULL,
-  endpoint VARCHAR(256) NOT NULL,  -- different framework will have different endpoint format.
-  port VARCHAR(6) NOT NULL,
+  provider_id VARCHAR(2) NOT NULL,
+  server_url VARCHAR(256) NOT NULL,  -- different framework will have different endpoint format.
+  uri VARCHAR(64) NOT NULL,
   provider_name VARCHAR(64),
   PRIMARY KEY (provider_id)
 )
 ENGINE=INNODB;
 
-CREATE TABLE key_provider_id (
-  provider_id int NOT NULL,
-  key_id int NOT NULL
-)
-ENGINE=INNODB;
 
 
 create table audit_log (

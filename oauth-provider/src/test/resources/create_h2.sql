@@ -52,9 +52,9 @@ CREATE TABLE refresh_token (
 );
 
 CREATE TABLE oauth_provider (
-  provider_id VARCHAR(64) NOT NULL,
-  endpoint VARCHAR(256) NOT NULL,  -- different framework will have different endpoint format.
-  port VARCHAR(6) NOT NULL,
+  provider_id VARCHAR(2) NOT NULL,
+  server_url VARCHAR(256) NOT NULL,  -- different framework will have different endpoint format.
+  uri VARCHAR(64) NOT NULL,
   provider_name VARCHAR(64),
   PRIMARY KEY (provider_id)
 );
