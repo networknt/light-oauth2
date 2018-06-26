@@ -110,7 +110,7 @@ ENGINE=INNODB;
 CREATE TABLE IF NOT EXISTS client (
   client_id VARCHAR(32) NOT NULL,
   client_secret VARCHAR(512) NOT NULL,
-  client_type VARCHAR(12) NOT NULL, -- public confidential trusted, external
+  client_type VARCHAR(12) NOT NULL, -- public confidential trusted external
   client_description VARCHAR(1024),
   reuse_refresh_tokens BOOLEAN DEFAULT true NOT NULL,
   dynamically_registered BOOLEAN DEFAULT false NOT NULL,
