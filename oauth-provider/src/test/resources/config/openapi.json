@@ -1,5 +1,5 @@
 {"components":{"securitySchemes":{"provider_auth":{"type": "oauth2","description": "This API uses OAuth 2 with the client credential grant flow.","flows":{"clientCredentials":{"tokenUrl": "https://localhost:6882/token","scopes":{"read:provider": "read provider","write:provider": "modify provider","server.info.r":"read server info"}}}}},"schemas":{"Error":{"required":["code",
-          "message"],"properties":{"message":{"type": "string"},"code":{"type": "integer","format": "int32"}}},"Provider":{"required":["endpoint"],"properties":{"endpoint":{"type": "string"},"port":{"type": "string"},"providerId":{"type": "string"},"providerName":{"type": "string"}}}}},"servers": [
+          "message"],"properties":{"message":{"type": "string"},"code":{"type": "integer","format": "int32"}}},"Provider":{"required":["serverUrl"],"properties":{"uri":{"type": "string"},"providerId":{"type": "string"},"providerName":{"type": "string"},"serverUrl":{"type": "string"}}}}},"servers": [
     {
       "url": "http://light-oauth2.swagger.io"
     }
