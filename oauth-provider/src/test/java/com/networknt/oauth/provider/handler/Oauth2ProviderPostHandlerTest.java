@@ -54,7 +54,7 @@ public class Oauth2ProviderPostHandlerTest {
 
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
-        String s ="{\"endpoint\":\"http://google.ca/light-4j\",\"port\":\"8080\",\"providerName\":\"cloud light-4j\"}";
+
         final ClientConnection connection;
         try {
             connection = client.connect(new URI(url), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, enableHttp2 ? OptionMap.create(UndertowOptions.ENABLE_HTTP2, true): OptionMap.EMPTY).get();

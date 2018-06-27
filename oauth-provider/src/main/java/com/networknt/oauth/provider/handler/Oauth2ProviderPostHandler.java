@@ -19,6 +19,7 @@ public class Oauth2ProviderPostHandler extends ProviderAuditHandler implements L
     static Logger logger = LoggerFactory.getLogger(Oauth2ProviderPostHandler.class);
     static final String PROVIDER_ID_EXISTS = "ERR12048";
     static final String PROVIDER_ID_NOT_SET = "ERR12047";
+    static final String PROVIDER_ID_INVALID = "ERR12049";
     static final String CONFIG_SECURITY = "security";
     static final String PROVIDER_ID = "providerId";
 
@@ -40,7 +41,9 @@ public class Oauth2ProviderPostHandler extends ProviderAuditHandler implements L
             if (provider_id.length() == 1) {
                 provider_id = "0" + provider_id;
             } else if (provider_id.length()>2) {
-                provider_id = provider_id.substring(0,2);
+                setExchangeStatus(exchange, PROVIDER_ID_INVALID);
+                processAudit(exchange);
+                return;
             }
             provider.setProviderId(provider_id);
         }
@@ -48,7 +51,6 @@ public class Oauth2ProviderPostHandler extends ProviderAuditHandler implements L
         IMap<String, Provider> providers = CacheStartupHookProvider.hz.getMap("providers");
         if(providers.get(provider_id) == null) {
             providers.set(provider_id, provider);
-
             exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(provider));
         } else {
             setExchangeStatus(exchange, PROVIDER_ID_EXISTS, provider_id);
