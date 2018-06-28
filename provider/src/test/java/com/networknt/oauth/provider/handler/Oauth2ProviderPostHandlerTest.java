@@ -62,6 +62,7 @@ public class Oauth2ProviderPostHandlerTest {
             throw new ClientException(e);
         }
         Provider provider = new Provider();
+        provider.setProviderId("05");
         provider.setServerUrl("http://google.ca/light-4j:8080");
         provider.setUri("/oauth/key");
         provider.setProviderName("cloud light-4j");

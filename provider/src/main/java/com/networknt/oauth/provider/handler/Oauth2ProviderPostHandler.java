@@ -18,10 +18,6 @@ public class Oauth2ProviderPostHandler extends ProviderAuditHandler implements L
 
     static Logger logger = LoggerFactory.getLogger(Oauth2ProviderPostHandler.class);
     static final String PROVIDER_ID_EXISTS = "ERR12048";
-    static final String PROVIDER_ID_NOT_SET = "ERR12047";
-    static final String PROVIDER_ID_INVALID = "ERR12049";
-    static final String CONFIG_SECURITY = "security";
-    static final String PROVIDER_ID = "providerId";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -29,24 +25,7 @@ public class Oauth2ProviderPostHandler extends ProviderAuditHandler implements L
         Map<String, Object> body = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
         Provider provider = Config.getInstance().getMapper().convertValue(body, Provider.class);
 
-        // generate provider id from security.yml file
-        Map<String, Object> config = Config.getInstance().getJsonMapConfig(CONFIG_SECURITY);
-        String provider_id = "" ;
-        if (config.get(PROVIDER_ID)==null) {
-            setExchangeStatus(exchange, PROVIDER_ID_NOT_SET);
-            processAudit(exchange);
-            return;
-        } else {
-            provider_id =config.get(PROVIDER_ID).toString();
-            if (provider_id.length() == 1) {
-                provider_id = "0" + provider_id;
-            } else if (provider_id.length()>2) {
-                setExchangeStatus(exchange, PROVIDER_ID_INVALID);
-                processAudit(exchange);
-                return;
-            }
-            provider.setProviderId(provider_id);
-        }
+        String provider_id = provider.getProviderId() ;
 
         IMap<String, Provider> providers = CacheStartupHookProvider.hz.getMap("providers");
         if(providers.get(provider_id) == null) {

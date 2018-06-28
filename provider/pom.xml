@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.networknt</groupId>
-    <artifactId>oauth-provider</artifactId>
+    <artifactId>oauth2-provider</artifactId>
 
 
     <dependencies>
