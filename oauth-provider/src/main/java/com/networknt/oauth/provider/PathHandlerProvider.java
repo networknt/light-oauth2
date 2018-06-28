@@ -6,6 +6,7 @@ import com.networknt.info.ServerInfoGetHandler;
 import com.networknt.oauth.provider.handler.Oauth2ProviderGetHandler;
 import com.networknt.oauth.provider.handler.Oauth2ProviderPostHandler;
 import com.networknt.oauth.provider.handler.Oauth2ProviderProviderIdDeleteHandler;
+import com.networknt.oauth.provider.handler.Oauth2ProviderPutHandler;
 import com.networknt.server.HandlerProvider;
 import io.undertow.Handlers;
 import io.undertow.server.HttpHandler;
@@ -22,6 +23,7 @@ public class PathHandlerProvider implements HandlerProvider {
            .add(Methods.DELETE, "/oauth2/provider/{providerId}", new Oauth2ProviderProviderIdDeleteHandler())
                 .add(Methods.GET, "/health", new HealthGetHandler())
             .add(Methods.GET, "/server/info", new ServerInfoGetHandler())
+                .add(Methods.PUT, "/oauth2/provider", new Oauth2ProviderPutHandler())
 
                 ;
     }
