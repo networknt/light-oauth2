@@ -24,7 +24,7 @@ public class ProviderMapStore implements MapStore<String, Provider> {
     private static final String insert = "INSERT INTO oauth_provider (provider_id, server_url, uri, provider_name) VALUES (?, ?, ?, ?)";
     private static final String delete = "DELETE FROM oauth_provider WHERE provider_id = ?";
     private static final String select = "SELECT * FROM oauth_provider WHERE provider_id = ?";
-    private static final String update = "UPDATE oauth_provider SET server_url=?, uri=?, provider_name=? WHERE oauth_provider=?";
+    private static final String update = "UPDATE oauth_provider SET server_url=?, uri=?, provider_name=? WHERE provider_id=?";
     private static final String loadall = "SELECT provider_id FROM oauth_provider";
 
     @Override
@@ -54,7 +54,16 @@ public class ProviderMapStore implements MapStore<String, Provider> {
                 throw new RuntimeException(e);
             }
         } else {
-            //should be no update
+            try (Connection connection = ds.getConnection(); PreparedStatement stmt = connection.prepareStatement(update)) {
+                stmt.setString(1, provider.getServerUrl());
+                stmt.setString(2, provider.getUri());
+                stmt.setString(3, provider.getProviderName());
+                stmt.setString(4, provider.getProviderId());
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                logger.error("Exception:", e);
+                throw new RuntimeException(e);
+            }
         }
     }
     @Override
