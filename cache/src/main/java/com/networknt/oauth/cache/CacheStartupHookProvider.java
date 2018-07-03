@@ -116,7 +116,11 @@ public class CacheStartupHookProvider implements StartupHookProvider {
         // provider map distributed.
         MapConfig providerConfig = new MapConfig();
         providerConfig.setName("providers");
-        providerConfig.setBackupCount(1);
+        NearCacheConfig providerCacheConfig = new NearCacheConfig();
+        providerCacheConfig.setEvictionPolicy("NONE");
+        providerCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
+        providerCacheConfig.setCacheLocalEntries(true); // this enables the local caching
+        providerConfig.setNearCacheConfig(providerCacheConfig);
         providerConfig.getMapStoreConfig()
                 .setEnabled(true)
                 .setClassName("com.networknt.oauth.cache.ProviderMapStore");
