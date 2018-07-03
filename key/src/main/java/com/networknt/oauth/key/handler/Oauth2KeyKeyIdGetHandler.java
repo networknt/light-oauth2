@@ -50,6 +50,7 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
     static final String UNAUTHORIZED_CLIENT = "ERR12007";
     static final String INVALID_KEY_ID = "ERR12030";
 
+    private static final String PROVIDER_ID = "providerId";
     private static final String BASIC_PREFIX = BASIC + " ";
     private static final String LOWERCASE_BASIC_PREFIX = BASIC_PREFIX.toLowerCase(Locale.ENGLISH);
     private static final int PREFIX_LENGTH = BASIC_PREFIX.length();
@@ -67,9 +68,10 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
         Map<String, Object> config = Config.getInstance().getJsonMapConfig(CONFIG_SECURITY);
         Map<String, Object> jwtConfig = (Map<String, Object>)config.get(CONFIG_JWT);
         Map<String, Object> certificateConfig = (Map<String, Object>)jwtConfig.get(CONFIG_CERTIFICATE);
+        String provider_id = config.get(PROVIDER_ID)==null ? "": config.get(PROVIDER_ID).toString();
 
-        if (getProviderId(keyId)==null || "00".equals(getProviderId(keyId))) {
-            if (getProviderId(keyId)==null) {
+        if (getProviderId(keyId)==null || "00".equals(getProviderId(keyId)) || provider_id.equals(getProviderId(keyId))) {
+            if (getProviderId(keyId)==null  || provider_id.equals(getProviderId(keyId))) {
                 // Standalone light-oauth server
                 // check if client_id and client_secret in header are valid pair.
                 HeaderValues values = exchange.getRequestHeaders().get(AUTHORIZATION);

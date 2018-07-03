@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Oauth2ProviderProviderIdDeleteHandler extends ProviderAuditHandler implements LightHttpHandler {
-    static final String CLIENT_NOT_FOUND = "ERR12014";
+    static final String PROVIDER_ID_NOT_EXISTING = "ERR12047";
 
     static Logger logger = LoggerFactory.getLogger(Oauth2ProviderProviderIdDeleteHandler.class);
 
@@ -22,7 +22,7 @@ public class Oauth2ProviderProviderIdDeleteHandler extends ProviderAuditHandler 
 
         IMap<String, Provider> providers = CacheStartupHookProvider.hz.getMap("providers");
         if(providers.get(providerId) == null) {
-            setExchangeStatus(exchange, CLIENT_NOT_FOUND, providerId);
+            setExchangeStatus(exchange, PROVIDER_ID_NOT_EXISTING, providerId);
         } else {
             providers.delete(providerId);
         }
