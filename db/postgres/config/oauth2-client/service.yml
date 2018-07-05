@@ -4,7 +4,7 @@ singletons:
 - com.networknt.utility.Decryptor:
   - com.networknt.decrypt.AESDecryptor
 # HandlerProvider implementation
-- com.networknt.server.HandlerProvider:
+- com.networknt.handler.HandlerProvider:
   - com.networknt.oauth.client.PathHandlerProvider
 # StartupHookProvider implementations, there are one to many and they are called in the same sequence defined.
 - com.networknt.server.StartupHookProvider:
