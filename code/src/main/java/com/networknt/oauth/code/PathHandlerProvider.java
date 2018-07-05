@@ -8,7 +8,7 @@ import com.networknt.oauth.code.handler.Oauth2CodePostHandler;
 import com.networknt.oauth.security.LightBasicAuthenticationMechanism;
 import com.networknt.oauth.security.LightGSSAPIAuthenticationMechanism;
 import com.networknt.oauth.security.LightIdentityManager;
-import com.networknt.server.HandlerProvider;
+import com.networknt.handler.HandlerProvider;
 import io.undertow.Handlers;
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.AuthenticationMode;

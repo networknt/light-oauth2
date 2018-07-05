@@ -3,7 +3,7 @@ package com.networknt.oauth.key;
 import com.networknt.health.HealthGetHandler;
 import com.networknt.info.ServerInfoGetHandler;
 import com.networknt.oauth.key.handler.Oauth2KeyKeyIdGetHandler;
-import com.networknt.server.HandlerProvider;
+import com.networknt.handler.HandlerProvider;
 import io.undertow.Handlers;
 import io.undertow.server.HttpHandler;
 import io.undertow.util.Methods;
