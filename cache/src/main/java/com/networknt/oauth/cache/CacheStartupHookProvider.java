@@ -6,14 +6,25 @@ import com.hazelcast.core.HazelcastInstance;
 import com.networknt.oauth.cache.model.*;
 import com.networknt.server.StartupHookProvider;
 
+import java.io.InputStream;
+
 /**
  * Created by stevehu on 2016-12-27.
  */
 public class CacheStartupHookProvider implements StartupHookProvider {
     public static HazelcastInstance hz;
+    public static final String CONFIG_NAME = "hazelcast.xml";
+
     @Override
     public void onStartup() {
-        Config config = new Config();
+        InputStream is = com.networknt.config.Config.getInstance().getInputStreamFromFile(CONFIG_NAME);
+        Config config = null;
+        if(is != null) {
+            config = new XmlConfigBuilder(is).build();
+        } else {
+            config = new Config();
+        }
+
         config.getNetworkConfig().setPort( 5900 )
                 .setPortAutoIncrement( true );
 

@@ -67,6 +67,7 @@
         <version.hikaricp>3.1.0</version.hikaricp>
         <version.h2>1.4.196</version.h2>
         <version.hazelcast>3.9.2</version.hazelcast>
+        <version.hazelcast-kubernetes>1.1.0</version.hazelcast-kubernetes>
         <version.oracle>11.2.0.3</version.oracle>
         <version.mysql>6.0.5</version.mysql>
         <version.postgres>9.4.1211</version.postgres>
@@ -331,6 +332,11 @@
                 <groupId>com.hazelcast</groupId>
                 <artifactId>hazelcast</artifactId>
                 <version>${version.hazelcast}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hazelcast</groupId>
+                <artifactId>hazelcast-kubernetes</artifactId>
+                <version>${version.hazelcast-kubernetes}</version>
             </dependency>
             <dependency>
                 <groupId>com.oracle</groupId>
