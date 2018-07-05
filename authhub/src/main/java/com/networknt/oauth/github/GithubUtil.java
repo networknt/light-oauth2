@@ -53,16 +53,17 @@ public class GithubUtil {
 
 		String apiURL = config.protocol + "://" + config.host;
 		String contentsURL = config.pathPrefix + "/repos/" + config.owner + "/" + config.repo + "/contents/" + config.path;
-		
+
 		final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
         
         final ClientConnection connection = client.connect(new URI(apiURL), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         try {
+					logger.info("Create request to github path: " + contentsURL);
         	final ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(contentsURL);
 			request.getRequestHeaders().put(Headers.AUTHORIZATION, "token " + githubToken);
-			request.getRequestHeaders().put(Headers.HOST, "localhost");
+			request.getRequestHeaders().put(Headers.HOST, config.host);
 			request.getRequestHeaders().put(Headers.ACCEPT, "application/vnd.github.v3.raw");
 			request.getRequestHeaders().put(Headers.CACHE_CONTROL, "no-cache");
 			request.getRequestHeaders().put(Headers.USER_AGENT, "stevehu");
@@ -75,16 +76,19 @@ public class GithubUtil {
             IoUtils.safeClose(connection);
         }
 		int statusCode = reference.get().getResponseCode();
-		System.out.println("statusCode = " + statusCode);
 		String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
-		System.out.println("testHttp2Get: statusCode = " + statusCode + " body = " + body);
+		if(logger.isDebugEnabled()) logger.debug("testHttp2Get: statusCode = " + statusCode + " body = " + body);
 
 		if (statusCode == 200) {
 			ObjectMapper objectMapper = new ObjectMapper();
 			List<GithubMetadata> listMeta = objectMapper.readValue(body, new TypeReference<List<GithubMetadata>>(){});
 			for (GithubMetadata meta : listMeta) {
-				if (meta.github_username.equals(username)) {
-					logger.info(meta.github_username + " is attached to the following primary group: " + meta.groups.primary + " and secondary groups: " + Arrays.toString(meta.groups.secondary));
+				if (meta.userID.equals(username)) {
+					groups.add("primary." + meta.groups.primary);
+					for (String group: meta.groups.secondary) {
+						groups.add("secondary." + group);
+					}
+					if(logger.isDebugEnabled()) logger.debug(meta.userID + " is attached to the following primary group: " + meta.groups.primary + " and secondary groups: " + Arrays.toString(meta.groups.secondary));
 				}
 			}
 		}
