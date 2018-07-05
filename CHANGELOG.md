@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.5.16](https://github.com/networknt/light-oauth2/tree/1.5.16) (2018-07-05)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.15...1.5.16)
+
+**Closed issues:**
+
+- add info log to indicate which hazelcast.xml is loaded [\#127](https://github.com/networknt/light-oauth2/issues/127)
+- pass marketplace authorize roles into jwt token [\#126](https://github.com/networknt/light-oauth2/issues/126)
+- Create a none-multicast option for Hazelcast  [\#125](https://github.com/networknt/light-oauth2/issues/125)
+- update client and token swagger specifications in db folder [\#123](https://github.com/networknt/light-oauth2/issues/123)
+- update token service to return by reference token for external client [\#120](https://github.com/networknt/light-oauth2/issues/120)
+- create a new endpoint to de-reference opaque token to JWT for external client [\#119](https://github.com/networknt/light-oauth2/issues/119)
+
 ## [1.5.15](https://github.com/networknt/light-oauth2/tree/1.5.15) (2018-06-18)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.14...1.5.15)
 
