@@ -25,7 +25,6 @@ import io.undertow.server.session.InMemorySessionManager;
 import io.undertow.server.session.SessionAttachmentHandler;
 import io.undertow.server.session.SessionCookieConfig;
 import io.undertow.util.Methods;
-import org.jose4j.base64url.SimplePEMEncoder;
 
 import javax.security.auth.Subject;
 import java.security.GeneralSecurityException;

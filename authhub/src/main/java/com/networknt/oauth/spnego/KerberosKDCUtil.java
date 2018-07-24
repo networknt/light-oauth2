@@ -1,5 +1,7 @@
 package com.networknt.oauth.spnego;
 
+import com.networknt.config.Config;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.*;
 import javax.security.auth.login.AppConfigurationEntry;
@@ -24,7 +26,6 @@ import static javax.security.auth.login.AppConfigurationEntry.LoginModuleControl
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 public class KerberosKDCUtil {
-    private static final boolean IS_IBM = System.getProperty("java.vendor").contains("IBM");
 
     public static Subject login(final String userName, final char[] password) throws LoginException {
         Subject theSubject = new Subject();
@@ -48,17 +49,9 @@ public class KerberosKDCUtil {
                 Map<String, Object> options = new HashMap<>();
                 options.put("debug", "true");
                 options.put("refreshKrb5Config", "true");
-
-                if (IS_IBM) {
-                    options.put("noAddress", "true");
-                    options.put("credsType", "both");
-                    entries[0] = new AppConfigurationEntry("com.ibm.security.auth.module.Krb5LoginModule", REQUIRED, options);
-                } else {
-                    options.put("storeKey", "true");
-                    options.put("isInitiator", "true");
-                    entries[0] = new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule", REQUIRED, options);
-                }
-
+                options.put("storeKey", "true");
+                options.put("isInitiator", "true");
+                entries[0] = new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule", REQUIRED, options);
                 return entries;
             }
 
