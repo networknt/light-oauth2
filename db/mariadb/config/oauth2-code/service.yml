@@ -36,6 +36,10 @@ singletons:
   - com.networknt.sanitizer.SanitizerHandler
   # Validator Validate request based on swagger specification (depending on Swagger and Body)
   - com.networknt.validator.ValidatorHandler
+- com.networknt.oauth.auth.Authenticator<com.networknt.oauth.auth.DefaultAuth>:
+  - com.networknt.oauth.auth.DefaultAuthenticator
+- com.networknt.oauth.auth.Authenticator<com.networknt.oauth.auth.MarketPlaceAuth>:
+  - com.networknt.oauth.auth.MarketPlaceAuthenticator
 - javax.sql.DataSource:
   - com.zaxxer.hikari.HikariDataSource:
       jdbcUrl: jdbc:mariadb://mariadb:3306/oauth2?useSSL=false
