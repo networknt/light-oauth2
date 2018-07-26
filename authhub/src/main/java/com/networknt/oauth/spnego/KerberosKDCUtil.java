@@ -26,6 +26,8 @@ import static javax.security.auth.login.AppConfigurationEntry.LoginModuleControl
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 public class KerberosKDCUtil {
+    static final String CONFIG_SPNEGO = "spnego";
+    static final SpnegoConfig config = (SpnegoConfig)Config.getInstance().getJsonObjectConfig(CONFIG_SPNEGO, SpnegoConfig.class);
 
     public static Subject login(final String userName, final char[] password) throws LoginException {
         Subject theSubject = new Subject();
@@ -47,9 +49,14 @@ public class KerberosKDCUtil {
 
                 AppConfigurationEntry[] entries = new AppConfigurationEntry[1];
                 Map<String, Object> options = new HashMap<>();
-                options.put("debug", "true");
+                options.put("debug", config.getDebug());
                 options.put("refreshKrb5Config", "true");
                 options.put("storeKey", "true");
+                if("true".equalsIgnoreCase(config.getUseKeyTab())) {
+                    options.put("useKeyTab", config.getUseKeyTab());
+                    options.put("keyTab", config.getKeyTab());
+                    options.put("principal", config.getPrincipal());
+                }
                 options.put("isInitiator", "true");
                 entries[0] = new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule", REQUIRED, options);
                 return entries;
