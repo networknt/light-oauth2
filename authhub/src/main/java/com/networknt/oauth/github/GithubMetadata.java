@@ -15,7 +15,7 @@ public class GithubMetadata {
 	String email_address;
 	boolean invited;
 	String name;
-	String github_username;
+	String userID;
 	Groups groups;
 	String[] orgs;
 	String _id;
@@ -32,8 +32,8 @@ public class GithubMetadata {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     
-    public String getGithub_username() { return github_username; }
-    public void setGithub_username(String github_username) { this.github_username = github_username; }
+    public String getUserID() { return userID; }
+    public void setUserID(String userID) { this.userID = userID; }
     
     public Groups getGroups() { return groups; }
     public void setGroups(Groups groups) { this.groups = groups; }

@@ -20,12 +20,18 @@ public class Oauth2ClientPutHandler  extends ClientAuditHandler implements Light
     static Logger logger = LoggerFactory.getLogger(Oauth2ClientPutHandler.class);
     static final String CLIENT_NOT_FOUND = "ERR12014";
     static final String USER_NOT_FOUND = "ERR12013";
+    static final String DEREF_NOT_EXTERNAL = "ERR12043";
 
     @SuppressWarnings("unchecked")
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         Map<String, Object> body = (Map)exchange.getAttachment(BodyHandler.REQUEST_BODY);
         Client client = Config.getInstance().getMapper().convertValue(body, Client.class);
+        if(client.getDerefClientId() != null && Client.ClientTypeEnum.EXTERNAL != client.getClientType()) {
+            // only external client may have deref client id
+            setExchangeStatus(exchange, DEREF_NOT_EXTERNAL);
+            return;
+        }
 
         String clientId = client.getClientId();
 

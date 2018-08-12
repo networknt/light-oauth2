@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.networknt</groupId>
     <artifactId>light-oauth2</artifactId>
-    <version>1.5.16</version>
+    <version>1.5.18</version>
     <packaging>pom</packaging>
     <name>Parent POM</name>
     <description>OAuth2 provider microservices based on Light-Java and SQL</description>
@@ -52,8 +52,8 @@
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.light-4j>1.5.16</version.light-4j>
-        <version.light-rest-4j>1.5.16</version.light-rest-4j>
+        <version.light-4j>1.5.18</version.light-4j>
+        <version.light-rest-4j>1.5.18</version.light-rest-4j>
         <version.json-schema-validator>0.1.18</version.json-schema-validator>
         <version.openapi-parser>1.5.16</version.openapi-parser>
         <version.jackson>2.9.5</version.jackson>
@@ -63,11 +63,12 @@
         <version.encoder>1.2.1</version.encoder>
         <version.logback>1.2.3</version.logback>
         <version.junit>4.12</version.junit>
-        <version.undertow>1.4.23.Final</version.undertow>
+        <version.undertow>2.0.11.Final</version.undertow>
         <version.swagger-parser>1.0.34</version.swagger-parser>
         <version.hikaricp>3.1.0</version.hikaricp>
         <version.h2>1.4.196</version.h2>
         <version.hazelcast>3.9.2</version.hazelcast>
+        <version.hazelcast-kubernetes>1.1.0</version.hazelcast-kubernetes>
         <version.oracle>11.2.0.3</version.oracle>
         <version.mysql>6.0.5</version.mysql>
         <version.postgres>9.4.1211</version.postgres>
@@ -352,6 +353,11 @@
                 <groupId>com.hazelcast</groupId>
                 <artifactId>hazelcast</artifactId>
                 <version>${version.hazelcast}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hazelcast</groupId>
+                <artifactId>hazelcast-kubernetes</artifactId>
+                <version>${version.hazelcast-kubernetes}</version>
             </dependency>
             <dependency>
                 <groupId>com.oracle</groupId>

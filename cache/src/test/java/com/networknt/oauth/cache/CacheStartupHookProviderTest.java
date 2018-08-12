@@ -160,6 +160,29 @@ public class CacheStartupHookProviderTest {
     }
 
     @Test
+    public void testReferenceCache() {
+        CacheStartupHookProvider start = new CacheStartupHookProvider();
+        start.onStartup();
+
+        final IMap<String, Object> references = CacheStartupHookProvider.hz.getMap("references");
+        Map<String, String> referenceMap = new HashMap<>();
+        referenceMap.put("ref", "jwt");
+        referenceMap.put("clientId", "client1");
+
+        references.put("ref", referenceMap);
+
+        System.out.println("references size = " + references.size());
+
+        references.delete("ref");
+
+        System.out.println("references size = " + references.size());
+
+        CacheShutdownHookProvider shutdown = new CacheShutdownHookProvider();
+        shutdown.onShutdown();
+
+    }
+
+    @Test
     public void testRefreshTokenCache() {
         CacheStartupHookProvider start = new CacheStartupHookProvider();
         start.onStartup();

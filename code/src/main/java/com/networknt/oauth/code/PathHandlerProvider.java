@@ -8,7 +8,7 @@ import com.networknt.oauth.code.handler.Oauth2CodePostHandler;
 import com.networknt.oauth.security.LightBasicAuthenticationMechanism;
 import com.networknt.oauth.security.LightGSSAPIAuthenticationMechanism;
 import com.networknt.oauth.security.LightIdentityManager;
-import com.networknt.server.HandlerProvider;
+import com.networknt.handler.HandlerProvider;
 import io.undertow.Handlers;
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.AuthenticationMode;
@@ -25,7 +25,6 @@ import io.undertow.server.session.InMemorySessionManager;
 import io.undertow.server.session.SessionAttachmentHandler;
 import io.undertow.server.session.SessionCookieConfig;
 import io.undertow.util.Methods;
-import org.jose4j.base64url.SimplePEMEncoder;
 
 import javax.security.auth.Subject;
 import java.security.GeneralSecurityException;

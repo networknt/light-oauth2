@@ -1,15 +1,13 @@
 
 package com.networknt.oauth.client;
 
-import com.networknt.config.Config;
-import com.networknt.server.HandlerProvider;
+import com.networknt.health.HealthGetHandler;
+import com.networknt.info.ServerInfoGetHandler;
+import com.networknt.oauth.client.handler.*;
+import com.networknt.handler.HandlerProvider;
 import io.undertow.Handlers;
 import io.undertow.server.HttpHandler;
-import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Methods;
-import com.networknt.info.ServerInfoGetHandler;
-import com.networknt.health.HealthGetHandler;
-import com.networknt.oauth.client.handler.*;
 
 public class PathHandlerProvider implements HandlerProvider {
     @Override

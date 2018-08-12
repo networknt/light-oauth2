@@ -1,5 +1,7 @@
 package com.networknt.oauth.client.handler;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
 import com.networknt.exception.ApiException;
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.xnio.IoUtils;
 import org.xnio.OptionMap;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.concurrent.CountDownLatch;
@@ -74,6 +77,40 @@ public class Oauth2ClientPostHandlerTest {
     }
 
     @Test
+    public void testAuthClassDerefHandler() throws ClientException, ApiException, UnsupportedEncodingException {
+        String s = "{\"clientType\":\"external\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\":\"https://localhost:8080/authorization\",\"authenticateClass\":\"com.networknt.oauth.code.auth.MarketPlaceAuth\",\"derefClientId\":\"59f347a0-c92d-11e6-9d9d-cec0c932ce03\",\"ownerId\":\"admin\"}";
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6884"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/client");
+            request.getRequestHeaders().put(Headers.HOST, "localhost");
+            request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/json");
+            request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+            connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+            latch.await();
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+        int statusCode = reference.get().getResponseCode();
+        String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+        Assert.assertEquals(200, statusCode);
+        if(statusCode == 200) {
+            Assert.assertNotNull(body);
+        }
+    }
+
+    @Test
     public void testOwnerNotFound() throws ClientException, ApiException, UnsupportedEncodingException {
         String s = "{\"clientType\":\"public\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\": \"http://localhost:8080/authorization\",\"ownerId\":\"fake\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
@@ -97,7 +134,7 @@ public class Oauth2ClientPostHandlerTest {
                     connection.sendRequest(request, client.createClientCallback(reference, latch, s));
                 }
             });
-            latch.await(10, TimeUnit.SECONDS);
+            latch.await();
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(404, statusCode);
@@ -114,6 +151,45 @@ public class Oauth2ClientPostHandlerTest {
             IoUtils.safeClose(connection);
         }
     }
+
+    @Test
+    public void testDerefNotExternal() throws ClientException, IOException {
+        // The input has derefClientId but the client type is public not external which is the only type that needs optional derefClientId
+        String s = "{\"clientType\":\"public\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\":\"http://localhost:8080/authorization\",\"derefClientId\":\"47b943db-a4d5-4df5-b21f-c3cfb44b1bb3\",\"ownerId\":\"admin\"}";
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6884"), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+
+        try {
+            final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/client");
+            request.getRequestHeaders().put(Headers.HOST, "localhost");
+            request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/json");
+            request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+            connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+            latch.await();
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+        int statusCode = reference.get().getResponseCode();
+        String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+        Assert.assertEquals(400, statusCode);
+        if(statusCode == 400) {
+            Status status = Config.getInstance().getMapper().readValue(body, Status.class);
+            Assert.assertNotNull(status);
+            Assert.assertEquals("ERR12043", status.getCode());
+            Assert.assertEquals("DEREF_NOT_EXTERNAL", status.getMessage());
+        }
+    }
+
 
     @Test
     public void testInvalidClientType() throws ClientException, ApiException, UnsupportedEncodingException {

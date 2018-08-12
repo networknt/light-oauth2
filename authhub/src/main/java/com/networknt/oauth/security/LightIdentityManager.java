@@ -41,6 +41,7 @@ public class LightIdentityManager implements IdentityManager {
         if (credential instanceof LightPasswordCredential) {
             LightPasswordCredential passwordCredential = (LightPasswordCredential) credential;
             String clientAuthClass = passwordCredential.getClientAuthClass();
+            if(logger.isDebugEnabled()) logger.debug("LightPasswordCredential with clientAuthClass = " + clientAuthClass);
             // get authenticator object.
             Class clazz = DefaultAuth.class;
             if(clientAuthClass != null && clientAuthClass.trim().length() > 0) {
@@ -51,6 +52,7 @@ public class LightIdentityManager implements IdentityManager {
                     return null;
                 }
             }
+            if(logger.isDebugEnabled()) logger.debug("Get Authenticator implementation from service factory with clazz = " + clazz);
             Authenticator authenticator = SingletonServiceFactory.getBean(Authenticator.class, clazz);
             return authenticator.authenticate(id, credential);
         }
@@ -64,6 +66,7 @@ public class LightIdentityManager implements IdentityManager {
                 final LightGSSContextCredential gssCredential = (LightGSSContextCredential) credential;
                 final String name = gssCredential.getGssContext().getSrcName().toString();
                 final String clientAuthClass = gssCredential.getClientAuthClass();
+                if(logger.isDebugEnabled()) logger.debug("LightGSSContextCredential with clientAuthClass = " + clientAuthClass);
                 // get authenticator object.
                 Class clazz = DefaultAuth.class;
                 if(clientAuthClass != null && clientAuthClass.trim().length() > 0) {
@@ -74,6 +77,7 @@ public class LightIdentityManager implements IdentityManager {
                         return null;
                     }
                 }
+                if(logger.isDebugEnabled()) logger.debug("Get Authenticator implementation from service factory with clazz = " + clazz);
                 Authenticator authenticator = SingletonServiceFactory.getBean(Authenticator.class, clazz);
                 return authenticator.authenticate(name, credential);
             } catch (GSSException e) {

@@ -8,7 +8,7 @@ import com.networknt.oauth.authorize.handler.Oauth2AuthorizeGetHandler;
 import com.networknt.oauth.authorize.handler.Oauth2AuthorizePostHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.User;
-import com.networknt.server.HandlerProvider;
+import com.networknt.handler.HandlerProvider;
 import io.undertow.Handlers;
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.AuthenticationMode;

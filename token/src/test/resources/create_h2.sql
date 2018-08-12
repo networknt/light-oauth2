@@ -20,7 +20,7 @@ CREATE UNIQUE INDEX email_idx ON user_profile(email);
 create table client (
   client_id VARCHAR PRIMARY KEY,
   client_secret VARCHAR,
-  client_type VARCHAR,  -- public, confidential, trusted
+  client_type VARCHAR,  -- public, confidential, trusted, external
   client_profile VARCHAR, -- server, mobile, service, batch, browser
   client_name VARCHAR,
   client_desc VARCHAR,
@@ -28,6 +28,7 @@ create table client (
   custom_claim VARCHAR,   -- custom claim(s) in json format that will be included in the jwt token
   redirect_uri VARCHAR,
   authenticate_class VARCHAR,
+  deref_client_id VARCHAR, -- only this client calls AS to deref token to JWT for external client type
   owner_id VARCHAR
 );
 
@@ -68,6 +69,9 @@ INSERT INTO user_profile(user_id, user_type, first_name, last_name, email, roles
 INSERT INTO client (client_id, client_type, client_profile, client_secret, client_name, client_desc, scope, custom_claim, redirect_uri, owner_id) VALUES('f7d42348-c647-4efb-a52d-4c5787421e72', 'trusted', 'mobile', '1000:5b37332c202d36362c202d36392c203131362c203132362c2036322c2037382c20342c202d37382c202d3131352c202d35332c202d34352c202d342c202d3132322c203130322c2033325d:29ad1fe88d66584c4d279a6f58277858298dbf9270ffc0de4317a4d38ba4b41f35f122e0825c466f2fa14d91e17ba82b1a2f2a37877a2830fae2973076d93cc2', 'PetStore Web Server', 'PetStore Web Server that calls PetStore API', 'petstore.r petstore.w', '{"c1": "361", "c2": "67"}', 'http://localhost:8080/authorization', 'admin' );
 INSERT INTO client (client_id, client_type, client_profile, client_secret, client_name, client_desc, scope, custom_claim, redirect_uri, owner_id) VALUES('6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d', 'public', 'mobile', '1000:5b37332c202d36362c202d36392c203131362c203132362c2036322c2037382c20342c202d37382c202d3131352c202d35332c202d34352c202d342c202d3132322c203130322c2033325d:29ad1fe88d66584c4d279a6f58277858298dbf9270ffc0de4317a4d38ba4b41f35f122e0825c466f2fa14d91e17ba82b1a2f2a37877a2830fae2973076d93cc2', 'PetStore Web Server', 'PetStore Web Server that calls PetStore API', 'petstore.r petstore.w', '{"c1": "361", "c2": "67"}', 'http://localhost:8080/authorization', 'admin' );
 INSERT INTO client (client_id, client_type, client_secret, client_profile, client_name, client_desc, scope, custom_claim, redirect_uri, authenticate_class, owner_id) VALUES('f71a9df8-79db-4f30-9b28-d3ea90c83cf7', 'public', '1000:5b37332c202d36362c202d36392c203131362c203132362c2036322c2037382c20342c202d37382c202d3131352c202d35332c202d34352c202d342c202d3132322c203130322c2033325d:29ad1fe88d66584c4d279a6f58277858298dbf9270ffc0de4317a4d38ba4b41f35f122e0825c466f2fa14d91e17ba82b1a2f2a37877a2830fae2973076d93cc2', 'mobile', 'MarketPlace', 'This is the marketplace client that has customized authenticate_class', 'mp.r mp.w', '{"c1": "361", "c2": "67"}', 'http://localhost:8080/authorization', 'com.networknt.oauth.code.auth.MarketPlaceAuth', 'admin' );
+
+INSERT INTO client (client_id, client_type, client_profile, client_secret, client_name, client_desc, scope, custom_claim, redirect_uri, deref_client_id, owner_id) VALUES('78cd9a2e-7690-11e8-adc0-fa7ae01bbebc', 'external', 'service', '1000:5b37332c202d36362c202d36392c203131362c203132362c2036322c2037382c20342c202d37382c202d3131352c202d35332c202d34352c202d342c202d3132322c203130322c2033325d:29ad1fe88d66584c4d279a6f58277858298dbf9270ffc0de4317a4d38ba4b41f35f122e0825c466f2fa14d91e17ba82b1a2f2a37877a2830fae2973076d93cc2', 'External client', 'External client that receives by-reference token', 'petstore.r petstore.w', null, 'http://localhost:8080/authorization', '841c7d50-7690-11e8-adc0-fa7ae01bbebc', 'admin' );
+INSERT INTO client (client_id, client_type, client_profile, client_secret, client_name, client_desc, scope, custom_claim, redirect_uri, owner_id) VALUES('841c7d50-7690-11e8-adc0-fa7ae01bbebc', 'confidential', 'service', '1000:5b37332c202d36362c202d36392c203131362c203132362c2036322c2037382c20342c202d37382c202d3131352c202d35332c202d34352c202d342c202d3132322c203130322c2033325d:29ad1fe88d66584c4d279a6f58277858298dbf9270ffc0de4317a4d38ba4b41f35f122e0825c466f2fa14d91e17ba82b1a2f2a37877a2830fae2973076d93cc2', 'BFF for the external client', 'Backend for Frontend for external client', 'petstore.r petstore.w', null, 'http://localhost:8080/authorization', 'admin' );
 
 INSERT INTO service (service_id, service_type, service_name, service_desc, scope, owner_id) VALUES ('AACT0001', 'ms', 'Account Service', 'A microservice that serves account information', 'a.r b.r', 'admin');
 

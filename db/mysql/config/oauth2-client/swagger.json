@@ -415,7 +415,8 @@
           "enum": [
             "confidential",
             "public",
-            "trusted"
+            "trusted",
+            "external"
           ]
         },
         "clientProfile": {
@@ -452,6 +453,10 @@
         "redirectUri": {
           "type": "string",
           "description": "redirect uri"
+        },
+        "authenticateClass": {
+          "type": "string",
+          "description": "authenticate class"
         }
       }
     }

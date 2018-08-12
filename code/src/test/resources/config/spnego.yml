@@ -1,0 +1,8 @@
+# If SPNEGO/Kerberos debugging is enabled. Should be disabled for production. 
+debug: true
+# If keytab file is used. If Microsoft AD is used, then set it to true
+useKeyTab: false
+# The keytab file location. It should be in the /config folder for Kubernetes
+keyTab: /Users/stevehu/networknt/light-oauth2/code/src/test/resources/config/krb_oauth2code_poc-allenc.keytab
+# The SPN principal name, normally it will be HTTP/{hostname}@domain
+principal: HTTP/localhost

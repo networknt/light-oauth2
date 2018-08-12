@@ -29,7 +29,7 @@ CREATE UNIQUE INDEX email_idx ON user_profile(email);
 
 CREATE TABLE client (
   client_id VARCHAR(36) NOT NULL,
-  client_type VARCHAR(12) NOT NULL,  -- public, confidential, trusted
+  client_type VARCHAR(12) NOT NULL,  -- public, confidential, trusted, external
   client_profile VARCHAR(10) NOT NULL, -- webserver, mobile, browser, batch, service
   client_secret VARCHAR(1024) NOT NULL,
   client_name VARCHAR(32) NOT NULL,
@@ -38,6 +38,7 @@ CREATE TABLE client (
   custom_claim VARCHAR(4096), -- custom claim(s) in json format that will be included in the jwt token
   redirect_uri VARCHAR(1024),
   authenticate_class VARCHAR(256),
+  deref_client_id VARCHAR(36), -- only this client calls AS to deref token to JWT for external client type
   owner_id VARCHAR(32) NOT NULL,
   PRIMARY KEY (client_id),
   FOREIGN KEY (owner_id) REFERENCES user_profile(user_id)
