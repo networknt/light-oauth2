@@ -142,6 +142,55 @@
           }
         }
       }
+    },
+    "/oauth2/signing": {
+      "post": {
+        "description": "Sign a JSON object and return a JWT",
+        "operationId": "postSigning",
+        "parameters": [
+          {
+            "name": "authorization",
+            "description": "encoded client_id and client_secret pair",
+            "in": "header",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Signing request object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SignRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "SignRequest": {
+      "type": "object",
+      "required": [
+        "expires",
+        "payload"
+      ],
+      "properties": {
+        "expires": {
+          "type": "integer",
+          "format": "int32",
+          "description": "expires in seconds"
+        },
+        "payload": {
+          "type": "object",
+          "description": "payload that needs to be signed"
+        }
+      }
     }
   }
 }
