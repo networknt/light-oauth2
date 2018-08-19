@@ -1,5 +1,26 @@
 # Change Log
 
+## [1.5.18](https://github.com/networknt/light-oauth2/tree/1.5.18) (2018-08-16)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.17...1.5.18)
+
+**Closed issues:**
+
+- flatten the config files into the same directory for k8s [\#139](https://github.com/networknt/light-oauth2/issues/139)
+- Add JWT token signing endpoint to token service [\#136](https://github.com/networknt/light-oauth2/issues/136)
+- upgrade to undertow 2.0.11.Final [\#135](https://github.com/networknt/light-oauth2/issues/135)
+- add authenticator implementations to server.yml for code [\#133](https://github.com/networknt/light-oauth2/issues/133)
+- update LightIdentityManager with debug info to indicate with authenticator is loaded [\#132](https://github.com/networknt/light-oauth2/issues/132)
+- add spnego configuration for Microsoft AD SSO integration [\#131](https://github.com/networknt/light-oauth2/issues/131)
+- remove ibm jdk support for the Kerberos login module [\#130](https://github.com/networknt/light-oauth2/issues/130)
+- externalize krb5.conf for code and authorize services [\#129](https://github.com/networknt/light-oauth2/issues/129)
+
+**Merged pull requests:**
+
+- fixes \#136 Add JWT token signing endpoint to token service [\#137](https://github.com/networknt/light-oauth2/pull/137) ([stevehu](https://github.com/stevehu))
+
+## [1.5.17](https://github.com/networknt/light-oauth2/tree/1.5.17) (2018-07-06)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.16...1.5.17)
+
 ## [1.5.16](https://github.com/networknt/light-oauth2/tree/1.5.16) (2018-07-05)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.15...1.5.16)
 

@@ -102,7 +102,7 @@ public class ApacheDirectoryServer {
         Transport ldap = new TcpTransport( "0.0.0.0", LDAPS_PORT, 3, 5 );
         ldap.enableSSL(true);
         ldapServer.addTransports(ldap);
-        ldapServer.setKeystoreFile(ApacheDirectoryServer.class.getResource("/config/tls/server.keystore").getFile());
+        ldapServer.setKeystoreFile(ApacheDirectoryServer.class.getResource("/config/server.keystore").getFile());
         ldapServer.setCertificatePassword("password");
         ldapServer.loadKeyStore();
         ldapServer.setDirectoryService(directoryService);
