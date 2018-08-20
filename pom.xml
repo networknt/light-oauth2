@@ -54,6 +54,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.light-4j>1.5.19</version.light-4j>
         <version.light-rest-4j>1.5.19</version.light-rest-4j>
+        <version.openapi-parser>1.5.19</version.openapi-parser>
         <version.json-schema-validator>0.1.21</version.json-schema-validator>
         <version.jackson>2.9.5</version.jackson>
         <version.slf4j>1.7.25</version.slf4j>

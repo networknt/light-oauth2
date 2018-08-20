@@ -7,7 +7,7 @@ import com.networknt.oauth.provider.handler.Oauth2ProviderGetHandler;
 import com.networknt.oauth.provider.handler.Oauth2ProviderPostHandler;
 import com.networknt.oauth.provider.handler.Oauth2ProviderProviderIdDeleteHandler;
 import com.networknt.oauth.provider.handler.Oauth2ProviderPutHandler;
-import com.networknt.server.HandlerProvider;
+import com.networknt.handler.HandlerProvider;
 import io.undertow.Handlers;
 import io.undertow.server.HttpHandler;
 import io.undertow.util.Methods;

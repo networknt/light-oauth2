@@ -61,9 +61,7 @@ public class Oauth2ProviderProviderIdDeleteHandlerTest {
         }
         int statusCode = reference.get().getResponseCode();
         String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
-        Assert.assertEquals(404, statusCode);  //response:{"statusCode":404,"code":"ERR12014","message":"CLIENT_NOT_FOUND","description":"Client 11111 is not found."}
-
+        Assert.assertEquals(400, statusCode);  //response:{"statusCode":400,"code":"ERR12047","message":"PROVIDER_ID_NOT_EXISTING","description":"The provider id is not existing","severity":"ERROR"}
         Assert.assertNotNull(body);
-
     }
 }
