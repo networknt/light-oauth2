@@ -2,27 +2,27 @@ package com.networknt.oauth.key.handler;
 
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
+
+import com.networknt.client.oauth.KeyRequest;
+import com.networknt.client.oauth.OauthHelper;
 import com.networknt.config.Config;
 import com.networknt.exception.ApiException;
+import com.networknt.exception.ClientException;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
-import com.networknt.oauth.cache.model.AuditInfo;
-import com.networknt.oauth.cache.model.Client;
-import com.networknt.oauth.cache.model.Oauth2Service;
+import com.networknt.oauth.cache.model.*;
 import com.networknt.status.Status;
 import com.networknt.utility.HashUtil;
-import io.undertow.server.HttpHandler;
+
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.FlexBase64;
-import io.undertow.util.HeaderValues;
-import io.undertow.util.Headers;
-import io.undertow.util.HttpString;
-import org.owasp.encoder.Encode;
+import io.undertow.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import java.io.IOException;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +30,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static io.undertow.util.Headers.AUTHORIZATION;
 import static io.undertow.util.Headers.BASIC;
@@ -48,6 +50,7 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
     static final String UNAUTHORIZED_CLIENT = "ERR12007";
     static final String INVALID_KEY_ID = "ERR12030";
 
+    private static final String PROVIDER_ID = "providerId";
     private static final String BASIC_PREFIX = BASIC + " ";
     private static final String LOWERCASE_BASIC_PREFIX = BASIC_PREFIX.toLowerCase(Locale.ENGLISH);
     private static final int PREFIX_LENGTH = BASIC_PREFIX.length();
@@ -58,33 +61,40 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
     @SuppressWarnings("unchecked")
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        // check if client_id and client_secret in header are valid pair.
-        HeaderValues values = exchange.getRequestHeaders().get(AUTHORIZATION);
-        String authHeader;
-        if(values != null) {
-            authHeader = values.getFirst();
-        } else {
-            setExchangeStatus(exchange, MISSING_AUTHORIZATION_HEADER);
-            processAudit(exchange);
-            return;
-        }
-        if(authHeader == null) {
-            setExchangeStatus(exchange, MISSING_AUTHORIZATION_HEADER);
-            processAudit(exchange);
-            return;
-        }
-        String clientId = authenticate(authHeader);
-        if(clientId != null) {
-            if(logger.isDebugEnabled()) logger.debug("clientId = " + clientId);
 
-            String keyId = exchange.getQueryParameters().get("keyId").getFirst();
-            if(logger.isDebugEnabled()) logger.debug("keyId = " + keyId);
-            // find the location of the certificate
-            Map<String, Object> config = Config.getInstance().getJsonMapConfig(CONFIG_SECURITY);
-            Map<String, Object> jwtConfig = (Map<String, Object>)config.get(CONFIG_JWT);
-            Map<String, Object> certificateConfig = (Map<String, Object>)jwtConfig.get(CONFIG_CERTIFICATE);
-            // find the path for certificate file
-            String filename = (String)certificateConfig.get(keyId);
+        String keyId = exchange.getQueryParameters().get("keyId").getFirst();
+        if(logger.isDebugEnabled()) logger.debug("keyId = " + keyId);
+        // find the location of the certificate
+        Map<String, Object> config = Config.getInstance().getJsonMapConfig(CONFIG_SECURITY);
+        Map<String, Object> jwtConfig = (Map<String, Object>)config.get(CONFIG_JWT);
+        Map<String, Object> certificateConfig = (Map<String, Object>)jwtConfig.get(CONFIG_CERTIFICATE);
+        String provider_id = config.get(PROVIDER_ID)==null ? "": config.get(PROVIDER_ID).toString();
+
+        if (getProviderId(keyId)==null || "00".equals(getProviderId(keyId)) || provider_id.equals(getProviderId(keyId))) {
+            if (getProviderId(keyId)==null  || provider_id.equals(getProviderId(keyId))) {
+                // Standalone light-oauth server
+                // check if client_id and client_secret in header are valid pair.
+                HeaderValues values = exchange.getRequestHeaders().get(AUTHORIZATION);
+                String authHeader;
+                if(values != null) {
+                    authHeader = values.getFirst();
+                } else {
+                    setExchangeStatus(exchange, MISSING_AUTHORIZATION_HEADER);
+                    processAudit(exchange);
+                    return;
+                }
+                if(authHeader == null) {
+                    setExchangeStatus(exchange, MISSING_AUTHORIZATION_HEADER);
+                    processAudit(exchange);
+                    return;
+                }
+                if (authenticate(authHeader) == null) {
+                    setExchangeStatus(exchange, UNAUTHORIZED_CLIENT);
+                    processAudit(exchange);
+                    return;
+                }
+            }
+            String filename = (String)certificateConfig.get(getKeyId(keyId));
             if(filename != null) {
                 String content = Config.getInstance().getStringFromFile(filename);
                 if(logger.isDebugEnabled()) logger.debug("certificate = " + content);
@@ -97,7 +107,18 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
             } else {
                 setExchangeStatus(exchange, INVALID_KEY_ID, keyId);
             }
+        } else {
+            //Federation light-oauth server
+            String content = getCertificateFromProvider(getProviderId(keyId), getKeyId(keyId));
+            if(logger.isDebugEnabled()) logger.debug("certificate from provider = " + content);
+            if(content != null) {
+                exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/text");
+                exchange.getResponseSender().send(content);
+            } else {
+                setExchangeStatus(exchange, KEY_NOT_FOUND, keyId);
+            }
         }
+
         processAudit(exchange);
     }
 
@@ -136,6 +157,40 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
         return result;
     }
 
+
+    private String getCertificateFromProvider(String providerId, String keyId) throws ClientException {
+        IMap<String, Provider> providers = CacheStartupHookProvider.hz.getMap("providers");
+        Provider provider = providers.get(providerId);
+        String key = null;
+
+        if(provider != null) {
+            KeyRequest keyRequest = new KeyRequest();
+            keyRequest.setServerUrl(provider.getServerUrl());
+            keyRequest.setUri(provider.getUri() + "/00" + keyId);
+            keyRequest.setEnableHttp2(true);
+            key = OauthHelper.getKey(keyRequest);
+        }
+        return key;
+    }
+
+    private String getProviderId(String keyId)  {
+        if ( keyId.length()< 4) {
+            return null;
+        } else {
+            return keyId.substring(0,2);
+        }
+    }
+
+    private String getKeyId(String keyId)  {
+        if (keyId.length()< 4) {
+            return keyId;
+        } else {
+            return keyId.substring(2);
+        }
+    }
+
+
+
     private void processAudit(HttpServerExchange exchange) throws Exception {
         if (oauth_config.isEnableAudit() ) {
             AuditInfo auditInfo = new AuditInfo();
@@ -150,3 +205,4 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
         }
     }
 }
+

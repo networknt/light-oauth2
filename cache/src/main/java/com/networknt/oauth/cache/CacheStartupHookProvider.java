@@ -39,6 +39,7 @@ public class CacheStartupHookProvider implements StartupHookProvider {
         config.getSerializationConfig().addDataSerializableFactory(3, new ServiceDataSerializableFactory());
         config.getSerializationConfig().addDataSerializableFactory(4, new RefreshTokenDataSerializableFactory());
         config.getSerializationConfig().addDataSerializableFactory(5, new ServiceEndpointDataSerializableFactory());
+        config.getSerializationConfig().addDataSerializableFactory(6, new ProviderDataSerializableFactory());
 
         // service map with near cache.
         MapConfig serviceConfig = new MapConfig();
@@ -138,6 +139,20 @@ public class CacheStartupHookProvider implements StartupHookProvider {
         userConfig.addMapIndexConfig(new MapIndexConfig("email", true));
 
         config.addMapConfig(userConfig);
+
+        // provider map distributed.
+        MapConfig providerConfig = new MapConfig();
+        providerConfig.setName("providers");
+        NearCacheConfig providerCacheConfig = new NearCacheConfig();
+        providerCacheConfig.setEvictionPolicy("NONE");
+        providerCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
+        providerCacheConfig.setCacheLocalEntries(true); // this enables the local caching
+        providerConfig.setNearCacheConfig(providerCacheConfig);
+        providerConfig.getMapStoreConfig()
+                .setEnabled(true)
+                .setClassName("com.networknt.oauth.cache.ProviderMapStore");
+
+        config.addMapConfig(providerConfig);
 
         hz = Hazelcast.newHazelcastInstance( config );
 
