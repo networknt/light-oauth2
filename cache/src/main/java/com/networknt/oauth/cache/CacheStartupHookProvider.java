@@ -30,9 +30,6 @@ public class CacheStartupHookProvider implements StartupHookProvider {
             config = new Config();
         }
 
-        config.getNetworkConfig().setPort( 5900 )
-                .setPortAutoIncrement( true );
-
         // data serializer factory
         config.getSerializationConfig().addDataSerializableFactory(1, new UserDataSerializableFactory());
         config.getSerializationConfig().addDataSerializableFactory(2, new ClientDataSerializableFactory());
