@@ -71,7 +71,10 @@ public class PathHandlerProvider implements HandlerProvider {
         handler = new AuthenticationCallHandler(handler);
         handler = new AuthenticationConstraintHandler(handler);
         List<AuthenticationMechanism> mechanisms = new ArrayList<>();
-        mechanisms.add(new LightGSSAPIAuthenticationMechanism(new SubjectFactory()));
+        // bypass the SPNEGO if service password is not even configured.
+        if(spnegoServicePassword != null) {
+            mechanisms.add(new LightGSSAPIAuthenticationMechanism(new SubjectFactory()));
+        }
         mechanisms.add(new LightBasicAuthenticationMechanism("OAuth"));
         handler = new AuthenticationMechanismsHandler(handler, mechanisms);
         handler = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, identityManager, handler);
