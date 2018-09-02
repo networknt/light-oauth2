@@ -184,5 +184,4 @@ VALUES('f7d42348-c647-4efb-a52d-4c5787421e72', '1000:5b37332c202d36362c202d36392
 INSERT INTO service (service_id, service_type, service_name, service_desc, scope, owner_id)
 VALUES ('AACT0001', 'openapi', 'Account Service', 'A microservice that serves account information', 'a.r b.r', 'admin');
 
-INSERT INTO key_provider_id (provider_id, key_id) VALUES (1, 0);
 

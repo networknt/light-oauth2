@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS service;
 DROP TABLE IF EXISTS client;
 DROP TABLE IF EXISTS user_profile;
 DROP TABLE IF EXISTS refresh_token;
+DROP TABLE IF EXISTS oauth_provider;
 DROP TABLE IF EXISTS audit_log;
 
 
@@ -94,6 +95,17 @@ CREATE TABLE refresh_token (
 )
 ENGINE=INNODB;
 
+CREATE TABLE oauth_provider (
+  provider_id VARCHAR(2) NOT NULL,
+  server_url VARCHAR(256) NOT NULL,  -- different framework will have different endpoint format.
+  uri VARCHAR(64) NOT NULL,
+  provider_name VARCHAR(64),
+  PRIMARY KEY (provider_id)
+)
+ENGINE=INNODB;
+
+
+
 create table audit_log (
   log_id BIGINT, -- system milliseonds from 1970.
   service_id VARCHAR(32) NOT NULL,
@@ -171,3 +183,5 @@ VALUES('f7d42348-c647-4efb-a52d-4c5787421e72', '1000:5b37332c202d36362c202d36392
 
 INSERT INTO service (service_id, service_type, service_name, service_desc, scope, owner_id)
 VALUES ('AACT0001', 'openapi', 'Account Service', 'A microservice that serves account information', 'a.r b.r', 'admin');
+
+
