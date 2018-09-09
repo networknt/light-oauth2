@@ -1,3 +1,4 @@
+
 package com.networknt.oauth.authorize.handler;
 
 import com.networknt.server.Server;
@@ -13,8 +14,8 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
+import com.networknt.server.ServerConfig;
 
 public class TestServer extends ExternalResource {
     static final Logger logger = LoggerFactory.getLogger(TestServer.class);
@@ -46,6 +47,10 @@ public class TestServer extends ExternalResource {
 
     }
 
+    public ServerConfig getServerConfig() {
+        return Server.config;
+    }
+
     @Override
     protected void before() {
         try {
@@ -65,5 +70,4 @@ public class TestServer extends ExternalResource {
             Server.stop();
         }
     }
-
 }
