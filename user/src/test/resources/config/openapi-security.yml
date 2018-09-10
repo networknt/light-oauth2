@@ -1,4 +1,7 @@
-# Security configuration in light framework.
+# Security configuration for openapi-security in light-rest-4j. It is a specific config
+# for OpenAPI framework security. It is introduced to support multiple frameworks in the
+# same server instance. If this file cannot be found, the generic security.yml will be
+# loaded for backward compatibility.
 ---
 # Enable JWT verification flag.
 enableVerifyJwt: false
@@ -22,9 +25,12 @@ logJwtToken: true
 # Enable or disable client_id, user_id and scope logging.
 logClientUserScope: false
 
-# If OAuth2 provider support http2 protocol. If using light-oauth2, set this to true.
-oauthHttp2Support: true
-
 # Enable JWT token cache to speed up verification. This will only verify expired time
 # and skip the signature verification as it takes more CPU power and long time.
 enableJwtCache: true
+
+# If you are using light-oauth2, then you don't need to have oauth subfolder for public
+# key certificate to verify JWT token, the key will be retrieved from key endpoint once
+# the first token is arrived. Default to false for dev environment without oauth2 server
+# or official environment that use other OAuth 2.0 providers.
+bootstrapFromKeyService: false

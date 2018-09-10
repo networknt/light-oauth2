@@ -1,49 +1,57 @@
-{
-  "swagger": "2.0",
-  "info": {
-    "version": "1.0.0",
-    "title": "OAuth2 Service Registration",
-    "description": "OAuth2 Service Registration microservices endpoints.",
-    "contact": {
-      "email": "stevehu@gmail.com"
+{"components":{"requestBodies": {
+      "Service": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Service"
+            }
+          }
+        },
+        "description": "Service object that needs to be added",
+        "required": true
+      }
+    },"securitySchemes": {
+      "service_auth": {
+        "type": "oauth2",
+        "flows": {
+          "implicit": {
+            "authorizationUrl": "http://localhost:8888/oauth2/code",
+            "scopes": {
+              "oauth.service.w": "write oauth service",
+              "oauth.service.r": "read oauth service"
+            }
+          }
+        }
+      }
+    },"schemas":{"Service":{"type": "object","required":["serviceId",
+          "serviceName",
+          "serviceType",
+          "scope"],"properties":{"serviceType":{"type": "string","description": "service type","enum":["swagger",
+              "openapi",
+              "graphql",
+              "hybrid"]},"serviceDesc":{"type": "string","description": "service description"},"scope":{"type": "string","description": "service scopes separated by space"},"serviceId":{"type": "string","description": "a unique service id"},"serviceName":{"type": "string","description": "service name"},"ownerId":{"type": "string","description": "service owner userId"},"updateDt":{"type": "string","format": "date-time","description": "update date time"},"createDt":{"type": "string","format": "date-time","description": "create date time"}}},"ServiceEndpoint":{"type": "object","required":["endpoint",
+          "operation",
+          "scope"],"properties":{"operation":{"type": "string","description": "operationId of the endpoint"},"endpoint":{"type": "string","description": "a combination of path and method to uniquely identify an operation"},"scope":{"type": "string","description": "scope associated with the endpoint"}}}}},"servers": [
+    {
+      "url": "http://oauth2.networknt.com/"
     },
-    "license": {
-      "name": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    {
+      "url": "https://oauth2.networknt.com/"
     }
-  },
-  "host": "oauth2.networknt.com",
-  "schemes": [
-    "http",
-    "https"
-  ],
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
-  "paths": {
+  ],"openapi": "3.0.0","paths": {
     "/oauth2/service": {
       "post": {
         "description": "Return a service object",
         "operationId": "createService",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "description": "Service object that needs to be added",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Service"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Successful response",
-            "schema": {
-              "$ref": "#/definitions/Service"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
             }
           }
         },
@@ -53,27 +61,23 @@
               "oauth.service.w"
             ]
           }
-        ]
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/Service"
+        }
       },
       "put": {
         "description": "Return the updated service",
         "operationId": "updateService",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "description": "Service object that needs to be added",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Service"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Successful response",
-            "schema": {
-              "$ref": "#/definitions/Service"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
             }
           }
         },
@@ -83,7 +87,10 @@
               "oauth.service.w"
             ]
           }
-        ]
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/Service"
+        }
       },
       "get": {
         "description": "Return all services",
@@ -94,32 +101,42 @@
             "in": "query",
             "description": "Page number",
             "required": true,
-            "type": "integer",
-            "format": "int32"
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
           },
           {
             "name": "pageSize",
             "in": "query",
             "description": "Pag size",
             "required": false,
-            "type": "integer",
-            "format": "int32"
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
           },
           {
             "name": "serviceId",
             "in": "query",
             "description": "Partial serviceId for filter",
             "required": false,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "successful operation",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Service"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Service"
+                  }
+                }
               }
             }
           }
@@ -143,7 +160,9 @@
             "in": "path",
             "description": "Service Id",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -171,14 +190,20 @@
             "in": "path",
             "description": "Service Id",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "Successful response",
-            "schema": {
-              "$ref": "#/definitions/Service"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
             }
           },
           "400": {
@@ -208,18 +233,8 @@
             "in": "path",
             "description": "Service Id",
             "required": true,
-            "type": "string"
-          },
-          {
-            "in": "body",
-            "name": "body",
-            "description": "A list of endpoint object",
-            "required": true,
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ServiceEndpoint"
-              }
+              "type": "string"
             }
           }
         ],
@@ -234,7 +249,21 @@
               "oauth.service.w"
             ]
           }
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ServiceEndpoint"
+                }
+              }
+            }
+          },
+          "description": "A list of endpoint object",
+          "required": true
+        }
       },
       "delete": {
         "description": "Delete all endpoints for a service",
@@ -245,7 +274,9 @@
             "in": "path",
             "description": "Service Id",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -273,16 +304,22 @@
             "in": "path",
             "description": "Service Id",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "Successful response",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ServiceEndpoint"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceEndpoint"
+                  }
+                }
               }
             }
           },
@@ -303,91 +340,15 @@
         ]
       }
     }
-  },
-  "securityDefinitions": {
-    "service_auth": {
-      "type": "oauth2",
-      "authorizationUrl": "http://localhost:8888/oauth2/code",
-      "flow": "implicit",
-      "scopes": {
-        "oauth.service.w": "write oauth service",
-        "oauth.service.r": "read oauth service"
-      }
-    }
-  },
-  "definitions": {
-    "Service": {
-      "type": "object",
-      "required": [
-        "serviceId",
-        "serviceName",
-        "serviceType",
-        "scope"
-      ],
-      "properties": {
-        "serviceId": {
-          "type": "string",
-          "description": "a unique service id"
-        },
-        "serviceType": {
-          "type": "string",
-          "description": "service type",
-          "enum": [
-            "swagger",
-            "openapi",
-            "graphql",
-            "hybrid"
-          ]
-        },
-        "serviceName": {
-          "type": "string",
-          "description": "service name"
-        },
-        "serviceDesc": {
-          "type": "string",
-          "description": "service description"
-        },
-        "ownerId": {
-          "type": "string",
-          "description": "service owner userId"
-        },
-        "scope": {
-          "type": "string",
-          "description": "service scopes separated by space"
-        },
-        "createDt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "create date time"
-        },
-        "updateDt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "update date time"
-        }
-      }
+  },"info": {
+    "version": "1.0.0",
+    "title": "OAuth2 Service Registration",
+    "description": "OAuth2 Service Registration microservices endpoints.",
+    "contact": {
+      "email": "stevehu@gmail.com"
     },
-    "ServiceEndpoint": {
-      "type": "object",
-      "required": [
-        "endpoint",
-        "operation",
-        "scope"
-      ],
-      "properties": {
-        "endpoint": {
-          "type": "string",
-          "description": "a combination of path and method to uniquely identify an operation"
-        },
-        "operation": {
-          "type": "string",
-          "description": "operationId of the endpoint"
-        },
-        "scope": {
-          "type": "string",
-          "description": "scope associated with the endpoint"
-        }
-      }
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
-  }
-}
+  }}
