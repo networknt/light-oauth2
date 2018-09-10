@@ -50,7 +50,7 @@ handlers:
   # - com.networknt.metrics.prometheus.PrometheusGetHandler@getprometheus
   # Business Handlers
   - com.networknt.oauth.token.handler.Oauth2TokenPostHandler
-  - com.networknt.oauth.token.handler.Oauth2DerefTokenGetHandler
+  - com.networknt.oauth.token.handler.Oauth2DerefGetHandler
   - com.networknt.oauth.token.handler.Oauth2SigningPostHandler
 
 
@@ -77,7 +77,7 @@ paths:
     method: 'get'
     exec:
       - default
-      - com.networknt.oauth.token.handler.Oauth2DerefTokenGetHandler
+      - com.networknt.oauth.token.handler.Oauth2DerefGetHandler
   - path: '/oauth2/signing'
     method: 'post'
     exec:
