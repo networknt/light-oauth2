@@ -44,7 +44,7 @@ public class Oauth2PasswordUserIdPostHandler extends UserAuditHandler implements
                 return;
             }
             if(newPassword.equals(newPasswordConfirm)) {
-                String hashedPass = HashUtil.generateStorngPasswordHash(newPassword);
+                String hashedPass = HashUtil.generateStrongPasswordHash(newPassword);
                 user.setPassword(hashedPass);
                 users.set(userId, user);
             } else {

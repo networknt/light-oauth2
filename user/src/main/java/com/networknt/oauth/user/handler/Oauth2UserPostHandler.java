@@ -49,7 +49,7 @@ public class Oauth2UserPostHandler extends UserAuditHandler implements LightHttp
             // check if there are the same
             if(password.equals(passwordConfirm)) {
                 // hash the password with salt.
-                String hashedPass = HashUtil.generateStorngPasswordHash(password);
+                String hashedPass = HashUtil.generateStrongPasswordHash(password);
                 user.setPassword(hashedPass);
                 user.setPasswordConfirm(null);
                 String userId = user.getUserId();

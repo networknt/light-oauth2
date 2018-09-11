@@ -40,7 +40,7 @@ public class Oauth2ClientPostHandler  extends ClientAuditHandler implements Ligh
         String clientId = UUID.randomUUID().toString();
         client.setClientId(clientId);
         String clientSecret = Util.getUUID();
-        client.setClientSecret(HashUtil.generateStorngPasswordHash(clientSecret));
+        client.setClientSecret(HashUtil.generateStrongPasswordHash(clientSecret));
 
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         if(clients.get(clientId) == null) {
