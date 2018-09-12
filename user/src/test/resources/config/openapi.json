@@ -33,11 +33,9 @@
               "partner"]},"updateDt":{"type": "string","format": "date-time","description": "update date time"},"userId":{"type": "string","description": "a unique id"},"createDt":{"type": "string","format": "date-time","description": "create date time"},"email":{"type": "string","description": "email address"}}},"Password":{"type": "object","required":["password",
           "newPassword",
           "newPasswordConfirm"],"properties":{"newPasswordConfirm":{"type": "string","format": "password","description": "new password confirm"},"newPassword":{"type": "string","format": "password","description": "new password"},"password":{"type": "string","format": "password","description": "existing password"}}}}},"servers": [
+
     {
-      "url": "http://oauth2.networknt.com/"
-    },
-    {
-      "url": "https://oauth2.networknt.com/"
+      "url": "https://oauth2.networknt.com"
     }
   ],"openapi": "3.0.0","paths": {
     "/oauth2/user": {

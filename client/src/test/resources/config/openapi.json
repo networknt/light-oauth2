@@ -37,10 +37,7 @@
               "service",
               "batch"]},"clientName":{"type": "string","description": "client name"},"customClaim":{"type": "string","description": "custom claim string in JSON format"},"scope":{"type": "string","description": "client scope separated by space"},"clientSecret":{"type": "string","description": "client secret"},"ownerId":{"type": "string","description": "client owner id"},"authenticateClass":{"type": "string","description": "authenticate class"}}}}},"servers": [
     {
-      "url": "http://oauth2.networknt.com/"
-    },
-    {
-      "url": "https://oauth2.networknt.com/"
+      "url": "https://oauth2.networknt.com"
     }
   ],"openapi": "3.0.0","paths": {
     "/oauth2/client": {

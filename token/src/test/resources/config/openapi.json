@@ -1,10 +1,8 @@
 {"components":{"schemas":{"SignRequest":{"type": "object","required":["expires",
           "payload"],"properties":{"payload":{"type": "object","description": "payload that needs to be signed"},"expires":{"type": "integer","format": "int32","description": "expires in seconds"}}}}},"servers": [
+
     {
-      "url": "http://oauth2.networknt.com/"
-    },
-    {
-      "url": "https://oauth2.networknt.com/"
+      "url": "https://oauth2.networknt.com"
     }
   ],"openapi": "3.0.0","paths": {
     "/oauth2/token": {

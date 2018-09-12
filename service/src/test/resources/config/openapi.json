@@ -32,11 +32,9 @@
               "hybrid"]},"serviceDesc":{"type": "string","description": "service description"},"scope":{"type": "string","description": "service scopes separated by space"},"serviceId":{"type": "string","description": "a unique service id"},"serviceName":{"type": "string","description": "service name"},"ownerId":{"type": "string","description": "service owner userId"},"updateDt":{"type": "string","format": "date-time","description": "update date time"},"createDt":{"type": "string","format": "date-time","description": "create date time"}}},"ServiceEndpoint":{"type": "object","required":["endpoint",
           "operation",
           "scope"],"properties":{"operation":{"type": "string","description": "operationId of the endpoint"},"endpoint":{"type": "string","description": "a combination of path and method to uniquely identify an operation"},"scope":{"type": "string","description": "scope associated with the endpoint"}}}}},"servers": [
+
     {
-      "url": "http://oauth2.networknt.com/"
-    },
-    {
-      "url": "https://oauth2.networknt.com/"
+      "url": "https://oauth2.networknt.com"
     }
   ],"openapi": "3.0.0","paths": {
     "/oauth2/service": {

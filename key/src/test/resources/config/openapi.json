@@ -14,10 +14,7 @@
     },"schemas":{"Key":{"type": "object","required":["keyId",
           "certificate"],"properties":{"certificate":{"type": "string","description": "certificate"},"keyId":{"type": "string","description": "a unique id"}}}}},"servers": [
     {
-      "url": "http://oauth2.networknt.com/"
-    },
-    {
-      "url": "https://oauth2.networknt.com/"
+      "url": "https://oauth2.networknt.com"
     }
   ],"openapi": "3.0.0","paths": {
     "/oauth2/key/{keyId}": {

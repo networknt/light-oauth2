@@ -14,11 +14,9 @@
     },"schemas":{"RefreshToken":{"type": "object","required":["refreshToken",
           "userId",
           "clientId"],"properties":{"clientId":{"type": "string","description": "client id"},"userId":{"type": "string","description": "user id"},"refreshToken":{"type": "string","description": "refresh token"},"scope":{"type": "string","description": "service scopes separated by space"}}}}},"servers": [
+
     {
-      "url": "http://oauth2.networknt.com/"
-    },
-    {
-      "url": "https://oauth2.networknt.com/"
+      "url": "https://oauth2.networknt.com"
     }
   ],"openapi": "3.0.0","paths": {
     "/oauth2/refresh_token": {
