@@ -1,0 +1,130 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: OAuth2 Service Token Service
+  description: OAuth2 Service that issues access tokens.
+  contact:
+    email: stevehu@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'https://oauth2.networknt.com'    
+paths:
+  /oauth2/token:
+    post:
+      description: JSON object that contains access token
+      operationId: postToken
+      parameters:
+        - name: authorization
+          description: encoded client_id and client_secret pair
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                grant_type:
+                  type: string
+                  enum:
+                    - authorization_code
+                    - client_credentials
+                    - password
+                    - refresh_token
+                    - client_authenticated_user
+                client_id:
+                  description: >-
+                    used as alternative to authentication header for client
+                    authentication
+                  type: string
+                client_secret:
+                  description: >-
+                    used as alternative to authentication header for client
+                    authentication
+                  type: string
+                code:
+                  description: used in authorization_code to specify the code
+                  type: string
+                username:
+                  description: mandatory in password grant type
+                  type: string
+                password:
+                  description: mandatory in password grant type
+                  type: string
+                user_type:
+                  description: mandatory user type in password grant type
+                  type: string
+                roles:
+                  description: optional user roles in password grant type
+                  type: string
+                scope:
+                  description: used by all flows to specify scope in the access token
+                  type: string
+                redirect_uri:
+                  description: used in authorization code if code endpoint with rediret_uri
+                  type: string
+                refresh_token:
+                  description: refresh token used to get another access token
+                  type: string
+                code_verifier:
+                  description: PKCE code verifier
+                  type: string
+              required:
+                - grant_type
+  '/oauth2/deref/{token}':
+    get:
+      description: exchange by-reference token to a JWT
+      operationId: derefToken
+      parameters:
+        - name: token
+          in: path
+          description: by-reference token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+  /oauth2/signing:
+    post:
+      description: Sign a JSON object and return a JWT
+      operationId: postSigning
+      parameters:
+        - name: authorization
+          description: encoded client_id and client_secret pair
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignRequest'
+        description: Signing request object
+        required: true
+components:
+  schemas:
+    SignRequest:
+      type: object
+      required:
+        - expires
+        - payload
+      properties:
+        expires:
+          type: integer
+          format: int32
+          description: expires in seconds
+        payload:
+          type: object
+          description: payload that needs to be signed
