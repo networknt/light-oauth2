@@ -182,12 +182,13 @@ public class Oauth2CodeGetHandlerTest {
             latch.await();
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+
             Assert.assertEquals(400, statusCode);
             if(statusCode == 400) {
                 Status status = Config.getInstance().getMapper().readValue(body, Status.class);
                 Assert.assertNotNull(status);
-                Assert.assertEquals("ERR11002", status.getCode());
-                Assert.assertEquals("VALIDATOR_REQUEST_PARAMETER_ENUM_INVALID", status.getMessage()); // response type wrong
+                Assert.assertEquals("ERR11004", status.getCode());
+                Assert.assertEquals("VALIDATOR_SCHEMA", status.getMessage()); // response type wrong
             }
         } catch (Exception e) {
             logger.error("Exception: ", e);

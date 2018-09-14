@@ -1,6 +1,7 @@
 package com.networknt.oauth.token.handler;
 
 import com.networknt.server.Server;
+import com.networknt.server.ServerConfig;
 import com.networknt.service.SingletonServiceFactory;
 import org.h2.tools.RunScript;
 import org.junit.rules.ExternalResource;
@@ -44,6 +45,10 @@ public class TestServer extends ExternalResource {
             e.printStackTrace();
         }
 
+    }
+
+    public ServerConfig getServerConfig() {
+        return Server.config;
     }
 
     @Override

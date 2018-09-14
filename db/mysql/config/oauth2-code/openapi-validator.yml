@@ -1,0 +1,8 @@
+# This is specific OpenAPI validator configuration file. It is introduced to support multiple
+# frameworks in the same server instance and it is recommended. If this file cannot be found,
+# the generic validator.yml will be loaded as a fallback.
+---
+# Enable request validation. Response validation is not done on the server but client.
+enabled: true
+# Log error message if validation error occurs
+logError: true

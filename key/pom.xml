@@ -127,7 +127,22 @@
             <groupId>com.networknt</groupId>
             <artifactId>swagger-validator</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>openapi-parser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>openapi-meta</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>openapi-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>openapi-validator</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
