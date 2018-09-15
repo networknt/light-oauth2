@@ -9,6 +9,9 @@ enableVerifyScope: true
 # User for test only. should be always be false on official environment.
 enableMockJwt: false
 
+# provider id
+providerId: '05'
+
 # JWT signature public certificates. kid and certificate path mappings.
 jwt:
   certificate:

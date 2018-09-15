@@ -24,22 +24,25 @@ singletons:
   - com.networknt.correlation.CorrelationHandler
   # Cors handler to handler post/put pre-flight
   - com.networknt.cors.CorsHttpHandler
-  # Swagger Parsing swagger specification based on request uri and method.
-  - com.networknt.swagger.SwaggerHandler
-  # Security JWT token verification and scope verification (depending on SwaggerHandler)
-  - com.networknt.security.JwtVerifyHandler
+  # Parsing OpenAPI 3.0 specification based on request uri and method.
+  - com.networknt.openapi.OpenApiHandler
+  # Security JWT token verification and scope verification (depending on OpenApiHandler)
+  - com.networknt.openapi.JwtVerifyHandler
   # Body Parse body based on content type in the header.
   - com.networknt.body.BodyHandler
   # SimpleAudit Log important info about the request into audit log
   - com.networknt.audit.AuditHandler
   # Sanitizer Encode cross site scripting
   - com.networknt.sanitizer.SanitizerHandler
-  # Validator Validate request based on swagger specification (depending on Swagger and Body)
-  - com.networknt.validator.ValidatorHandler
+  # Validator Validate request based on OpenAPI 3.0 specification (depending on OpenApiHandler and BodyHandler)
+  - com.networknt.openapi.ValidatorHandler
+
+# Authenticator implementation mapping
 - com.networknt.oauth.auth.Authenticator<com.networknt.oauth.auth.DefaultAuth>:
   - com.networknt.oauth.auth.DefaultAuthenticator
 - com.networknt.oauth.auth.Authenticator<com.networknt.oauth.auth.MarketPlaceAuth>:
   - com.networknt.oauth.auth.MarketPlaceAuthenticator
+# DataSource mapping
 - javax.sql.DataSource:
   - com.zaxxer.hikari.HikariDataSource:
       jdbcUrl: jdbc:mysql://mysqldb:3306/oauth2?useSSL=false

@@ -1,5 +1,3 @@
-
-
 # Singleton service factory configuration/IoC injection
 singletons:
 # Default decryptor implementation

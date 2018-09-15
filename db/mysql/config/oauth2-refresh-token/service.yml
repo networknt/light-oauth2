@@ -9,6 +9,7 @@ singletons:
 # ShutdownHookProvider implementations, there are one to many and they are called in the same sequence defined.
 - com.networknt.server.ShutdownHookProvider:
   - com.networknt.oauth.cache.CacheShutdownHookProvider
+#
 - javax.sql.DataSource:
   - com.zaxxer.hikari.HikariDataSource:
       jdbcUrl: jdbc:mysql://mysqldb:3306/oauth2?useSSL=false

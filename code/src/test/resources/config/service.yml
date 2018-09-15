@@ -1,4 +1,3 @@
-
 # Singleton service factory configuration/IoC injection
 singletons:
 # Default decryptor implementation
@@ -23,6 +22,8 @@ singletons:
   - com.networknt.traceability.TraceabilityHandler
   # Correlation Create correlationId if it doesn't exist in the request header and put it into the request header
   - com.networknt.correlation.CorrelationHandler
+  # Cors handler to handler post/put pre-flight
+  - com.networknt.cors.CorsHttpHandler
   # Parsing OpenAPI 3.0 specification based on request uri and method.
   - com.networknt.openapi.OpenApiHandler
   # Security JWT token verification and scope verification (depending on OpenApiHandler)
