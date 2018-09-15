@@ -109,7 +109,7 @@ public class ProviderMapStore implements MapStore<String, Provider> {
         try (Connection connection = ds.getConnection(); PreparedStatement stmt = connection.prepareStatement(loadall)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    keys.add(rs.getString("service_id"));
+                    keys.add(rs.getString("provider_id"));
                 }
             }
         } catch (SQLException e) {
