@@ -12,7 +12,7 @@ singletons:
 #
 - javax.sql.DataSource:
   - com.zaxxer.hikari.HikariDataSource:
-      jdbcUrl: jdbc:mysql://mysqldb:3306/oauth2?useSSL=false
+      jdbcUrl: jdbc:mysql://mysqldb:3306/oauth2?useSSL=false&disableMariaDbDriver
       username: mysqluser
       password: mysqlpw
       maximumPoolSize: 2

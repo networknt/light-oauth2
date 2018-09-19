@@ -75,6 +75,7 @@
         <version.sqlserver>6.5.1.jre8-preview</version.sqlserver>
         <version.org.apache.directory.server>2.0.0-M15</version.org.apache.directory.server>
         <versions.maven-version>2.4</versions.maven-version>
+        <version.mariadb>1.1.7</version.mariadb>
         <argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
     </properties>
  
@@ -384,7 +385,11 @@
                 <artifactId>mssql-jdbc</artifactId>
                 <version>${version.sqlserver}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.mariadb.jdbc</groupId>
+                <artifactId>mariadb-java-client</artifactId>
+                <version>${version.mariadb}</version>
+            </dependency>
             <!-- Test Dependencies -->
             <dependency>
                 <groupId>org.apache.directory.server</groupId>
