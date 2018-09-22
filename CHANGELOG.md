@@ -1,5 +1,24 @@
 # Change Log
 
+## [1.5.19](https://github.com/networknt/light-oauth2/tree/1.5.19) (2018-09-22)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.18...1.5.19)
+
+**Closed issues:**
+
+- sync mysql db config to light-docker oauth2 [\#151](https://github.com/networknt/light-oauth2/issues/151)
+- fixes error message when moving to openapi specification [\#148](https://github.com/networknt/light-oauth2/issues/148)
+- replace openapi.json with openapi.yaml and remove the validators from service.yml [\#147](https://github.com/networknt/light-oauth2/issues/147)
+- fix a typo in HashUtil [\#146](https://github.com/networknt/light-oauth2/issues/146)
+- sync federated provider db script from mysql to others [\#144](https://github.com/networknt/light-oauth2/issues/144)
+- fix the typo in mysql script in db [\#143](https://github.com/networknt/light-oauth2/issues/143)
+- bypass GSSAPI SPNEGO authentication mechanism if not configured [\#141](https://github.com/networknt/light-oauth2/issues/141)
+- remove the network port configuration so that everything is controlled by hazelcast.xml [\#140](https://github.com/networknt/light-oauth2/issues/140)
+
+**Merged pull requests:**
+
+- fix the issue \#145 [\#149](https://github.com/networknt/light-oauth2/pull/149) ([chenyan71](https://github.com/chenyan71))
+- Provider service [\#138](https://github.com/networknt/light-oauth2/pull/138) ([stevehu](https://github.com/stevehu))
+
 ## [1.5.18](https://github.com/networknt/light-oauth2/tree/1.5.18) (2018-08-16)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.17...1.5.18)
 
