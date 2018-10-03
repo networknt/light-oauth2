@@ -1,0 +1,91 @@
+
+# Singleton service factory configuration/IoC injection
+singletons:
+# OpenAPI parser validator implementation
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Callback>:
+  - com.networknt.oas.validator.impl.CallbackValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Contact>:
+  - com.networknt.oas.validator.impl.ContactValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.EncodingProperty>:
+  - com.networknt.oas.validator.impl.EncodingPropertyValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Example>:
+  - com.networknt.oas.validator.impl.ExampleValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.ExternalDocs>:
+  - com.networknt.oas.validator.impl.ExternalDocsValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Header>:
+  - com.networknt.oas.validator.impl.HeaderValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.License>:
+  - com.networknt.oas.validator.impl.LicenseValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Info>:
+  - com.networknt.oas.validator.impl.InfoValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Link>:
+  - com.networknt.oas.validator.impl.LinkValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Schema>:
+  - com.networknt.oas.validator.impl.SchemaValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.MediaType>:
+  - com.networknt.oas.validator.impl.MediaTypeValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.OAuthFlow>:
+  - com.networknt.oas.validator.impl.OAuthFlowValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.OpenApi3>:
+  - com.networknt.oas.validator.impl.OpenApi3Validator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.RequestBody>:
+  - com.networknt.oas.validator.impl.RequestBodyValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Operation>:
+  - com.networknt.oas.validator.impl.OperationValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Parameter>:
+  - com.networknt.oas.validator.impl.ParameterValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Path>:
+  - com.networknt.oas.validator.impl.PathValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Response>:
+  - com.networknt.oas.validator.impl.ResponseValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.SecurityRequirement>:
+  - com.networknt.oas.validator.impl.SecurityRequirementValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.SecurityScheme>:
+  - com.networknt.oas.validator.impl.SecuritySchemeValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Server>:
+  - com.networknt.oas.validator.impl.ServerValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.ServerVariable>:
+  - com.networknt.oas.validator.impl.ServerVariableValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Tag>:
+  - com.networknt.oas.validator.impl.TagValidator
+- com.networknt.oas.validator.Validator<com.networknt.oas.model.Xml>:
+  - com.networknt.oas.validator.impl.XmlValidator
+# HandlerProvider implementation
+- com.networknt.handler.HandlerProvider:
+  - com.networknt.oauth.provider.PathHandlerProvider
+# StartupHookProvider implementations, there are one to many and they are called in the same sequence defined.
+- com.networknt.server.StartupHookProvider:
+  - com.networknt.oauth.cache.CacheStartupHookProvider
+# ShutdownHookProvider implementations, there are one to many and they are called in the same sequence defined.
+- com.networknt.server.ShutdownHookProvider:
+  - com.networknt.oauth.cache.CacheShutdownHookProvider
+# MiddlewareHandler implementations, the calling sequence is as defined in the request/response chain.
+- com.networknt.handler.MiddlewareHandler:
+  # Exception Global exception handler that needs to be called first to wrap all middleware handlers and business handlers
+  - com.networknt.exception.ExceptionHandler
+  # Metrics handler to calculate response time accurately, this needs to be the second handler in the chain.
+  - com.networknt.metrics.MetricsHandler
+  # Traceability Put traceabilityId into response header from request header if it exists
+  - com.networknt.traceability.TraceabilityHandler
+  # Correlation Create correlationId if it doesn't exist in the request header and put it into the request header
+  - com.networknt.correlation.CorrelationHandler
+  # Parsing OpenAPI 3.0 specification based on request uri and method.
+  - com.networknt.openapi.OpenApiHandler
+  # Security JWT token verification and scope verification (depending on OpenApiHandler)
+  - com.networknt.openapi.JwtVerifyHandler
+  # Body Parse body based on content type in the header.
+  - com.networknt.body.BodyHandler
+  # SimpleAudit Log important info about the request into audit log
+  - com.networknt.audit.AuditHandler
+  # Sanitizer Encode cross site scripting
+  - com.networknt.sanitizer.SanitizerHandler
+  # Validator Validate request based on OpenAPI 3.0 specification (depending on OpenApiHandler and BodyHandler)
+  - com.networknt.openapi.ValidatorHandler
+
+- javax.sql.DataSource:
+  - com.zaxxer.hikari.HikariDataSource:
+      DriverClassName: oracle.jdbc.pool.OracleDataSource
+      jdbcUrl: jdbc:oracle:thin:@oracledb:1521:XE
+      username: SYSTEM
+      password: oracle
+      maximumPoolSize: 2

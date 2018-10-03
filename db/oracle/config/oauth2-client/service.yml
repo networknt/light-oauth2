@@ -10,7 +10,6 @@ singletons:
 - com.networknt.server.ShutdownHookProvider:
   - com.networknt.oauth.cache.CacheShutdownHookProvider
 
-
 - javax.sql.DataSource:
   - com.zaxxer.hikari.HikariDataSource:
       DriverClassName: oracle.jdbc.pool.OracleDataSource
