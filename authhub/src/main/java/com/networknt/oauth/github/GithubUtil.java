@@ -57,7 +57,7 @@ public class GithubUtil {
 		final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
         
-        final ClientConnection connection = client.connect(new URI(apiURL), Http2Client.WORKER, Http2Client.SSL, Http2Client.POOL, OptionMap.EMPTY).get();
+        final ClientConnection connection = client.connect(new URI(apiURL), Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, OptionMap.EMPTY).get();
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         try {
 					logger.info("Create request to github path: " + contentsURL);
