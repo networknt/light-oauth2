@@ -1,0 +1,141 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: OpenID Connect Service Authorize
+  description: OpenID Connect Authorize/OAuth 2.0 Authorization Code Service.
+  contact:
+    email: stevehu@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'https://oauth2.networknt.com/'    
+paths:
+  /oauth2/authorize:
+    get:
+      description: Return 302 redirect with authorization code
+      operationId: getAuthorize
+      parameters:
+        - name: Authorization
+          description: 'encoded username:password mandatory if Basic Authentication is used'
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: response_type
+          in: query
+          description: The response type for authorization code
+          required: true
+          schema:
+            type: string
+            enum:
+              - code
+        - name: client_id
+          in: query
+          description: The client id for authorization code
+          required: true
+          schema:
+            type: string
+        - name: redirect_uri
+          in: query
+          description: The redirect uri for authorization code
+          required: false
+          schema:
+            type: string
+        - name: username
+          in: query
+          description: The user name for authorization code
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for authorization code in clear text
+          required: false
+          schema:
+            type: string
+        - name: user_type
+          in: query
+          description: The type of user that drives authentication and authorization
+          required: false
+          schema:
+            type: string
+        - name: roles
+          in: query
+          description: User roles concat with a space for fine-grained authorization
+          required: false
+          schema:
+            type: string
+        - name: state
+          in: query
+          description: to prevent cross-site request forgery
+          required: false
+          schema:
+            type: string
+        - name: scope
+          in: query
+          description: scope of the request
+          required: false
+          schema:
+            type: string
+        - name: code_challenge
+          in: query
+          description: PKCE code challenge
+          required: false
+          schema:
+            type: string
+        - name: code_challenge_method
+          in: query
+          description: PKCE code challenge method
+          required: false
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Successful Operation
+    post:
+      description: Return 302 redirect with authorization code
+      operationId: postAuthorize
+      responses:
+        '302':
+          description: Successful Operation
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                j_username:
+                  description: User name
+                  type: string
+                j_password:
+                  description: Password
+                  type: string
+                response_type:
+                  description: Response type
+                  type: string
+                  enum:
+                    - code
+                client_id:
+                  description: Client Id
+                  type: string
+                redirect_uri:
+                  description: Redirect Uri
+                  type: string
+                state:
+                  description: to prevent cross-site request forgery
+                  type: string
+                scope:
+                  description: scope of the request
+                  type: string
+                code_challenge:
+                  description: PKCE code challenge
+                  type: string
+                code_challenge_method:
+                  description: PKCE code challenge method
+                  type: string
+              required:
+                - j_username
+                - j_password
+                - response_type
+                - client_id
