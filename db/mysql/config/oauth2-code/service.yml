@@ -26,8 +26,6 @@ singletons:
   - com.networknt.cors.CorsHttpHandler
   # Parsing OpenAPI 3.0 specification based on request uri and method.
   - com.networknt.openapi.OpenApiHandler
-  # Security JWT token verification and scope verification (depending on OpenApiHandler)
-  - com.networknt.openapi.JwtVerifyHandler
   # Body Parse body based on content type in the header.
   - com.networknt.body.BodyHandler
   # SimpleAudit Log important info about the request into audit log
