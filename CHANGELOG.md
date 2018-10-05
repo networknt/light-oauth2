@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.5.20](https://github.com/networknt/light-oauth2/tree/1.5.20) (2018-10-05)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.19...1.5.20)
+
+**Closed issues:**
+
+- sync db configurations with light-docker [\#154](https://github.com/networknt/light-oauth2/issues/154)
+- upgrade authorize service to OpenAPI 3.0 [\#153](https://github.com/networknt/light-oauth2/issues/153)
+- remove JwtVerifyHandler from middleware chain for code and authorize services [\#152](https://github.com/networknt/light-oauth2/issues/152)
+- add provider service to make multiple OAuth 2.0 providers trust each other [\#118](https://github.com/networknt/light-oauth2/issues/118)
+
 ## [1.5.19](https://github.com/networknt/light-oauth2/tree/1.5.19) (2018-09-22)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.18...1.5.19)
 
