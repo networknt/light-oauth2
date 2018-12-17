@@ -1,0 +1,43 @@
+@font-face {
+  font-family:"Muli";
+  font-style:normal;
+  font-weight:200;
+  src: url("../fonts/muli-latin-200.woff2") format("woff2"),
+}
+
+@font-face {
+  font-family:"Muli";
+  font-style:normal;
+  font-weight:400;
+  src: url("../fonts/muli-latin-200.woff2") format("woff2"),
+}
+
+@font-face {
+  font-family:"Muli";
+  font-style:normal;
+  font-weight:800;
+  src: url("../fonts/muli-latin-800.woff2") format("woff2"),
+}
+
+.logo-text {
+  font: 800 30px Muli, sans-serif;
+}
+
+body {
+  font: 14px "Century Gothic", Futura, sans-serif;
+  margin: 20px;
+}
+
+ol, ul {
+  padding-left: 30px;
+}
+
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+.status {
+  margin-bottom: 10px;
+}
