@@ -1,8 +1,11 @@
 .logo-text {
-  font: 800 22px Muli, sans-serif;
-  color: white;
-  margin-top: 5px;
-  margin-left: 5px;
+    display: block;
+    font: 800 22px Muli, sans-serif;
+    color: white;
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-right: 20px;
+	text-decoration: none;
 }
 
 [role=banner]{
@@ -12,25 +15,13 @@
 	height: 48px;
 }
 
-[role=banner]>a {
-    display: block;
-    margin-right: 12px;
-	text-decoration: none;
-}
-
-
 [role=banner]>div {
     display: flex;
     justify-content: space-between;
     flex-grow: 1;
 }
 
-[role=banner] nav:first-of-type, [role=banner] nav:last-of-type {
-    font-weight: 600;
-	letter-spacing: .03em;
-}
-
-[role=banner] nav:first-of-type ul, [role=banner] nav:last-of-type ul {
+[role=banner] nav ul{
     display: flex;
 }
 ul{
@@ -43,16 +34,22 @@ li {
     display: list-item;
 }
 
-[role=banner] nav:first-of-type a, [role=banner] nav:last-of-type a {
+[role=banner] nav button {
+    font-size: 1.2em;
+	letter-spacing: .03em;
+    background-color: #9e2159;
     color: #fff;
 	display: block;
-    padding: 3px 12px;
-    border-radius: 4px;
-    white-space: nowrap;
-	text-decoration: none;
 	cursor: pointer;
+    border-width: 0;
+    border-radius: 4px;
+    outline: none;
+    padding: 3px 12px;
+    margin-top: 5px;
+    margin-right: 10px;
 }
 
-[role=banner] nav:first-of-type a:visited, [role=banner] nav:last-of-type a:active{
+[role=banner] nav button:focus {
     background-color: #5a1434;
+    outline: none;
 }
