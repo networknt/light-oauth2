@@ -1,4 +1,4 @@
-#OAuth 2 web console
+# OAuth 2 web console
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
