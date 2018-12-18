@@ -12,7 +12,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 2. Install dependencies
 
 ```
-    cd light-oauth2
+    cd light-oauth2/oauth2-console
     npm install
 ```
 
