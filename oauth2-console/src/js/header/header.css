@@ -17,7 +17,7 @@
 
 [role=banner]>div {
     display: flex;
-    justify-content: space-between;
+	align-items: center;
     flex-grow: 1;
 }
 
@@ -34,7 +34,7 @@ li {
     display: list-item;
 }
 
-[role=banner] nav button {
+[role=banner] nav a {
     font-size: 1.2em;
 	letter-spacing: .03em;
     background-color: #9e2159;
@@ -47,9 +47,10 @@ li {
     padding: 3px 12px;
     margin-top: 5px;
     margin-right: 10px;
+	text-decoration: none;
 }
 
-[role=banner] nav button:focus {
+[role=banner] nav a:focus, [role=banner] nav a.selected {
     background-color: #5a1434;
     outline: none;
 }

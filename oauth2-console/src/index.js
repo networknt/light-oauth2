@@ -1,19 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom'
 import Header from './js/header/header.js';
+import Main from './js/main/main.js';
 
-class OAuth2Console extends React.Component {
-  render() {
-    return (
-      <Header />
-    );
-  }
-}
+const OAuth2Console = () => (
+  <div>
+    <Header />
+    <Main />
+  </div>
+);
 
 // ========================================
 
 ReactDOM.render(
-  <OAuth2Console />,
-  document.getElementById('root')
+(
+    <BrowserRouter>
+        <OAuth2Console />
+    </BrowserRouter>
+), document.getElementById('root')
 );
 

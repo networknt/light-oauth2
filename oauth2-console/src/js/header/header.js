@@ -1,68 +1,41 @@
 import React from 'react';
-import '../../css/main.css';
+import { Link } from 'react-router-dom';
+import { Views } from '../common/common.js';
+import '../../css/default.css';
 import './header.css';
 
-const views = ["Services", "Clients", "Users"];
-
-function Logo(){
-    return (
-          <a className="logo-text" href="/">LIGHT OAuth 2</a>   
-    );
-
-}
-
-function MenuItem(props){
-    return (
-        <li>
-            <button onClick={props.onClick}>
-                {props.text}
-            </button>   
-        </li>
-    );
-}
-
-class Menu extends React.Component{
+class Header extends React.Component{
     constructor(props){
         super(props);
-        this.state={
-            activeViewId: 0
+        this.state = {
+            activeView: Views[0].name
         };
     }
 
-    selectMenuItem(i){
-        this.setState({
-            activeViewId: i
-        });
-    }
+    handleClick(viewName){
+        var newState = Object.assign({}, this.state, {activeView: viewName});        
 
-    renderMenuItem(i){
-        return (
-            <MenuItem text={views[i]} onClick={()=>this.selectMenuItem(i)} />
-        );
+        this.setState(newState);
     }
 
     render(){
         return (
-            <div>
-                <nav>
-                    <ul>
-                        {
-                            views.map((text, index)=>this.renderMenuItem(index))
-                        }
-                    </ul>
-                </nav>
-            </div>
+            <header role="banner">
+                <div>
+                    <Link to='/' className="logo-text">LIGHT OAuth 2</Link>
+                    <nav>
+                        <ul>
+                            {
+                                Views.map((view, index) => <li key={view.name}><Link to={view.path} 
+                                                            className={this.state.activeView===view.name?"selected":""}
+                                                            onClick={()=>this.handleClick(view.name)}>{view.name}</Link></li>)
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            </header>
         );
     }
-}
-
-function Header() {
-    return (
-        <header role="banner">
-            <Logo />   
-            <Menu />
-        </header>
-    );
 }
 
 export default Header;
