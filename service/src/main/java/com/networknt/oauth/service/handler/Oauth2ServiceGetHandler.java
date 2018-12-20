@@ -3,7 +3,6 @@ package com.networknt.oauth.service.handler;
 import java.util.Collection;
 import java.util.Deque;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +17,6 @@ import com.networknt.oauth.cache.model.ServiceComparator;
 
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import io.undertow.util.HttpString;
 
 public class Oauth2ServiceGetHandler extends ServiceAuditHandler implements LightHttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2ServiceGetHandler.class);
@@ -41,13 +39,6 @@ public class Oauth2ServiceGetHandler extends ServiceAuditHandler implements Ligh
 
         exchange.getResponseHeaders().add(Headers.CONTENT_TYPE, "application/json");
         
-        String consoleURL = oauth_config.getConsoleURL();
-        
-        if (StringUtils.isNotBlank(consoleURL)) {
-            exchange.getResponseHeaders().add(new HttpString("Access-Control-Allow-Origin"), consoleURL);
-            exchange.getResponseHeaders().add(Headers.VARY, Headers.ORIGIN_STRING);        	
-        }
-
         exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(values));
         processAudit(exchange);
     }

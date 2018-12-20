@@ -9,7 +9,8 @@ export class Service extends React.Component {
     }
     
     componentDidMount(){
-       fetch(process.env.REACT_APP_SERVICES_URL)
+       fetch(process.env.REACT_APP_SERVICES_URL,
+                                     {Origin:window.location.origin}) //set 'Origin' header to fit CORS requirements
         .then(results => results.json())
         .then(data => {
             let services = data.map(service => <div key="{service.serviceId}"> {service.serviceName} </div>);

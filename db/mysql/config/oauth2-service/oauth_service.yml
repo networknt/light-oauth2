@@ -1,5 +1,3 @@
 # default config yml file for authorize service
 ---
 enableAudit: false
-
-consoleURL: http://localhost:3000
