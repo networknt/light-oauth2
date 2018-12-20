@@ -2,3 +2,4 @@
 ---
 enableAudit: false
 
+consoleURL: http://localhost:3000
