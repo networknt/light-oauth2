@@ -23,22 +23,31 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ```
 
 ## ssl settings to avoid NET:ERR_CERT_AUTHORITY_INVALID
+
 1. create keystore and truststore from local root
-* create local root certificate 
-openssl req -x509 -out localhost.crt -keyout localhost.key \
-  -newkey rsa:2048 -nodes -sha256 -days 3650 \
-  -subj '/CN=localhost' -extensions EXT -config <( \
-   printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
 
-* create keystore
-openssl pkcs12 -export -in localhost.crt -inkey localhost.key -out localhost.p12 -name "localhost_key" 
-keytool -importkeystore -destkeystore server.keystore -deststorepass password -srckeystore localhost.p12 -srcstoretype PKCS12 -srcstorepass password
+    + create local root certificate 
+    ```
+        openssl req -x509 -out localhost.crt -keyout localhost.key \
+            -newkey rsa:2048 -nodes -sha256 -days 3650 \
+            -subj '/CN=localhost' -extensions EXT -config <( \
+            printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
+    ```
 
-* create truststore
-keytool -import -file localhost.crt -keystore server.truststore -storepass password
+    + create keystore
+    ```
+        openssl pkcs12 -export -in localhost.crt -inkey localhost.key -out localhost.p12 -name "localhost_key" 
+        keytool -importkeystore -destkeystore server.keystore -deststorepass password -srckeystore localhost.p12 -srcstoretype PKCS12 -srcstorepass password
+    ```
 
-* copy the generated keystore and truststore files to the server config folder and then restart the server
+    + create truststore
+    ```
+        keytool -import -file localhost.crt -keystore server.truststore -storepass password
+    ```
+
+    + copy the generated keystore and truststore files to the server config folder (override existing) and then restart the server
 
 2. install root certificate to your os
-For Chrome, this can be done via `Settings>Advanced>Manage certificates`. From the popup dialog, you can import the `localhost.crt` generated above into `Login>Certificates`. You can download the crt file from the browser.
-After the installation, please set the certificate as 'Always Trust' and then restart Chrome.
+
+For Chrome, this can be done via `Settings>Advanced>Manage certificates`. From the popup dialog, you can import the `localhost.crt` generated above into `Login>Certificates`. You can download also the certificate (.crt) file from the browser.
+After the installation, please set the certificate as `Always Trust` and then restart Chrome.
