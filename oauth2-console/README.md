@@ -49,5 +49,5 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 2. install root certificate to your os
 
-<p style="margin-left: 4em">For Chrome, this can be done via `Settings>Advanced>Manage certificates`. From the popup dialog, you can import the `localhost.crt` generated above into `Login>Certificates`. You can also download the certificate (.crt) file from the browser.
-After the installation, please set the certificate as `Always Trust` and then restart Chrome.</p>
+>For Chrome, this can be done via `Settings>Advanced>Manage certificates`. From the popup dialog, you can import the `localhost.crt` generated above into `Login>Certificates`. You can also download the certificate (.crt) file from the browser.
+After the installation, please set the certificate as `Always Trust` and then restart Chrome.
