@@ -1,72 +1,63 @@
 import React from 'react';
 import axios from 'axios';
 import $ from 'jquery';
+import './views.css';
 
-function toServiceSummaryId(serviceId){
-    return serviceId+'-s';
-}
+//presentation
+const toServiceSummaryId = serviceId => serviceId+'-s';
 
-function toServiceDetailId(serviceId){
-    return serviceId+'-d';
-}
+const toServiceDetailId = serviceId => serviceId+'-d';
 
-function closeTab(e, serviceId){
-    let source = e.target || e.srcElement;
-    let serviceView = $(source).closest('#serviceView');
+const toggleTab = (serviceId, active) => {
+    let serviceView = $('#serviceView');
     let serviceSummaryId = toServiceSummaryId(serviceId);
     let serviceDetailId = toServiceDetailId(serviceId);
+    let serviceSummary = $(serviceView).find('#'+serviceSummaryId).first();
+    let serviceDetail = $(serviceView).find('#'+serviceDetailId).first();
 
-    $(serviceView).find('#'+serviceSummaryId).first().removeClass('active');
-    $(serviceView).find('#'+serviceDetailId).first().removeClass('active');
-}
-
-class ServiceSummary extends React.Component {
-    constructor(props){
-         super(props);
-         this.state = {
-             isActive:false
-         }
-    }
-
-    closeTab(e, serviceId){
-        if (this.state.isActive){
-            closeTab(e, serviceId);
-        }
-
-        this.setState({isActive: !this.state.isActive});
-    }
-
-    render(){
-        return (
-            <a className='list-group-item list-group-item-action flex-column align-items-start' 
-                data-toggle='list' 
-                href={'#'+toServiceDetailId(this.props.service.serviceId)} 
-                role='tab' 
-                id={toServiceSummaryId(this.props.service.serviceId)}
-                onClick={e=>this.closeTab(e, this.props.service.serviceId)}>
-
-            {this.props.service.serviceName}
-            </a>
-     );
+    if (active){
+        serviceSummary.addClass('active');
+        serviceDetail.addClass('active');
+    }else{
+        serviceSummary.removeClass('active');
+        serviceDetail.removeClass('active');
     }
 }
 
-const ServiceDetail = ({service}) => (
+const ServiceSummary = ({service, active, onClick}) => (
+   <a className='list-group-item list-group-item-action flex-column align-items-start' 
+        data-toggle='list' 
+        href={'#'+toServiceDetailId(service.serviceId)} 
+        role='tab' 
+        id={toServiceSummaryId(service.serviceId)}
+        onClick={onClick}>
+
+        {service.serviceName}
+    </a>
+);
+
+const ServiceDetail = ({service, active, onClick}) => (
     <div className='tab-pane' id={toServiceDetailId(service.serviceId)} role='tabpanel'>
-        <button type="button" className="close" aria-label="Close" onClick={e=>closeTab(e, service.serviceId)}>
-            <span aria-hidden="true">&times;</span>
+        <button type="button" className="icon-button" aria-label="Close" onClick={onClick}>
+            <i className="material-icons">clear</i>
+        </button>
+        <button type="button" className="icon-button" aria-label="Delete">
+            <i className="material-icons">delete_sweep</i>
+        </button>
+        <button type="button" className="icon-button" aria-label="Edit">
+            <i className="material-icons">create</i>
         </button>
 
         <pre>{JSON.stringify(service, null, 4)}</pre>
     </div>
 );
 
+// data & controller
 export class Service extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            serviceSummaries: [],
-            serviceDetails: []
+            services: {}
         }
     }
     
@@ -76,35 +67,62 @@ export class Service extends React.Component {
         .then(response => {
             let data = response.data;
 
-            let serviceSummaries = data.map(service => <ServiceSummary key={service.serviceId} service={service}/>);
+            const services = {};
+            
+            data.forEach(service => services[service.serviceId]={
+                                                                payload: service,
+                                                                active: false    
+                                                            });
 
-            let serviceDetails = data.map(service => <ServiceDetail key={service.serviceId} service={service}/>); 
-
-            this.setState({
-                    serviceSummaries: serviceSummaries,
-                    serviceDetails: serviceDetails
-            });
+            this.setState({services: services});
         });
+    }
+
+    handleClick(serviceId){
+        const copiedState = Object.assign({}, this.state);
+
+        const service = copiedState.services[serviceId];
+
+        if (!service){
+            console.log('service not found.');
+            return;
+        }
+
+        const active = !service.active;
+        toggleTab(serviceId, active);
+
+        service['active']=active;
+
+        this.setState(copiedState);
     }
     
     render(){
         return (
-        <div className='row' id='serviceView'>
-        <div className='col-4'>
-            <div className='list-group' id='svcSummaries' role='tablist'>
-                {this.state.serviceSummaries}
+            <div className='row' id='serviceView'>
+                <div className='col-4'>
+                    <div className='list-group' id='svcSummaries' role='tablist'>
+                        {
+                            Object.entries(this.state.services).map(([serviceId, service], index) =>
+                                <ServiceSummary key={index} service={service.payload} active={service.active} onClick={()=>this.handleClick(serviceId)}/>
+                            )
+                        }
+                    </div>
+                </div>
+                <div className='col-8'>
+                    <div className='tab-content' id='svcDetails'>
+                        {
+                            Object.entries(this.state.services).map(([serviceId, service], index) =>
+                                <ServiceDetail key={index} service={service.payload} active={service.active} onClick={()=>this.handleClick(serviceId)}/>
+                            )
+                        }
+                    </div>
+                </div>
             </div>
-        </div>
-        <div className='col-8'>
-            <div className='tab-content' id='svcDetails'>
-                {this.state.serviceDetails}
-            </div>
-        </div>
-        </div>
         );
     }
 };
 
+//TO be completed.
 export const Client = () => (
     <div> Hello, clients. </div>
 );
