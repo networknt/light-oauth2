@@ -52,11 +52,19 @@ const ServiceDetailViewer = ({service, active, onClick}) => (
     </div>
 );
 
-const ServiceDetailEditor = ({className}) => (
-    <div className={className} id='service-detail-editor'>
-        an editor
-    </div>
-);
+class ServiceDetailEditor extends React.Component {
+    constructor(props){
+        super(props);
+    }
+
+    render(){
+        return (
+            <div className={this.props.className} id='service-detail-editor'>
+                an editor
+            </div>
+        );
+    }
+}
 
 // data & controller
 const VIEW_MODE='view',
