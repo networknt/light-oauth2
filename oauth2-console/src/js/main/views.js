@@ -36,7 +36,7 @@ const ServiceSummary = ({service, active, onClick}) => (
     </a>
 );
 
-const ServiceDetail = ({service, active, onClick}) => (
+const ServiceDetailViewer = ({service, active, onClick}) => (
     <div className='tab-pane' id={toServiceDetailId(service.serviceId)} role='tabpanel'>
         <button type="button" className="icon-button" aria-label="Close" onClick={onClick}>
             <i className="material-icons">clear</i>
@@ -52,12 +52,24 @@ const ServiceDetail = ({service, active, onClick}) => (
     </div>
 );
 
+const ServiceDetailEditor = ({className}) => (
+    <div className={className} id='service-detail-editor'>
+        an editor
+    </div>
+);
+
 // data & controller
+const VIEW_MODE='view',
+      EDIT_MODE='edit',
+      ADD_MODE='add';
+
 export class Service extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            services: {}
+            mode: VIEW_MODE,
+            activeServiceId: '',
+            services: []
         }
     }
     
@@ -65,57 +77,83 @@ export class Service extends React.Component {
        axios.get(process.env.REACT_APP_SERVICES_URL,
                                      {Origin:window.location.origin}) //set 'Origin' header to fit CORS requirements
         .then(response => {
-            let data = response.data;
-
-            const services = {};
-            
-            data.forEach(service => services[service.serviceId]={
-                                                                payload: service,
-                                                                active: false    
-                                                            });
+            const services = response.data.slice();
 
             this.setState({services: services});
         });
     }
 
-    handleClick(serviceId){
+    toggleDetailView(serviceId){
         const copiedState = Object.assign({}, this.state);
 
-        const service = copiedState.services[serviceId];
-
-        if (!service){
-            console.log('service not found.');
-            return;
+        if (copiedState.activeServiceId===serviceId){
+            toggleTab(serviceId, false);
+            copiedState.activeServiceId='';
+        }else{
+            toggleTab(serviceId, true);
+            copiedState.activeServiceId=serviceId;
         }
 
-        const active = !service.active;
-        toggleTab(serviceId, active);
-
-        service['active']=active;
+        copiedState.mode=VIEW_MODE;
 
         this.setState(copiedState);
+    }
+
+    editService(service){
+        // toggle the viewer first
+        if (this.state.activeServiceId){
+            toggleTab(this.state.activeServiceId, false);
+        }
+
+        const copiedState = Object.assign({}, this.state);
+
+        if (!service){
+            copiedState.mode=ADD_MODE;
+            copiedState.activeServiceId='';
+        }else{
+            copiedState.mode=EDIT_MODE;
+        }
+
+        this.setState(copiedState); 
+    }
+
+    renderServiceDetailEditor(){
+        const cssClasses = this.state.mode===VIEW_MODE?'hide':'show';
+
+        return (
+            <ServiceDetailEditor className={cssClasses}/>
+        );
+    }
+
+    renderServiceDetailViewer(){
+        const cssClasses = 'tab-content ' + (this.state.mode===VIEW_MODE?'show':'hide');
+
+        return (<div className={cssClasses} id='service-detail-viewer'>
+                {
+                    this.state.services.map((service, index) =>
+                        <ServiceDetailViewer key={index} service={service} active={service.serviceId===this.state.activeServiceId} onClick={()=>this.toggleDetailView(service.serviceId)}/>)
+                }
+                </div>);
     }
     
     render(){
         return (
             <div className='row' id='serviceView'>
                 <div className='col-4'>
-                    <div className='list-group' id='svcSummaries' role='tablist'>
+                    <div className="mb-2 d-flex flex-row-reverse">
+                        <button type="button" className="btn btn-outline-primary" onClick={()=>this.editService()}>Add service</button>
+                    </div>
+                    <div className='list-group' id='service-summary-list' role='tablist'>
                         {
-                            Object.entries(this.state.services).map(([serviceId, service], index) =>
-                                <ServiceSummary key={index} service={service.payload} active={service.active} onClick={()=>this.handleClick(serviceId)}/>
+                            this.state.services.map((service, index) =>
+                                <ServiceSummary key={index} service={service} active={service.serviceId===this.state.activeServiceId} onClick={()=>this.toggleDetailView(service.serviceId)}/>
                             )
                         }
                     </div>
                 </div>
                 <div className='col-8'>
-                    <div className='tab-content' id='svcDetails'>
-                        {
-                            Object.entries(this.state.services).map(([serviceId, service], index) =>
-                                <ServiceDetail key={index} service={service.payload} active={service.active} onClick={()=>this.handleClick(serviceId)}/>
-                            )
-                        }
-                    </div>
+                    { this.renderServiceDetailViewer() }
+                    { this.renderServiceDetailEditor() }
                 </div>
             </div>
         );
