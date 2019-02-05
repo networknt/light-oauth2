@@ -81,6 +81,11 @@ paths:
       - default
       - com.networknt.oauth.service.handler.Oauth2ServicePostHandler
   - path: '/oauth2/service'
+    method: 'options'
+    exec:
+      - default
+      - com.networknt.oauth.service.handler.Oauth2ServicePostHandler      
+  - path: '/oauth2/service'
     method: 'put'
     exec:
       - default

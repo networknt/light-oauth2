@@ -27,6 +27,12 @@ paths:
             - oauth.service.w
       requestBody:
         $ref: '#/components/requestBodies/Service'
+    options:
+      description: Return permissions
+      operationId: check permission
+      responses:
+        '200':
+          description: Successful response
     put:
       description: Return the updated service
       operationId: updateService

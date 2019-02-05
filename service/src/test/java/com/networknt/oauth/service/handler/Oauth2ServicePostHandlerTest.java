@@ -33,6 +33,11 @@ public class Oauth2ServicePostHandlerTest {
     public static TestServer server = TestServer.getInstance();
 
     static final Logger logger = LoggerFactory.getLogger(Oauth2ServicePostHandlerTest.class);
+    
+    @Test
+    public void run() throws InterruptedException {
+    	TimeUnit.MINUTES.sleep(120);
+    }
 
     @Test
     public void testOauth2ServicePostHandler() throws ClientException, ApiException, UnsupportedEncodingException {

@@ -1,12 +1,18 @@
 import React from 'react';
 import axios from 'axios';
 import $ from 'jquery';
+import * as Yup from 'yup';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import './views.css';
 
 //presentation
 const toServiceSummaryId = serviceId => serviceId+'-s';
 
 const toServiceDetailId = serviceId => serviceId+'-d';
+
+const capitalize = s => s && s[0].toUpperCase() + s.slice(1).toLowerCase();
+
+const isEmpty = s => !s || 0 === s.length;
 
 const toggleTab = (serviceId, active) => {
     let serviceView = $('#serviceView');
@@ -52,24 +58,169 @@ const ServiceDetailViewer = ({service, active, onClick}) => (
     </div>
 );
 
+const FieldDict = {
+    serviceId: {
+        placeholder: 'Service ID',
+        label: 'Service ID'
+    },
+    serviceType: {
+        placeholder: 'Service Type',
+        label: 'Service Type'
+    },
+    serviceName: {
+        placeholder: 'Service Name',
+        label: 'Service Name'
+    },
+    serviceDesc: {
+        placeholder: 'Service Description',
+        label: 'Service Description'
+    },
+    scope: {
+        placeholder: 'Scope',
+        label: 'Scope'
+    },
+    ownerId: {
+        placeholder: 'Owner ID',
+        label: 'Owner ID'
+    } 
+};
+
+const InputField = ({name, required}) => (
+    <div className={`form-group ${required?'required':''}`}>
+        <label htmlFor={name} className='control-label'>{FieldDict[name].label}</label>
+        <Field className='form-control' name={name} placeholder={FieldDict[name].placeholder}/>
+        <ErrorMessage name={name} render={msg => <div className='error-message pl-1'>{msg}</div>}/>
+    </div>
+);
+
+const InputTextArea = ({name, required}) => (
+    <div className={`form-group ${required?'required':''}`}>
+        <label htmlFor={name} className='control-label'>{FieldDict[name].label}</label>
+        <Field className='form-control' component='textarea' name={name} placeholder={FieldDict[name].placeholder}/>
+        <ErrorMessage name={name} render={msg => <div className='error-message pl-1'>{msg}</div>}/>
+    </div>
+);
+
+const InputSelect = ({name, required, options}) => (
+    <div className={`form-group ${required?'required':''}`}>
+        <label htmlFor={name} className='control-label'>{FieldDict[name].label}</label>
+        <Field className='form-control' component='select' name={name}>
+            <option value=''> Please select </option>
+            {
+                options.map((item, index) => <option key={index} value={item}> {capitalize(item)} </option>)
+            }
+        </Field>
+        <ErrorMessage name={name} render={msg => <div className='error-message pl-1'>{msg}</div>}/>
+    </div>
+);
+
+// data, controller & form
+const VIEW_MODE='view',
+      EDIT_MODE='edit',
+      ADD_MODE='add';
+
+const ServiceSchema = Yup.object().shape({
+    serviceId: Yup.string()
+                    .max(32, FieldDict['serviceId'].label + ' cannot be longer than ${max}')
+                    .required(FieldDict['serviceId'].label + ' is required.')
+                    .test(
+                        'validServiceId',
+                        '${path} is not unique',
+                        function (value) {
+                            if (!value || (value !== null && value.length === 0)) {
+                                return false;
+                            }
+
+                            const {context} = this.options;
+                            const existingIds = context.existingIds;
+                            const result = !existingIds || !existingIds.includes(value);
+                            return result;
+                        }),
+    serviceType: Yup.string()
+                     .max(16, FieldDict['serviceType'].label + ' cannot be longer than ${max}')
+                     .required(FieldDict['serviceType'].label + ' is required.'),
+    serviceName: Yup.string()
+                     .max(32, FieldDict['serviceName'].label + ' cannot be longer than ${max}')
+                     .required(FieldDict['serviceName'].label + ' is required.'),
+    serviceDesc: Yup.string()
+                     .max(1024, FieldDict['serviceDesc'].label + ' cannot be longer than ${max}'),
+    scope: Yup.string()
+                     .max(1024, FieldDict['scope'].label + ' cannot be longer than ${max}'),
+    ownerId: Yup.string()
+                    .max(32, FieldDict['ownerId'].label + ' cannot be longer than ${max}')
+                    .required(FieldDict['ownerId'].label + ' is required.')
+});
+
 class ServiceDetailEditor extends React.Component {
     constructor(props){
         super(props);
+        this.state = {
+            userIds: [],
+            postResult: ''
+        }
+
+        this.userQueryUrl = process.env.REACT_APP_USERS_URL + process.env.REACT_APP_DEFAULT_PAGE_ARG;
+    }
+
+    componentDidMount(){/*
+        axios.get(this.userQueryUrl, {Origin:window.location.origin}) //set 'Origin' header to fit CORS requirements
+        .then(response => {
+            const userIds = response.data.slice().map(user=>user.userId);
+
+            this.setState({userIds: userIds});
+        });*/
+    }
+
+    doSubmit(values){
+        console.log('v=' + values);
+        this.props.post && this.props.post(values);
     }
 
     render(){
         return (
             <div className={this.props.className} id='service-detail-editor'>
-                an editor
+                <Formik
+                    initialValues={{
+                        serviceId: '',
+                        serviceType: '',
+                        serviceName: '',
+                        serviceDesc: '',
+                        scope: '',
+                        ownerId: ''
+                    }}
+
+                    validationSchema={ServiceSchema}
+
+                    onSubmit={(values, {resetForm})=>{
+                        this.doSubmit(values);
+                        resetForm();
+                    }} 
+
+                    render={({ errors, touched, handleSubmit, isSubmitting }) => {
+                        let ownerIdInput = <InputSelect name="ownerId" required options={this.state.userIds}/>;
+
+                        if (isEmpty(this.state.userIds)){
+                            ownerIdInput = <InputField name="ownerId" required/>;
+                        }
+
+                        return (   
+                            <Form>
+                                <InputField name="serviceId" required/>
+                                <InputSelect name="serviceType" required options={['swagger', 'openapi', 'graphql', 'hybrid']}/>
+                                <InputField name="serviceName" required/>
+                                <InputTextArea name="serviceDesc"/>
+                                <InputTextArea name="scope"/>
+                                {ownerIdInput}
+                                <button type="submit" disabled={isSubmitting} className="btn btn-primary float-right">Submit</button>
+                            </Form>);
+                        }
+                    }
+                />
             </div>
         );
     }
 }
 
-// data & controller
-const VIEW_MODE='view',
-      EDIT_MODE='edit',
-      ADD_MODE='add';
 
 export class Service extends React.Component {
     constructor(props){
@@ -79,15 +230,38 @@ export class Service extends React.Component {
             activeServiceId: '',
             services: []
         }
+
+        this.serviceQueryUrl = process.env.REACT_APP_SERVICES_URL + process.env.REACT_APP_DEFAULT_PAGE_ARG;
+        this.serviceClient = axios.create({ 
+                validateStatus: function (status) {
+                                    return status === 200;
+                                },
+                Origin:window.location.origin
+        });
     }
     
     componentDidMount(){
-       axios.get(process.env.REACT_APP_SERVICES_URL,
-                                     {Origin:window.location.origin}) //set 'Origin' header to fit CORS requirements
+        this.refresh();
+    }
+
+    refresh(){
+        axios.get(this.serviceQueryUrl, {Origin:window.location.origin}) //set 'Origin' header to fit CORS requirements
         .then(response => {
             const services = response.data.slice();
 
-            this.setState({services: services});
+            this.setState({
+                mode: VIEW_MODE,
+                activeServiceId: '',
+                services: services});
+        });
+    }
+
+    addService(service){
+        this.serviceClient.post(process.env.REACT_APP_SERVICES_URL, service)
+        .then(response => {
+            this.refresh();
+        })
+        .catch(error => {
         });
     }
 
@@ -129,7 +303,7 @@ export class Service extends React.Component {
         const cssClasses = this.state.mode===VIEW_MODE?'hide':'show';
 
         return (
-            <ServiceDetailEditor className={cssClasses}/>
+            <ServiceDetailEditor className={cssClasses} post={s=>this.addService(s)}/>
         );
     }
 
