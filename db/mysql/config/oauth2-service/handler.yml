@@ -95,6 +95,10 @@ paths:
     exec:
       - cors
   - path: '/oauth2/service/{serviceId}'
+    method: 'options'
+    exec:
+      - cors  
+  - path: '/oauth2/service/{serviceId}'
     method: 'delete'
     exec:
       - default

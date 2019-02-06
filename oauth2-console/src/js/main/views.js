@@ -44,13 +44,13 @@ const ServiceSummary = ({service, active, onClick}) => (
 
 const ServiceDetailViewer = ({service, active, close, edit, remove}) => (
     <div className='tab-pane' id={toServiceDetailId(service.serviceId)} role='tabpanel'>
-        <button type="button" className="icon-button" aria-label="Close" onClick={close}>
+        <button type="button" className="icon-button" aria-label="Close" onClick={()=>close()}>
             <i className="material-icons">close</i>
         </button>
-        <button type="button" className="icon-button" aria-label="Delete" onClick={remove(service)}>
+        <button type="button" className="icon-button" aria-label="Delete" onClick={service=>remove(service)}>
             <i className="material-icons">delete_sweep</i>
         </button>
-        <button type="button" className="icon-button" aria-label="Edit" onClick={edit(service)}>
+        <button type="button" className="icon-button" aria-label="Edit" onClick={service=>edit(service)}>
             <i className="material-icons">create</i>
         </button>
 
@@ -162,17 +162,17 @@ class ServiceDetailEditor extends React.Component {
         this.userQueryUrl = process.env.REACT_APP_USERS_URL + process.env.REACT_APP_DEFAULT_PAGE_ARG;
     }
 
-    componentDidMount(){
+    componentDidMount(){/*
         axios.get(this.userQueryUrl, {Origin:window.location.origin}) //set 'Origin' header to meet CORS requirements
         .then(response => {
             const userIds = response.data.slice().map(user=>user.userId);
 
             this.setState({userIds: userIds});
-        });
+        });*/
     }
 
     doSubmit(values){
-        this.props.post && this.props.post(values);
+        this.props.save && this.props.save(values);
     }
 
     doClose(){
@@ -180,17 +180,20 @@ class ServiceDetailEditor extends React.Component {
     }
 
     render(){
+        let initialValues = this.props.service || {
+            serviceId: '',
+            serviceType: '',
+            serviceName: '',
+            serviceDesc: '',
+            scope: '',
+            ownerId: ''
+        };
+        
         return (
             <div className={this.props.className} id='service-detail-editor'>
                 <Formik
-                    initialValues={{
-                        serviceId: '',
-                        serviceType: '',
-                        serviceName: '',
-                        serviceDesc: '',
-                        scope: '',
-                        ownerId: ''
-                    }}
+                    enableReinitialize
+                    initialValues={initialValues}
 
                     validationSchema={ServiceSchema}
 
@@ -255,7 +258,7 @@ export class Service extends React.Component {
     }
 
     refresh(){
-        axios.get(this.serviceQueryUrl, {Origin:window.location.origin}) //set 'Origin' header to fit CORS requirements
+        this.serviceClient.get(this.serviceQueryUrl, {Origin:window.location.origin}) //set 'Origin' header to fit CORS requirements
         .then(response => {
             const services = response.data.slice();
 
@@ -273,6 +276,26 @@ export class Service extends React.Component {
         })
         .catch(error => {
         });
+    }
+
+    updateService(service){
+        this.serviceClient.put(process.env.REACT_APP_SERVICES_URL, service)
+        .then(response => {
+            this.refresh();
+        })
+        .catch(error => {
+        });
+    }
+
+    removeService(service){
+        if (service){
+            let deleteUrl = process.env.REACT_APP_SERVICES_URL + '/' + service.serviceId
+
+            this.serviceClient.delete(deleteUrl)
+            .then(response => {
+                this.refresh();
+             });
+        }
     }
 
     toggleDetailView(serviceId){
@@ -307,18 +330,17 @@ export class Service extends React.Component {
         this.setState(copiedState); 
     }
 
-    editService(service){
-    }
-
-    removeService(service){
-    }
-
     renderServiceDetailEditor(){
         const cssClasses = this.state.mode===VIEW_MODE?'hide':'show';
 
-        return (
-            <ServiceDetailEditor className={cssClasses} post={s=>this.addService(s)} close={()=>this.refresh()}/>
-        );
+        let serviceEditor = <ServiceDetailEditor className={cssClasses} save={s=>this.addService(s)} close={()=>this.refresh()}/>;
+
+        if (EDIT_MODE===this.state.mode){
+            let service = this.state.services.find(s=>s.serviceId===this.state.activeServiceId);
+            serviceEditor = <ServiceDetailEditor className={cssClasses} save={s=>this.updateService(s)} service={service} close={()=>this.refresh()}/>;
+        }
+
+        return serviceEditor;
     }
 
     renderServiceDetailViewer(){
@@ -329,7 +351,7 @@ export class Service extends React.Component {
                     this.state.services.map((service, index) =>
                         <ServiceDetailViewer key={index} service={service} active={service.serviceId===this.state.activeServiceId} 
                             close={()=>this.toggleDetailView(service.serviceId)}
-                            edit={s=>this.editService(service)}
+                            edit={s=>this.showEditor(EDIT_MODE)}
                             remove={s=>this.removeService(service)}
                         />)
                 }
