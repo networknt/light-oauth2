@@ -35,11 +35,6 @@ public class Oauth2ServicePostHandlerTest {
     static final Logger logger = LoggerFactory.getLogger(Oauth2ServicePostHandlerTest.class);
     
     @Test
-    public void run() throws InterruptedException {
-    	TimeUnit.MINUTES.sleep(120);
-    }
-
-    @Test
     public void testOauth2ServicePostHandler() throws ClientException, ApiException, UnsupportedEncodingException {
         String service = "{\"serviceId\":\"AACT0005\",\"serviceType\":\"swagger\",\"serviceName\":\"Retail Account\",\"serviceDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\",\"ownerId\":\"admin\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();

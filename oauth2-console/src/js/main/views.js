@@ -42,15 +42,15 @@ const ServiceSummary = ({service, active, onClick}) => (
     </a>
 );
 
-const ServiceDetailViewer = ({service, active, onClick}) => (
+const ServiceDetailViewer = ({service, active, close, edit, remove}) => (
     <div className='tab-pane' id={toServiceDetailId(service.serviceId)} role='tabpanel'>
-        <button type="button" className="icon-button" aria-label="Close" onClick={onClick}>
-            <i className="material-icons">clear</i>
+        <button type="button" className="icon-button" aria-label="Close" onClick={close}>
+            <i className="material-icons">close</i>
         </button>
-        <button type="button" className="icon-button" aria-label="Delete">
+        <button type="button" className="icon-button" aria-label="Delete" onClick={remove(service)}>
             <i className="material-icons">delete_sweep</i>
         </button>
-        <button type="button" className="icon-button" aria-label="Edit">
+        <button type="button" className="icon-button" aria-label="Edit" onClick={edit(service)}>
             <i className="material-icons">create</i>
         </button>
 
@@ -162,18 +162,21 @@ class ServiceDetailEditor extends React.Component {
         this.userQueryUrl = process.env.REACT_APP_USERS_URL + process.env.REACT_APP_DEFAULT_PAGE_ARG;
     }
 
-    componentDidMount(){/*
-        axios.get(this.userQueryUrl, {Origin:window.location.origin}) //set 'Origin' header to fit CORS requirements
+    componentDidMount(){
+        axios.get(this.userQueryUrl, {Origin:window.location.origin}) //set 'Origin' header to meet CORS requirements
         .then(response => {
             const userIds = response.data.slice().map(user=>user.userId);
 
             this.setState({userIds: userIds});
-        });*/
+        });
     }
 
     doSubmit(values){
-        console.log('v=' + values);
         this.props.post && this.props.post(values);
+    }
+
+    doClose(){
+        this.props.close && this.props.close();
     }
 
     render(){
@@ -196,7 +199,7 @@ class ServiceDetailEditor extends React.Component {
                         resetForm();
                     }} 
 
-                    render={({ errors, touched, handleSubmit, isSubmitting }) => {
+                    render={({ errors, touched, handleSubmit, isSubmitting, resetForm }) => {
                         let ownerIdInput = <InputSelect name="ownerId" required options={this.state.userIds}/>;
 
                         if (isEmpty(this.state.userIds)){
@@ -205,6 +208,13 @@ class ServiceDetailEditor extends React.Component {
 
                         return (   
                             <Form>
+                                <button type="button" className="icon-button" aria-label="Close" 
+                                    onClick={()=>{
+                                                    resetForm();
+                                                    this.doClose();
+                                                   }}>
+                                    <i className="material-icons">close</i>
+                                </button>
                                 <InputField name="serviceId" required/>
                                 <InputSelect name="serviceType" required options={['swagger', 'openapi', 'graphql', 'hybrid']}/>
                                 <InputField name="serviceName" required/>
@@ -281,29 +291,33 @@ export class Service extends React.Component {
         this.setState(copiedState);
     }
 
-    editService(service){
+    showEditor(mode){
         // toggle the viewer first
         if (this.state.activeServiceId){
             toggleTab(this.state.activeServiceId, false);
         }
 
         const copiedState = Object.assign({}, this.state);
+        copiedState.mode=mode;
 
-        if (!service){
-            copiedState.mode=ADD_MODE;
+        if (ADD_MODE===mode){
             copiedState.activeServiceId='';
-        }else{
-            copiedState.mode=EDIT_MODE;
         }
 
         this.setState(copiedState); 
+    }
+
+    editService(service){
+    }
+
+    removeService(service){
     }
 
     renderServiceDetailEditor(){
         const cssClasses = this.state.mode===VIEW_MODE?'hide':'show';
 
         return (
-            <ServiceDetailEditor className={cssClasses} post={s=>this.addService(s)}/>
+            <ServiceDetailEditor className={cssClasses} post={s=>this.addService(s)} close={()=>this.refresh()}/>
         );
     }
 
@@ -313,7 +327,11 @@ export class Service extends React.Component {
         return (<div className={cssClasses} id='service-detail-viewer'>
                 {
                     this.state.services.map((service, index) =>
-                        <ServiceDetailViewer key={index} service={service} active={service.serviceId===this.state.activeServiceId} onClick={()=>this.toggleDetailView(service.serviceId)}/>)
+                        <ServiceDetailViewer key={index} service={service} active={service.serviceId===this.state.activeServiceId} 
+                            close={()=>this.toggleDetailView(service.serviceId)}
+                            edit={s=>this.editService(service)}
+                            remove={s=>this.removeService(service)}
+                        />)
                 }
                 </div>);
     }
@@ -323,7 +341,7 @@ export class Service extends React.Component {
             <div className='row' id='serviceView'>
                 <div className='col-4'>
                     <div className="mb-2 d-flex flex-row-reverse">
-                        <button type="button" className="btn btn-outline-primary" onClick={()=>this.editService()}>Add service</button>
+                        <button type="button" className="btn btn-outline-primary" onClick={()=>this.showEditor(ADD_MODE)}>Add service</button>
                     </div>
                     <div className='list-group' id='service-summary-list' role='tablist'>
                         {
