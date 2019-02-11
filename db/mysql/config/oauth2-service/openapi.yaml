@@ -12,7 +12,7 @@ servers:
   - url: 'https://oauth2.networknt.com'    
 paths:
   /oauth2/service:
-   options:
+    options:
       description: Return permissions
       operationId: checkPermisson
       responses:

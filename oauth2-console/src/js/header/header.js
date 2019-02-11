@@ -7,8 +7,9 @@ import './header.css';
 class Header extends React.Component{
     constructor(props){
         super(props);
+        this.views = Object.values(Views);
         this.state = {
-            activeView: Views[0].name
+            activeView: this.views[0].name
         };
     }
 
@@ -26,7 +27,7 @@ class Header extends React.Component{
                     <nav>
                         <ul>
                             {
-                                Views.map((view, index) => <li key={view.name}><Link to={view.path} 
+                                this.views.map((view, index) => <li key={view.name}><Link to={view.path} 
                                                             className={this.state.activeView===view.name?"selected":""}
                                                             onClick={()=>this.handleClick(view.name)}>{view.name}</Link></li>)
                             }
