@@ -69,8 +69,7 @@ export class ServiceEditor extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            userIds: [],
-            postResult: ''
+            userIds: []
         }
 
         this.userQueryUrl = process.env.REACT_APP_USERS_URL + process.env.REACT_APP_DEFAULT_PAGE_ARG;
@@ -112,28 +111,28 @@ export class ServiceEditor extends React.Component {
                     }} 
 
                     render={({ errors, touched, handleSubmit, isSubmitting, resetForm }) => {
-                        let ownerIdInput = <InputSelect name="ownerId" required fieldDict={FieldDict} options={this.state.userIds}/>;
+                        let ownerIdInput = <InputSelect name='ownerId' required fieldDict={FieldDict} options={this.state.userIds}/>;
 
                         if (Utils.isEmpty(this.state.userIds)){
-                            ownerIdInput = <InputField name="ownerId" required fieldDict={FieldDict}/>;
+                            ownerIdInput = <InputField name='ownerId' required fieldDict={FieldDict}/>;
                         }
 
                         return (   
                             <Form>
-                                <button type="button" className="icon-button" aria-label="Close" 
+                                <button type='button' className='icon-button' aria-label='Close' 
                                     onClick={()=>{
                                                     resetForm();
                                                     this.close();
                                                    }}>
-                                    <i className="material-icons">close</i>
+                                    <i className='material-icons'>close</i>
                                 </button>
-                                <InputField name="serviceId" required fieldDict={FieldDict}/>
-                                <InputSelect name="serviceType" required  fieldDict={FieldDict} options={['swagger', 'openapi', 'graphql', 'hybrid']}/>
-                                <InputField name="serviceName" required fieldDict={FieldDict}/>
-                                <InputTextArea name="serviceDesc" fieldDict={FieldDict}/>
-                                <InputTextArea name="scope" fieldDict={FieldDict}/>
+                                <InputField name='serviceId' required fieldDict={FieldDict}/>
+                                <InputSelect name='serviceType' required  fieldDict={FieldDict} options={['swagger', 'openapi', 'graphql', 'hybrid']}/>
+                                <InputField name='serviceName' required fieldDict={FieldDict}/>
+                                <InputTextArea name='serviceDesc' fieldDict={FieldDict}/>
+                                <InputTextArea name='scope' fieldDict={FieldDict}/>
                                 {ownerIdInput}
-                                <button type="submit" disabled={isSubmitting} className="btn btn-primary float-right">Submit</button>
+                                <button type='submit' disabled={isSubmitting} className='btn btn-primary float-right'>Submit</button>
                             </Form>);
                         }
                     }

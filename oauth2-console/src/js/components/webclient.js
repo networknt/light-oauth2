@@ -49,7 +49,8 @@ export class WebClient extends React.Component {
             showSpinner: false,
             activeId: '',
             mode: WebClient.MODES.VIEW,
-            data: []
+            data: [],
+            error: ''
         }
 
     }
@@ -159,12 +160,17 @@ export class WebClient extends React.Component {
         );
     }
 
+    handleError(error){
+        this.setState(Object.assign({}, this.state, {error: error}));
+    }
+
     addObject(obj){
         this.axiosClient.post(this.postUrl, Utils.clean(obj))
         .then(response => {
             this.refresh();
         })
         .catch(error => {
+            this.handleError(error);
         });
     }
 
@@ -174,6 +180,7 @@ export class WebClient extends React.Component {
             this.refresh(()=>this.openViewer(this.getId(obj)));
         })
         .catch(error => {
+            this.handleError(error);
         });
     }
 
@@ -184,7 +191,18 @@ export class WebClient extends React.Component {
             deleteUrl && this.axiosClient.delete(deleteUrl)
             .then(response => {
                 this.refresh();
-             });
+             })
+            .catch(error => {
+                this.handleError(error);
+            });
+        }
+    }
+
+    renderError(){
+        if (!Utils.isEmpty(this.state.error)){
+            return (
+               <div className='error-message'> {this.state.error.message} </div>
+            );
         }
     }
 
@@ -193,8 +211,8 @@ export class WebClient extends React.Component {
 
         if (this.state.loading){
             if (this.state.showSpinner){
-                clientView =<div class="spinner-border text-primary m-5" role="status">
-                             <span class="sr-only">Loading...</span>
+                clientView =<div class='spinner-border text-primary m-5' role='status'>
+                             <span class='sr-only'>Loading...</span>
                             </div>
             }
         }else{
@@ -212,6 +230,7 @@ export class WebClient extends React.Component {
                             <div className='col-8'>
                                 {this.renderDataViewers()}
                                 {this.renderDataEditor(this.editor)}
+                                {this.renderError()}
                             </div>
                         </div>
         }
