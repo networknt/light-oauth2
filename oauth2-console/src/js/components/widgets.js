@@ -19,12 +19,19 @@ export const LabelItem = ({dataId, active, itemName, onClick}) => {
     );
 }
 
-export const JSONViewer = ({data, dataId, active, close, edit, remove}) => {
+export const JSONViewer = ({data, dataId, active, excludeFields, close, edit, remove}) => {
     if (!active){ // simple return an empty tab-pane to establish the linkage with list items
         return (
             <div className='tab-pane' id={Utils.toViewerId(dataId)} role='tabpanel'/>
         );
     }
+
+    let displayData = Object.assign({}, data);
+
+    if (!Utils.isEmpty(excludeFields)){
+        excludeFields.forEach(f=>delete displayData[f]);
+    }
+
 
     return (
         <div className='tab-pane fade show active' id={Utils.toViewerId(dataId)} role='tabpanel'>
@@ -38,7 +45,7 @@ export const JSONViewer = ({data, dataId, active, close, edit, remove}) => {
                 <i className="material-icons">create</i>
             </button>
 
-            <pre>{JSON.stringify(data, null, 4)}</pre>
+            <pre>{JSON.stringify(displayData, null, 4)}</pre>
         </div>
     );
 }

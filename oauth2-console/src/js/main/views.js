@@ -3,6 +3,7 @@ import {WebClient} from '../components/webclient.js';
 import {Views} from '../common/common.js';
 import {ServiceEditor} from '../components/serviceEditor.js';
 import {ClientEditor} from '../components/clientEditor.js';
+import {UserEditor} from '../components/userEditor.js';
 
 export const Service = () => (
     <WebClient 
@@ -31,5 +32,15 @@ export const Client = () => (
 );
 
 export const User = () => (
-    <div> Hello, users. </div>
+    <WebClient 
+        dataType={Views.USER.dataType}
+        queryUrl={process.env.REACT_APP_USERS_URL + process.env.REACT_APP_DEFAULT_PAGE_ARG} 
+        postUrl={process.env.REACT_APP_USERS_URL} 
+        putUrl={process.env.REACT_APP_USERS_URL} 
+        getId={user=>user.userId} 
+        getName={user=>user.firstName + ' ' + user.lastName} 
+        getDeleteUrl={user=>process.env.REACT_APP_USERS_URL + '/' + user.userId}
+        editor={UserEditor}
+        excludeFields={['password', 'passwordConfirm']}
+    />
 );

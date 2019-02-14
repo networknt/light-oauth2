@@ -74,6 +74,10 @@ chains:
 
 paths:
   - path: '/oauth2/user'
+    method: 'options'
+    exec:
+      - cors
+  - path: '/oauth2/user'
     method: 'get'
     exec:
       - default
@@ -88,6 +92,10 @@ paths:
     exec:
       - default
       - com.networknt.oauth.user.handler.Oauth2UserPutHandler
+  - path: '/oauth2/user/{userId}'
+    method: 'options'
+    exec:
+      - cors
   - path: '/oauth2/user/{userId}'
     method: 'delete'
     exec:

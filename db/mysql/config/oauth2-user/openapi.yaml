@@ -12,6 +12,12 @@ servers:
   - url: 'https://oauth2.networknt.com'    
 paths:
   /oauth2/user:
+    options:
+      description: Return permissions
+      operationId: checkPermisson
+      responses:
+        '200':
+          description: Successful response     
     get:
       description: Return all users
       operationId: getAllUsers
@@ -71,6 +77,12 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/User'
   '/oauth2/user/{userId}':
+    options:
+      description: Return permissions
+      operationId: checkPermisson
+      responses:
+        '200':
+          description: Successful response     
     delete:
       description: Delete a user by Id
       operationId: deleteUser

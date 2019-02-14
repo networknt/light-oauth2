@@ -41,6 +41,7 @@ export class WebClient extends React.Component {
         this.getName = props.getName;
         this.getDeleteUrl = props.getDeleteUrl;
         this.editor = props.editor;
+        this.excludeFields = props.excludeFields;
 
         // state
         this.state = {
@@ -81,6 +82,7 @@ export class WebClient extends React.Component {
 
         return (
             <JSONViewer key={key} data={obj} dataId={dataId} active={active} 
+                excludeFields={this.excludeFields}
                 close={()=>this.closeViewer()}
                 remove={()=>this.removeObject(obj)}
                 edit={()=>this.openEditor(WebClient.MODES.EDIT)}
