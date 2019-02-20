@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { LabelItem, JSONViewer } from './widgets.js';
+import { LabelItem } from './widgets.js';
 import Utils from '../common/utils.js';
 
 /**
@@ -40,8 +40,9 @@ export class WebClient extends React.Component {
         this.getId = props.getId;
         this.getName = props.getName;
         this.getDeleteUrl = props.getDeleteUrl;
+        this.viewer = props.viewer;
         this.editor = props.editor;
-        this.excludeFields = props.excludeFields;
+        this.hideFields = props.hideFields;
 
         // state
         this.state = {
@@ -68,7 +69,8 @@ export class WebClient extends React.Component {
                 activeId: '',
                 mode: WebClient.MODES.VIEW,
                 data: data,
-                loading: false});
+                loading: false,
+                error: ''});
 
            callback && callback();
         });
@@ -77,16 +79,17 @@ export class WebClient extends React.Component {
         setTimeout(()=>this.setState(Object.assign({}, this.state, {showSpinner: true})), 500);
     }
 
-    createDataViewer(obj, key){
+    createDataViewer(Viewer, obj, key){
         let dataId = this.getId(obj);
         let active = dataId===this.state.activeId;
 
         return (
-            <JSONViewer key={key} data={obj} dataId={dataId} active={active} 
-                excludeFields={this.excludeFields}
+            <Viewer key={key} data={obj} dataId={dataId} active={active} 
+                hideFields={this.hideFields}
                 close={()=>this.closeViewer()}
                 remove={()=>this.removeObject(obj)}
                 edit={()=>this.openEditor(WebClient.MODES.EDIT)}
+                handleError={e=>this.handleError(e)}
             />
         );
     }
@@ -98,7 +101,7 @@ export class WebClient extends React.Component {
         
         return (
             <div className='tab-content' id='data-viewer'>
-                {this.state.data.map((obj, index)=>this.createDataViewer(obj, index))}
+                {this.state.data.map((obj, index)=>this.createDataViewer(this.viewer, obj, index))}
             </div>
         );
     }
@@ -211,8 +214,8 @@ export class WebClient extends React.Component {
 
         if (this.state.loading){
             if (this.state.showSpinner){
-                clientView =<div class='spinner-border text-primary m-5' role='status'>
-                             <span class='sr-only'>Loading...</span>
+                clientView =<div className='spinner-border text-primary m-5' role='status'>
+                             <span className='sr-only'>Loading...</span>
                             </div>
             }
         }else{

@@ -19,7 +19,7 @@ export const LabelItem = ({dataId, active, itemName, onClick}) => {
     );
 }
 
-export const JSONViewer = ({data, dataId, active, excludeFields, close, edit, remove}) => {
+export const JSONViewer = ({data, dataId, active, hideFields, close, edit, remove, additionalControls}) => {
     if (!active){ // simple return an empty tab-pane to establish the linkage with list items
         return (
             <div className='tab-pane' id={Utils.toViewerId(dataId)} role='tabpanel'/>
@@ -28,32 +28,34 @@ export const JSONViewer = ({data, dataId, active, excludeFields, close, edit, re
 
     let displayData = Object.assign({}, data);
 
-    if (!Utils.isEmpty(excludeFields)){
-        excludeFields.forEach(f=>delete displayData[f]);
+    if (!Utils.isEmpty(hideFields)){
+        hideFields.forEach(f=>delete displayData[f]);
     }
 
 
     return (
         <div className='tab-pane fade show active' id={Utils.toViewerId(dataId)} role='tabpanel'>
-            <button type="button" className="icon-button" aria-label="Close" onClick={()=>close()}>
+            <button type="button" title='close' className="icon-button" aria-label="Close" onClick={()=>close()}>
                 <i className="material-icons">clear</i>
             </button>
-            <button type="button" className="icon-button" aria-label="Delete" onClick={data=>remove(data)}>
+            <button type="button" title='remove' className="icon-button" aria-label="Delete" onClick={data=>remove(data)}>
                 <i className="material-icons">delete_sweep</i>
             </button>
-            <button type="button" className="icon-button" aria-label="Edit" onClick={data=>edit(data)}>
+            <button type="button" title='edit' className="icon-button" aria-label="Edit" onClick={data=>edit(data)}>
                 <i className="material-icons">create</i>
             </button>
+
+            {additionalControls}
 
             <pre>{JSON.stringify(displayData, null, 4)}</pre>
         </div>
     );
 }
 
-export const InputField = ({name, required, fieldDict}) => (
+export const InputField = ({name, type, required, fieldDict}) => (
     <div className={`form-group ${required?'required':''}`}>
         <label htmlFor={name} className='control-label'>{fieldDict[name].label}</label>
-        <Field className='form-control' name={name} placeholder={fieldDict[name].placeholder}/>
+        <Field className='form-control' name={name} type={type} placeholder={fieldDict[name].placeholder}/>
         <ErrorMessage name={name} render={msg => <div className='error-message pl-1'>{msg}</div>}/>
     </div>
 );

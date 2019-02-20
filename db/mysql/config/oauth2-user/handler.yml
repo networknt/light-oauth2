@@ -111,7 +111,11 @@ paths:
     exec:
       - default
       - com.networknt.oauth.user.handler.Oauth2PasswordUserIdPostHandler
-
+  - path: '/oauth2/password/{userId}'
+    method: 'options'
+    exec:
+      - cors
+      
   - path: '/health/com.networknt.oauth2-user-1.0.0'
     method: 'get'
     exec:

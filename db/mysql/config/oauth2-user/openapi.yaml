@@ -127,6 +127,12 @@ paths:
             - oauth.user.r
             - oauth.user.w
   '/oauth2/password/{userId}':
+    options:
+      description: Return permissions
+      operationId: checkPermisson
+      responses:
+        '200':
+          description: Successful response     
     post:
       description: Reset Password
       operationId: resetPassword

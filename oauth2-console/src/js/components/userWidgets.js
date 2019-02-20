@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import * as Yup from 'yup';
 import { Formik, Form } from 'formik';
-import { InputField, InputTextArea, InputSelect } from './widgets.js';
+import { InputField, InputTextArea, InputSelect, JSONViewer } from './widgets.js';
 import Utils from '../common/utils.js';
 import './editor.css';
 
@@ -67,7 +67,7 @@ const UserSchema = Yup.object().shape({
                      .email('Invalid email address')
                      .max(64, FieldDict['email'].label + ' cannot be longer than ${max}'),
     password: Yup.string()
-                     .max(1024, FieldDict['email'].label + ' cannot be longer than ${max}'),
+                     .max(1024, FieldDict['password'].label + ' cannot be longer than ${max}'),
     passwordConfirm: Yup.match('password', 'Passwords do not match'),
     roles: Yup.string()
                      .max(2048, FieldDict['roles'].label + ' cannot be longer than ${max}'),
@@ -94,9 +94,10 @@ export class UserEditor extends React.Component {
         };
 
         if (this.props.data){
-            initialValues = Object.assign({}, this.props.data);
-            initialValues['password']='';
-            initialValues['passwordConfirm']='';
+            initialValues = Object.assign({}, this.props.data, {
+                password: '',
+                passwordConfirm: ''
+            });
         }
         
         return (
@@ -138,5 +139,114 @@ export class UserEditor extends React.Component {
                 />
             </div>
         );
+    }
+}
+
+const PSWDFieldDict = {
+    password: {
+        placeholder: 'Password',
+        label: 'Password'
+    },
+    newPassword: {
+        placeholder: 'New Password',
+        label: 'New Password'
+    },
+    newPasswordConfirm: {
+        placeholder: 'New Password Confirm',
+        label: 'New Password Confirm'
+    }
+};
+
+const PSWDSchema = {
+    password: Yup.string()
+                     .max(1024, PSWDFieldDict['password'].label + ' cannot be longer than ${max}'),
+    newPassword: Yup.string()
+                     .max(1024, PSWDFieldDict['newPassword'].label + ' cannot be longer than ${max}'),
+    newPasswordConfirm: Yup.match('password', 'Passwords do not match'),
+}
+
+const PasswordEditor = ({save, close}) => (
+    <Formik
+        enableReinitialize
+        initialValues= {{
+            password: '',
+            newPassword: '',
+            newPasswordConfirm: ''
+        }}
+
+        validationSchema={PSWDSchema}
+
+        onSubmit={(values, {resetForm})=>{
+            save(values);
+            resetForm();
+        }} 
+
+        render={({ errors, touched, handleSubmit, isSubmitting, resetForm }) => {
+            return (   
+                <Form>
+                    <button type='button' className='icon-button' aria-label='Close' 
+                        onClick={()=>{
+                                        resetForm();
+                                        close();
+                                       }}>
+                        <i className='material-icons'>close</i>
+                    </button>
+                    <InputField name='password' type='password' required fieldDict={PSWDFieldDict}/>
+                    <InputField name='newPassword' type='password' required fieldDict={PSWDFieldDict}/>
+                    <InputField name='newPasswordConfirm' type='password' required fieldDict={PSWDFieldDict}/>
+                    <button type='submit' disabled={isSubmitting} className='btn btn-primary float-right'>Submit</button>
+                </Form>);
+            }
+        }
+    />
+);
+
+export class UserViewer extends React.Component {
+    constructor(props){
+        super(props);
+        this.state={
+           showPasswordEditor:false
+        }
+
+        this.close=props.close;
+        this.handleError=props.handleError;
+        this.postUrl=process.env.REACT_APP_PASSWORD_URL + '/' + props.dataId;
+
+        this.axiosClient = axios.create({ 
+                validateStatus: function (status) {
+                                    return status === 200;
+                                },
+                Origin:window.location.origin     // set 'Origin' header to meet CORS requirements
+        });
+    }
+
+    openPasswordEditor(){
+        this.setState(Object.assign({}, this.state, {showPasswordEditor:true}));
+    }
+
+    closePasswordEditor(){
+        this.setState(Object.assign({}, this.state, {showPasswordEditor:false}));
+    }
+
+    resetPassword(obj){
+        this.axiosClient.post(this.postUrl, Utils.clean(obj))
+        .then(response => {
+            this.closePasswordEditor();
+            this.handleError();
+        })
+        .catch(error => {
+            this.handleError(error);
+        });
+    }
+
+    render(){
+        if (this.state.showPasswordEditor){
+            return (<PasswordEditor save={o=>this.resetPassword(o)} close={()=>this.closePasswordEditor()}/>);
+        }else{
+            let editorToggler = <button type='button' className='icon-button' aria-label='reset password' title='reset password' onClick={()=>this.openPasswordEditor()}>
+                                    <i className='material-icons'>rotate_left</i>
+                                </button>;
+            return (<JSONViewer additionalControls={editorToggler} {...this.props}/>);
+        }
     }
 }
