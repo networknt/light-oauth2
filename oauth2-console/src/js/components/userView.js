@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 import * as Yup from 'yup';
 import { Formik, Form } from 'formik';
 import { InputField, InputTextArea, InputSelect, JSONViewer } from './widgets.js';
@@ -101,7 +100,7 @@ export class UserEditor extends React.Component {
         }
         
         return (
-            <div className={this.props.className} id='service-detail-editor'>
+            <div className={this.props.className} id='user-detail-editor'>
                 <Formik
                     enableReinitialize
                     initialValues={initialValues}
@@ -211,13 +210,7 @@ export class UserViewer extends React.Component {
         this.close=props.close;
         this.handleError=props.handleError;
         this.postUrl=process.env.REACT_APP_PASSWORD_URL + '/' + props.dataId;
-
-        this.axiosClient = axios.create({ 
-                validateStatus: function (status) {
-                                    return status === 200;
-                                },
-                Origin:window.location.origin     // set 'Origin' header to meet CORS requirements
-        });
+        this.axiosClient = Utils.createAxiosClient(); 
     }
 
     openPasswordEditor(){

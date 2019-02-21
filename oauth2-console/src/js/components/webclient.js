@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 import { LabelItem } from './widgets.js';
 import Utils from '../common/utils.js';
 
@@ -25,12 +24,7 @@ export class WebClient extends React.Component {
     constructor(props){
         super(props);
         // things that do not change
-        this.axiosClient = axios.create({ 
-                validateStatus: function (status) {
-                                    return status === 200;
-                                },
-                Origin:window.location.origin     // set 'Origin' header to meet CORS requirements
-        });
+        this.axiosClient = Utils.createAxiosClient(); 
 
         this.queryUrl = props.queryUrl;
         this.postUrl = props.postUrl;
@@ -51,7 +45,8 @@ export class WebClient extends React.Component {
             activeId: '',
             mode: WebClient.MODES.VIEW,
             data: [],
-            error: ''
+            error: '',
+            postResponse: ''
         }
 
     }
@@ -79,12 +74,12 @@ export class WebClient extends React.Component {
         setTimeout(()=>this.setState(Object.assign({}, this.state, {showSpinner: true})), 500);
     }
 
-    createDataViewer(Viewer, obj, key){
+    createDataViewer(obj, key){
         let dataId = this.getId(obj);
         let active = dataId===this.state.activeId;
 
         return (
-            <Viewer key={key} data={obj} dataId={dataId} active={active} 
+            <this.viewer key={key} data={obj} dataId={dataId} active={active} 
                 hideFields={this.hideFields}
                 close={()=>this.closeViewer()}
                 remove={()=>this.removeObject(obj)}
@@ -101,7 +96,7 @@ export class WebClient extends React.Component {
         
         return (
             <div className='tab-content' id='data-viewer'>
-                {this.state.data.map((obj, index)=>this.createDataViewer(this.viewer, obj, index))}
+                {this.state.data.map((obj, index)=>this.createDataViewer(obj, index))}
             </div>
         );
     }
@@ -146,7 +141,7 @@ export class WebClient extends React.Component {
         );
     }
 
-    renderDataEditor(Editor){
+    renderDataEditor(){
         if (WebClient.MODES.VIEW===this.state.mode){
             return '';
         }
@@ -154,12 +149,12 @@ export class WebClient extends React.Component {
         if (WebClient.MODES.EDIT===this.state.mode){
             let obj = this.state.data.find(o=>this.getId(o)===this.state.activeId);
             return (
-                    <Editor save={s=>this.updateObject(s)} data={obj} close={()=>this.closeViwer()}/>
+                    <this.editor save={s=>this.updateObject(s)} data={obj} close={()=>this.closeViwer()} handleError={e=>this.handleError(e)}/>
                 );
         }
 
         return (
-                <Editor save={s=>this.addObject(s)} close={()=>this.closeViewer()}/>
+                <this.editor save={s=>this.addObject(s)} close={()=>this.closeViewer()} handleError={e=>this.handleError(e)}/>
         );
     }
 
@@ -170,6 +165,7 @@ export class WebClient extends React.Component {
     addObject(obj){
         this.axiosClient.post(this.postUrl, Utils.clean(obj))
         .then(response => {
+            this.setState(Object.assign({}, this.state, {postResponse: response.data}));
             this.refresh();
         })
         .catch(error => {
@@ -209,6 +205,18 @@ export class WebClient extends React.Component {
         }
     }
 
+    renderPostResponse(){
+        if (!Utils.isEmpty(this.state.postResponse)){
+            return (
+                <this.viewer data={this.state.postResponse} dataId='post-response' active='true'
+                    close={()=>this.closeViewer()}
+                    handleError={e=>this.handleError(e)}
+                />
+            );
+        }
+    }
+
+
     render(){
         let clientView;
 
@@ -232,8 +240,9 @@ export class WebClient extends React.Component {
                             </div>
                             <div className='col-8'>
                                 {this.renderDataViewers()}
-                                {this.renderDataEditor(this.editor)}
+                                {this.renderDataEditor()}
                                 {this.renderError()}
+                                {this.renderPostResponse()}
                             </div>
                         </div>
         }

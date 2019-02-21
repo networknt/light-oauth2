@@ -32,30 +32,42 @@ export const JSONViewer = ({data, dataId, active, hideFields, close, edit, remov
         hideFields.forEach(f=>delete displayData[f]);
     }
 
+    let removeControl;
+
+    if (remove){
+        removeControl=<button type="button" title='remove' className="icon-button" aria-label="Delete" onClick={data=>remove(data)}>
+                <i className="material-icons">delete_sweep</i>
+            </button>;
+    }
+
+    let editControl;
+
+    if (edit){
+        editControl=<button type="button" title='edit' className="icon-button" aria-label="Edit" onClick={data=>edit(data)}>
+                <i className="material-icons">create</i>
+            </button>;
+    }
+
 
     return (
         <div className='tab-pane fade show active' id={Utils.toViewerId(dataId)} role='tabpanel'>
             <button type="button" title='close' className="icon-button" aria-label="Close" onClick={()=>close()}>
                 <i className="material-icons">clear</i>
             </button>
-            <button type="button" title='remove' className="icon-button" aria-label="Delete" onClick={data=>remove(data)}>
-                <i className="material-icons">delete_sweep</i>
-            </button>
-            <button type="button" title='edit' className="icon-button" aria-label="Edit" onClick={data=>edit(data)}>
-                <i className="material-icons">create</i>
-            </button>
+            {removeControl}
+            {editControl}
 
             {additionalControls}
 
-            <pre>{JSON.stringify(displayData, null, 4)}</pre>
+            <textarea readOnly value={JSON.stringify(displayData, null, 4)} />
         </div>
     );
 }
 
-export const InputField = ({name, type, required, fieldDict}) => (
+export const InputField = ({name, type, required, disabled, fieldDict}) => (
     <div className={`form-group ${required?'required':''}`}>
         <label htmlFor={name} className='control-label'>{fieldDict[name].label}</label>
-        <Field className='form-control' name={name} type={type} placeholder={fieldDict[name].placeholder}/>
+        <Field className='form-control' name={name} type={type} disabled={disabled} placeholder={fieldDict[name].placeholder}/>
         <ErrorMessage name={name} render={msg => <div className='error-message pl-1'>{msg}</div>}/>
     </div>
 );
@@ -74,7 +86,7 @@ export const InputSelect = ({name, required, options, fieldDict}) => (
         <Field className='form-control' component='select' name={name}>
             <option value=''> Please select </option>
             {
-                options.map((item, index) => <option key={index} value={item}> {Utils.capitalize(item)} </option>)
+                options.map((item, index) => <option key={index} value={item}> {Utils.replace(Utils.capitalize(item), '_', ' ')} </option>)
             }
         </Field>
         <ErrorMessage name={name} render={msg => <div className='error-message pl-1'>{msg}</div>}/>

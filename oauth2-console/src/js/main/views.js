@@ -3,7 +3,7 @@ import {WebClient} from '../components/webclient.js';
 import {Views} from '../common/common.js';
 import {ServiceEditor} from '../components/serviceEditor.js';
 import {ClientEditor} from '../components/clientEditor.js';
-import {UserViewer, UserEditor} from '../components/userWidgets.js';
+import {UserViewer, UserEditor} from '../components/userView.js';
 import {JSONViewer} from '../components/widgets.js';
 
 export const Service = () => (
@@ -31,6 +31,7 @@ export const Client = () => (
         getDeleteUrl={client=>process.env.REACT_APP_CLIENTS_URL + '/' + client.clientId}
         viewer={JSONViewer}
         editor={ClientEditor}
+        hideFields={['clientSecret']}
     />
 );
 
@@ -47,4 +48,8 @@ export const User  = () => (
         editor={UserEditor}
         hideFields={['password', 'passwordConfirm']}
     />
+);
+
+export const Key = ()=>(
+    <div> key </div>
 );

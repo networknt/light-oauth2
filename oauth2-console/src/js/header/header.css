@@ -62,3 +62,11 @@ li {
 [role=banner] nav a:hover {
     background-color: #c02c70;
 }
+
+a.help {
+    display: block;
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-right: 20px;
+	text-decoration: none;
+}

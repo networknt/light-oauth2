@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 import * as Yup from 'yup';
 import { Formik, Form } from 'formik';
 import { InputField, InputTextArea, InputSelect } from './widgets.js';
@@ -65,17 +64,22 @@ export class ClientEditor extends React.Component {
             userIds: []
         }
 
+        this.axiosClient = Utils.createAxiosClient();
         this.userQueryUrl = process.env.REACT_APP_USERS_URL + process.env.REACT_APP_DEFAULT_PAGE_ARG;
         this.save=props.save;
         this.close=props.close;
+        this.handleError=props.handleError;
     }
 
     componentDidMount(){
-        axios.get(this.userQueryUrl, {Origin:window.location.origin}) //set 'Origin' header to meet CORS requirements
+        this.axiosClient.get(this.userQueryUrl)
         .then(response => {
             const userIds = response.data.slice().map(user=>user.userId);
 
             this.setState({userIds: userIds});
+        })
+        .catch(error => {
+            this.handleError(error);
         });
     }
 
@@ -91,7 +95,7 @@ export class ClientEditor extends React.Component {
         };
         
         return (
-            <div className={this.props.className} id='service-detail-editor'>
+            <div className={this.props.className} id='client-detail-editor'>
                 <Formik
                     enableReinitialize
                     initialValues={initialValues}

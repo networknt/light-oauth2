@@ -25,3 +25,12 @@
     opacity: .5;
 }
 
+div.standalone {
+    height: 380px;
+}
+
+div.standalone>.tab-pane, div.standalone textarea{
+    width: 100%;
+    height: 100%;
+}
+
