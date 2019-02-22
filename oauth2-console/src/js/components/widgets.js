@@ -19,7 +19,7 @@ export const LabelItem = ({dataId, active, itemName, onClick}) => {
     );
 }
 
-export class JSONViewer extends React.Component{
+export class DataViewer extends React.Component{
     componentDidMount() { // required for initial resize()
         Utils.resize();
     }
@@ -35,10 +35,16 @@ export class JSONViewer extends React.Component{
             );
         }
 
-        let displayData = Object.assign({}, this.props.data);
+        let displayData = this.props.data;
 
-        if (!Utils.isEmpty(this.props.hideFields)){
-            this.props.hideFields.forEach(f=>delete displayData[f]);
+        if (this.props.type!=='text'){
+            displayData = Object.assign({}, this.props.data);
+
+            if (!Utils.isEmpty(this.props.hideFields)){
+                this.props.hideFields.forEach(f=>delete displayData[f]);
+            }
+
+            displayData = JSON.stringify(displayData, null, 4);
         }
 
         let removeControl;
@@ -68,7 +74,7 @@ export class JSONViewer extends React.Component{
 
                 {this.props.additionalControls}
 
-                <textarea readOnly value={JSON.stringify(displayData, null, 4)} />
+                <textarea className='code' readOnly value={displayData} />
             </div>
         );
     }

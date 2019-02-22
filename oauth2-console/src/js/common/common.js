@@ -1,5 +1,6 @@
-import { Service, Client, User, Key } from '../main/views.js';
+import { Service, Client, User } from '../main/views.js';
 import {TokenView} from '../components/tokenView.js';
+import {KeyView} from '../components/keyView.js';
 
 export const Views = {
     SERVICE: {
@@ -30,6 +31,6 @@ export const Views = {
                 name: "Key",
                 path: "/key",
                 dataType: "key",
-                component: Key 
+                component: KeyView 
           }
 };

@@ -34,3 +34,6 @@ div textarea{
     resize: none; 
 }
 
+.code {
+    font-family: "inconsolata",Menlo,Monaco,"Courier New",monospace;
+}

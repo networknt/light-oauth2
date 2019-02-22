@@ -4,7 +4,7 @@ import {Views} from '../common/common.js';
 import {ServiceEditor} from '../components/serviceEditor.js';
 import {ClientEditor} from '../components/clientEditor.js';
 import {UserViewer, UserEditor} from '../components/userView.js';
-import {JSONViewer} from '../components/widgets.js';
+import {DataViewer} from '../components/widgets.js';
 
 export const Service = () => (
     <WebClient 
@@ -15,7 +15,7 @@ export const Service = () => (
         getId={service=>service.serviceId} 
         getName={service=>service.serviceName} 
         getDeleteUrl={service=>process.env.REACT_APP_SERVICES_URL + '/' + service.serviceId}
-        viewer={JSONViewer}
+        viewer={DataViewer}
         editor={ServiceEditor}
     />
 );
@@ -29,7 +29,7 @@ export const Client = () => (
         getId={client=>client.clientId} 
         getName={client=>client.clientName} 
         getDeleteUrl={client=>process.env.REACT_APP_CLIENTS_URL + '/' + client.clientId}
-        viewer={JSONViewer}
+        viewer={DataViewer}
         editor={ClientEditor}
         hideFields={['clientSecret']}
     />
@@ -48,8 +48,4 @@ export const User  = () => (
         editor={UserEditor}
         hideFields={['password', 'passwordConfirm']}
     />
-);
-
-export const Key = ()=>(
-    <div> key </div>
 );

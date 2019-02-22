@@ -1,7 +1,7 @@
 import React from 'react';
 import * as Yup from 'yup';
 import { Formik, Form } from 'formik';
-import { InputField, InputTextArea, InputSelect, JSONViewer } from './widgets.js';
+import { InputField, InputTextArea, InputSelect, DataViewer } from './widgets.js';
 import Utils from '../common/utils.js';
 import './editor.css';
 
@@ -239,7 +239,7 @@ export class UserViewer extends React.Component {
             let editorToggler = <button type='button' className='icon-button' aria-label='reset password' title='reset password' onClick={()=>this.openPasswordEditor()}>
                                     <i className='material-icons'>rotate_left</i>
                                 </button>;
-            return (<JSONViewer additionalControls={editorToggler} {...this.props}/>);
+            return (<DataViewer additionalControls={editorToggler} {...this.props}/>);
         }
     }
 }

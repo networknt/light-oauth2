@@ -2,7 +2,7 @@ import React from 'react';
 import qs from 'querystring';
 import * as Yup from 'yup';
 import { Formik, Form } from 'formik';
-import { InputField, InputSelect, JSONViewer } from './widgets.js';
+import { InputField, InputSelect, DataViewer } from './widgets.js';
 import Utils from '../common/utils.js';
 import './editor.css';
 
@@ -161,7 +161,7 @@ export class TokenView extends React.Component {
 
         return (
             <div className='col-12 standalone'>
-                <JSONViewer data={data} dataId={dataId} active={active} 
+                <DataViewer data={data} dataId={dataId} active={active} 
                     close={()=>this.closeViewer()}
                     handleError={e=>this.handleError(e)}
                 />
