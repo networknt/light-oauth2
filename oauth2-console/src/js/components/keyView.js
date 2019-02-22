@@ -64,16 +64,30 @@ export class KeyView extends React.Component {
     constructor(props){
         super(props);
 
-        this.state = {
-            cert: ''
-        }
+        this.state={
+            loading: true,
+            showSpinner: false,
+            cert: '',
+            error: ''
+        };
 
         this.axiosClient = Utils.createAxiosClient(); 
 
         this.keyQueryUrl = process.env.REACT_APP_KEY_URL
     }
 
+    resetStatus(){
+        this.setState({
+            loading: true,
+            showSpinner: false,
+            cert: '',
+            error: ''
+        });
+    }
+
     requestCert(r){
+        this.resetStatus();
+
         let authStr = 'Basic ' + btoa(r['client_id'] + ':' + r['client_secret']);
         let config = {
           headers: {
@@ -87,11 +101,15 @@ export class KeyView extends React.Component {
         .then(response => {
             const data = response.data;
 
-            this.setState({cert: data});
+            this.setState({cert: data, loading: false});
         })
         .catch(error => {
+            this.setState(Object.assign({}, this.state, {loading: false, showSpinner: false}));
             this.handleError(error);
         });
+
+        // only show the spinner when it takes too long to load
+        setTimeout(()=>this.setState(Object.assign({}, this.state, {showSpinner: true})), 500);
     }
 
     closeViewer(){
@@ -103,6 +121,16 @@ export class KeyView extends React.Component {
     }
 
     renderViewer(){
+        if (this.state.loading){
+            if (this.state.showSpinner){
+                return <div className='col-12'>
+                            <div className='spinner-border text-primary m-5' role='status'>
+                                <span className='sr-only'>Loading...</span>
+                            </div>
+                        </div>;
+            }
+        }
+
         if (Utils.isEmpty(this.state.cert)){
             return '';
         }

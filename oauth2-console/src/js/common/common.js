@@ -34,3 +34,11 @@ export const Views = {
                 component: KeyView 
           }
 };
+/*
+    PROVIDER: {
+                name: "Providers",
+                path: "/providers",
+                dataType: "provider",
+                component: Provider 
+          }
+          */

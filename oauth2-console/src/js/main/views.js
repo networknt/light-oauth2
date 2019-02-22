@@ -49,3 +49,19 @@ export const User  = () => (
         hideFields={['password', 'passwordConfirm']}
     />
 );
+
+/* not in docker by default
+export const Provider = ()=>(
+    <WebClient 
+        dataType={Views.PROVIDER.dataType}
+        queryUrl={process.env.REACT_APP_PROVIDERS_URL} 
+        postUrl={process.env.REACT_APP_PROVIDERS_URL} 
+        putUrl={process.env.REACT_APP_PROVIDERS_URL} 
+        getId={provider=>provider.providerId} 
+        getName={provider=>provider.providerName} 
+        getDeleteUrl={provider=>process.env.REACT_APP_PROVIDERS_URL + '/' + provider.providerId}
+        viewer={DataViewer}
+        editor={UserEditor}
+    />
+);
+*/

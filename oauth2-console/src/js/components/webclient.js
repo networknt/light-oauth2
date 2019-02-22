@@ -68,6 +68,15 @@ export class WebClient extends React.Component {
                 error: ''});
 
            callback && callback();
+        })
+        .catch(error=>{
+            this.setState({
+                activeId: '',
+                mode: WebClient.MODES.VIEW,
+                loading: false,
+                showSpinner: false});
+
+           this.handleError(error); 
         });
 
         // only show the spinner when it takes too long to load
