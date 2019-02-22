@@ -1,4 +1,5 @@
 import axios from 'axios';
+import $ from 'jquery';
 
 export default class Utils{
     static isEmpty(s){
@@ -55,5 +56,15 @@ export default class Utils{
         }
 
         return formData;
+    }
+
+    static resize(){
+        $('textarea').each((index, text)=>{
+            text.style.height = 'auto';
+            text.style.height = text.scrollHeight + 'px';
+
+
+            console.log($(text).height());
+        });
     }
 } 

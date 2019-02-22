@@ -104,6 +104,7 @@ export class WebClient extends React.Component {
     openEditor(mode){
         const copiedState = Object.assign({}, this.state);
         copiedState.mode=mode;
+        copiedState.postResponse='';
 
         if (WebClient.MODES.ADD===mode){
             copiedState.activeServiceId='';
@@ -118,6 +119,7 @@ export class WebClient extends React.Component {
 
         copiedState.activeId='';
         copiedState.mode=WebClient.MODES.VIEW;
+        copiedState.postResponse='';
 
         this.setState(copiedState);
     }
@@ -127,6 +129,7 @@ export class WebClient extends React.Component {
 
         copiedState.activeId=dataId;
         copiedState.mode=WebClient.MODES.VIEW;
+        copiedState.postResponse='';
 
         this.setState(copiedState);
     }
@@ -215,7 +218,6 @@ export class WebClient extends React.Component {
             );
         }
     }
-
 
     render(){
         let clientView;
