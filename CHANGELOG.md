@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.5.29](https://github.com/networknt/light-oauth2/tree/1.5.29) (2019-02-11)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.28...1.5.29)
+
+## [1.5.28](https://github.com/networknt/light-oauth2/tree/1.5.28) (2019-01-12)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.27...1.5.28)
+
 ## [1.5.27](https://github.com/networknt/light-oauth2/tree/1.5.27) (2019-01-12)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.25...1.5.27)
 
