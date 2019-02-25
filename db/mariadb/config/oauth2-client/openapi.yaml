@@ -12,6 +12,12 @@ servers:
    - url: 'https://oauth2.networknt.com'    
 paths:
   /oauth2/client:
+    options:
+      description: Return permissions
+      operationId: checkPermisson
+      responses:
+        '200':
+          description: Successful response    
     post:
       description: Return a client object
       operationId: createClient
@@ -79,6 +85,12 @@ paths:
         - client_auth:
             - oauth.client.r
   '/oauth2/client/{clientId}':
+    options:
+      description: Return permissions
+      operationId: checkPermisson
+      responses:
+        '200':
+          description: Successful response   
     delete:
       description: Delete a client by Id
       operationId: deleteClient

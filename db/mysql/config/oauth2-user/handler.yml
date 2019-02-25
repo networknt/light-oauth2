@@ -42,6 +42,7 @@ handlers:
   - com.networknt.audit.AuditHandler@audit
   - com.networknt.sanitizer.SanitizerHandler@sanitizer
   - com.networknt.openapi.ValidatorHandler@validator
+  - com.networknt.cors.CorsHttpHandler@cors
   # Customer business domain specific cross-cutting concerns handlers
   # - com.example.validator.CustomizedValidator@custvalidator
   # Framework endpoint handlers
@@ -69,8 +70,13 @@ chains:
     - audit
     - sanitizer
     - validator
+    - cors
 
 paths:
+  - path: '/oauth2/user'
+    method: 'options'
+    exec:
+      - cors
   - path: '/oauth2/user'
     method: 'get'
     exec:
@@ -87,6 +93,10 @@ paths:
       - default
       - com.networknt.oauth.user.handler.Oauth2UserPutHandler
   - path: '/oauth2/user/{userId}'
+    method: 'options'
+    exec:
+      - cors
+  - path: '/oauth2/user/{userId}'
     method: 'delete'
     exec:
       - default
@@ -101,7 +111,11 @@ paths:
     exec:
       - default
       - com.networknt.oauth.user.handler.Oauth2PasswordUserIdPostHandler
-
+  - path: '/oauth2/password/{userId}'
+    method: 'options'
+    exec:
+      - cors
+      
   - path: '/health/com.networknt.oauth2-user-1.0.0'
     method: 'get'
     exec:

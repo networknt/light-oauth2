@@ -12,6 +12,12 @@ servers:
   - url: 'https://oauth2.networknt.com'    
 paths:
   /oauth2/token:
+    options:
+      description: Return permissions
+      operationId: checkPermisson
+      responses:
+        '200':
+          description: Successful response     
     post:
       description: JSON object that contains access token
       operationId: postToken

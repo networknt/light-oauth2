@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 public class ServiceAuditHandler extends AuditInfoHandler {
     static final Logger logger = LoggerFactory.getLogger(ServiceAuditHandler.class);
-    private final static String CONFIG = "oauth_service";
-    private final static OauthServiceConfig oauth_config = (OauthServiceConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthServiceConfig.class);
+    static final String CONFIG = "oauth_service";
+    static final OauthServiceConfig oauth_config = (OauthServiceConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthServiceConfig.class);
 
 
     protected void processAudit(HttpServerExchange exchange) throws Exception{

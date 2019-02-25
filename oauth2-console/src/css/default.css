@@ -1,0 +1,29 @@
+@font-face {
+  font-family:"Muli";
+  font-style:normal;
+  font-weight:200;
+  src: url("../fonts/muli-latin-200.woff2") format("woff2"),
+}
+
+@font-face {
+  font-family:"Muli";
+  font-style:normal;
+  font-weight:400;
+  src: url("../fonts/muli-latin-200.woff2") format("woff2"),
+}
+
+@font-face {
+  font-family:"Muli";
+  font-style:normal;
+  font-weight:800;
+  src: url("../fonts/muli-latin-800.woff2") format("woff2"),
+}
+
+body {
+  font-family:-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  margin: 0;
+}
+
+ol, ul {
+  padding-left: 30px;
+}

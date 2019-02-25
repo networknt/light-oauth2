@@ -1,0 +1,72 @@
+[role=banner] a.logo-text {
+    display: block;
+    font: 800 22px Muli, sans-serif;
+    color: white;
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-right: 20px;
+	text-decoration: none;
+}
+
+[role=banner]{
+    background-color: #9e2159;
+	display: flex;
+	align-items: center;
+	height: 48px;
+}
+
+[role=banner]>div {
+    display: flex;
+	align-items: center;
+    flex-grow: 1;
+}
+
+[role=banner] nav ul{
+    display: flex;
+}
+
+ul{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+li {
+    display: list-item;
+}
+
+[role=banner] nav a {
+    font-size: 1.2em;
+	letter-spacing: .03em;
+    background-color: #9e2159;
+    color: #fff;
+	display: block;
+	cursor: pointer;
+    border-width: 0;
+    border-radius: 4px;
+    outline: none;
+    padding: 3px 12px;
+    margin-top: 5px;
+    margin-right: 10px;
+	text-decoration: none;
+}
+
+[role=banner] nav a.selected, [role=banner] nav a:hover {
+    outline: none;
+}
+
+[role=banner] nav a.selected {
+    background-color: #5a1434;
+}
+
+[role=banner] nav a:hover {
+    background-color: #c02c70;
+}
+
+a.help {
+    display: block;
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-right: 20px;
+	text-decoration: none;
+}

@@ -1,0 +1,39 @@
+.error-message{
+    color: red;
+    font-size: 0.8em;
+}
+
+.form-group.required .control-label:after {
+  content:"*";
+  color:red;
+}
+
+.capitalized {
+    text-transform: capitalize;
+}
+
+.icon-button {
+    padding: 0px 5px;
+    background-color: transparent;
+    border: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    float: right;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+}
+
+div textarea{
+    width: 100%;
+    border: none;
+    overflow: auto;
+    outline: none;
+    box-shadow: none;
+    resize: none; 
+}
+
+.code {
+    font-family: "inconsolata",Menlo,Monaco,"Courier New",monospace;
+}
