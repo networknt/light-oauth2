@@ -62,9 +62,6 @@ export default class Utils{
         $('textarea').each((index, text)=>{
             text.style.height = 'auto';
             text.style.height = text.scrollHeight + 'px';
-
-
-            console.log($(text).height());
         });
     }
 } 
