@@ -161,7 +161,7 @@ export class WebClient extends React.Component {
         if (WebClient.MODES.EDIT===this.state.mode){
             let obj = this.state.data.find(o=>this.getId(o)===this.state.activeId);
             return (
-                    <this.editor save={s=>this.updateObject(s)} data={obj} close={()=>this.closeViwer()} handleError={e=>this.handleError(e)}/>
+                    <this.editor save={s=>this.updateObject(s)} data={obj} close={()=>this.closeViewer()} handleError={e=>this.handleError(e)}/>
                 );
         }
 
