@@ -1,5 +1,20 @@
 # Change Log
 
+## [1.5.31](https://github.com/networknt/light-oauth2/tree/1.5.31) (2019-03-02)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.30...1.5.31)
+
+**Closed issues:**
+
+- rollback cors in the handler.yml for oauth-console [\#159](https://github.com/networknt/light-oauth2/issues/159)
+
+**Merged pull requests:**
+
+- fix typo - \#155 [\#158](https://github.com/networknt/light-oauth2/pull/158) ([dz-1](https://github.com/dz-1))
+- add web console  - \#155 [\#157](https://github.com/networknt/light-oauth2/pull/157) ([dz-1](https://github.com/dz-1))
+
+## [1.5.30](https://github.com/networknt/light-oauth2/tree/1.5.30) (2019-02-16)
+[Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.29...1.5.30)
+
 ## [1.5.29](https://github.com/networknt/light-oauth2/tree/1.5.29) (2019-02-11)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.28...1.5.29)
 
