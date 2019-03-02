@@ -12,12 +12,6 @@ servers:
   - url: 'https://oauth2.networknt.com'    
 paths:
   /oauth2/service:
-    options:
-      description: Return permissions
-      operationId: checkPermisson
-      responses:
-        '200':
-          description: Successful response   
     post:
       description: Return a service object
       operationId: createService
@@ -85,12 +79,6 @@ paths:
         - service_auth:
             - oauth.service.r
   '/oauth2/service/{serviceId}':
-    options:
-      description: Return permissions
-      operationId: checkPermisson
-      responses:
-        '200':
-          description: Successful response   
     delete:
       description: Delete a service by Id
       operationId: deleteService

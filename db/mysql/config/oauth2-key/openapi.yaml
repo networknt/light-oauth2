@@ -12,12 +12,6 @@ servers:
   - url: 'https://oauth2.networknt.com'    
 paths:
   '/oauth2/key/{keyId}':
-    options:
-      description: Return permissions
-      operationId: checkPermisson
-      responses:
-        '200':
-          description: Successful response     
     get:
       description: Get a key by Id
       operationId: getKeyById

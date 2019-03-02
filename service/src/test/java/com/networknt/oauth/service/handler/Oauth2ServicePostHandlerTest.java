@@ -33,7 +33,7 @@ public class Oauth2ServicePostHandlerTest {
     public static TestServer server = TestServer.getInstance();
 
     static final Logger logger = LoggerFactory.getLogger(Oauth2ServicePostHandlerTest.class);
-    
+
     @Test
     public void testOauth2ServicePostHandler() throws ClientException, ApiException, UnsupportedEncodingException {
         String service = "{\"serviceId\":\"AACT0005\",\"serviceType\":\"swagger\",\"serviceName\":\"Retail Account\",\"serviceDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\",\"ownerId\":\"admin\"}";
