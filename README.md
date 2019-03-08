@@ -1,9 +1,13 @@
 A fast, light weight and cloud native OAuth 2.0 Server based on microservices architecture 
 built on top of light-4j and light-rest-4j frameworks. 
 
-[Developer Chat](https://gitter.im/networknt/light-oauth2) |
+[Stack Overflow](https://stackoverflow.com/questions/tagged/light-4j) |
+[Google Group](https://groups.google.com/forum/#!forum/light-4j) |
+[Gitter Chat](https://gitter.im/networknt/light-oauth2) |
+[Subreddit](https://www.reddit.com/r/lightapi/) |
+[Youtube Channel](https://www.youtube.com/channel/UCHCRMWJVXw8iB7zKxF55Byw) |
 [Documentation](https://doc.networknt.com/service/oauth/) |
-[Contribution Guide](CONTRIBUTING.md) |
+[Contribution Guide](https://doc.networknt.com/contribute/) |
 
 [![Build Status](https://travis-ci.org/networknt/light-oauth2.svg?branch=master)](https://travis-ci.org/networknt/light-oauth2)
 
