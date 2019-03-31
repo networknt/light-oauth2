@@ -1,6 +1,16 @@
 package com.networknt.oauth.code;
 
+import static com.networknt.oauth.spnego.KerberosKDCUtil.login;
+
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.security.auth.Subject;
+
 import com.networknt.config.Config;
+import com.networknt.handler.HandlerProvider;
 import com.networknt.health.HealthGetHandler;
 import com.networknt.info.ServerInfoGetHandler;
 import com.networknt.oauth.code.handler.Oauth2CodeGetHandler;
@@ -8,7 +18,7 @@ import com.networknt.oauth.code.handler.Oauth2CodePostHandler;
 import com.networknt.oauth.security.LightBasicAuthenticationMechanism;
 import com.networknt.oauth.security.LightGSSAPIAuthenticationMechanism;
 import com.networknt.oauth.security.LightIdentityManager;
-import com.networknt.handler.HandlerProvider;
+
 import io.undertow.Handlers;
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.AuthenticationMode;
@@ -26,18 +36,12 @@ import io.undertow.server.session.SessionAttachmentHandler;
 import io.undertow.server.session.SessionCookieConfig;
 import io.undertow.util.Methods;
 
-import javax.security.auth.Subject;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static com.networknt.oauth.spnego.KerberosKDCUtil.login;
-
 public class PathHandlerProvider implements HandlerProvider {
     private static final String SPNEGO_SERVICE_PASSWORD = "spnegoServicePassword";
     private static final String SECRET_CONFIG = "secret";
+    private static final String SERVER_CONFIG = "server";
     private static final Map<String, Object> secret = Config.getInstance().getJsonMapConfig(SECRET_CONFIG);
+    private static final Map<String, Object> server = Config.getInstance().getJsonMapConfigNoCache(SERVER_CONFIG);
     private static final String spnegoServicePassword = (String)secret.get(SPNEGO_SERVICE_PASSWORD);
 
     @Override
@@ -45,7 +49,7 @@ public class PathHandlerProvider implements HandlerProvider {
         final IdentityManager basicIdentityManager = new LightIdentityManager();
 
         HttpHandler handler = Handlers.routing()
-            .add(Methods.GET, "/health", new HealthGetHandler())
+            .add(Methods.GET, "/health/"+server.get("serviceId"), new HealthGetHandler())
             .add(Methods.GET, "/server/info", new ServerInfoGetHandler())
             .add(Methods.GET, "/oauth2/code", addGetSecurity(new Oauth2CodeGetHandler(), basicIdentityManager))
             .add(Methods.POST, "/oauth2/code", addFormSecurity(new Oauth2CodePostHandler(), basicIdentityManager))
@@ -63,6 +67,7 @@ public class PathHandlerProvider implements HandlerProvider {
         handler = new AuthenticationMechanismsHandler(handler, mechanisms);
         handler = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, identityManager, handler);
         handler = new SessionAttachmentHandler(handler, new InMemorySessionManager("oauth2"), new SessionCookieConfig());
+        
         return handler;
     }
 
@@ -78,6 +83,7 @@ public class PathHandlerProvider implements HandlerProvider {
         mechanisms.add(new LightBasicAuthenticationMechanism("OAuth"));
         handler = new AuthenticationMechanismsHandler(handler, mechanisms);
         handler = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, identityManager, handler);
+        
         return handler;
     }
 
