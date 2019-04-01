@@ -3,6 +3,7 @@ package com.networknt.oauth.token.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
+import com.networknt.client.oauth.SignRequest;
 import com.networknt.config.Config;
 import com.networknt.exception.ApiException;
 import com.networknt.handler.LightHttpHandler;
