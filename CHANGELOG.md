@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.6.0](https://github.com/networknt/light-oauth2/tree/1.6.0) (2019-04-06)
+
+
+**Merged pull requests:**
+
+
+- fixes \#162 update sign service to use the SignRequest from client module [\#163](https://github.com/networknt/light-oauth2/pull/163) ([stevehu](https://github.com/stevehu))
+- fix oauth2-code health check path - \#160 [\#161](https://github.com/networknt/light-oauth2/pull/161) ([dz-1](https://github.com/dz-1))
 ## [1.5.31](https://github.com/networknt/light-oauth2/tree/1.5.31) (2019-03-02)
 [Full Changelog](https://github.com/networknt/light-oauth2/compare/1.5.30...1.5.31)
 
