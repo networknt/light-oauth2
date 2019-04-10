@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import io.swagger.annotations.ApiModelProperty;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -71,7 +70,6 @@ public class User implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "a unique id")
   @JsonProperty("userId")
   public String getUserId() {
     return userId;
@@ -86,7 +84,6 @@ public class User implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "user type")
   @JsonProperty("userType")
   public UserTypeEnum getUserType() {
     return userType;
@@ -101,7 +98,6 @@ public class User implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "first name")
   @JsonProperty("firstName")
   public String getFirstName() {
     return firstName;
@@ -116,7 +112,6 @@ public class User implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "last name")
   @JsonProperty("lastName")
   public String getLastName() {
     return lastName;
@@ -131,7 +126,6 @@ public class User implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "email address")
   @JsonProperty("email")
   public String getEmail() {
     return email;
@@ -146,7 +140,6 @@ public class User implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", value = "password")
   @JsonProperty("password")
   public String getPassword() {
     return password;
@@ -161,7 +154,6 @@ public class User implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", value = "password confirm")
   @JsonProperty("passwordConfirm")
   public String getPasswordConfirm() {
     return passwordConfirm;
@@ -177,7 +169,6 @@ public class User implements IdentifiedDataSerializable {
   }
 
 
-  @ApiModelProperty(example = "null", value = "user roles")
   @JsonProperty("roles")
   public String getRoles() {
     return roles;

@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import io.swagger.annotations.ApiModelProperty;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -114,7 +113,6 @@ public class Client implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", value = "a unique client id")
   @JsonProperty("clientId")
   public String getClientId() {
     return clientId;
@@ -129,7 +127,6 @@ public class Client implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", value = "client secret")
   @JsonProperty("clientSecret")
   public String getClientSecret() {
     return clientSecret;
@@ -144,7 +141,6 @@ public class Client implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "client type")
   @JsonProperty("clientType")
   public ClientTypeEnum getClientType() {
     return clientType;
@@ -159,7 +155,6 @@ public class Client implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", value = "client profile")
   @JsonProperty("clientProfile")
   public ClientProfileEnum getClientProfile() {
     return clientProfile;
@@ -174,7 +169,6 @@ public class Client implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "client name")
   @JsonProperty("clientName")
   public String getClientName() {
     return clientName;
@@ -189,7 +183,6 @@ public class Client implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "client description")
   @JsonProperty("clientDesc")
   public String getClientDesc() {
     return clientDesc;
@@ -204,7 +197,6 @@ public class Client implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "client owner id")
   @JsonProperty("ownerId")
   public String getOwnerId() {
     return ownerId;
@@ -219,7 +211,6 @@ public class Client implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "client scope separated by space")
   @JsonProperty("scope")
   public String getScope() {
     return scope;
@@ -234,7 +225,6 @@ public class Client implements IdentifiedDataSerializable {
   }
 
 
-  @ApiModelProperty(example = "null", value = "custom claim")
   @JsonProperty("customClaim")
   public String getCustomClaim() {
     return customClaim;
@@ -250,7 +240,6 @@ public class Client implements IdentifiedDataSerializable {
   }
 
 
-  @ApiModelProperty(example = "null", value = "redirect uri")
   @JsonProperty("redirectUri")
   public String getRedirectUri() {
     return redirectUri;
@@ -266,7 +255,6 @@ public class Client implements IdentifiedDataSerializable {
   }
 
 
-  @ApiModelProperty(example = "null", value = "authenticate class")
   @JsonProperty("authenticateClass")
   public String getAuthenticateClass() {
     return authenticateClass;
@@ -282,7 +270,6 @@ public class Client implements IdentifiedDataSerializable {
   }
 
 
-  @ApiModelProperty(example = "null", value = "de-reference token client id")
   @JsonProperty("derefClientId")
   public String getDerefClientId() {
     return derefClientId;
