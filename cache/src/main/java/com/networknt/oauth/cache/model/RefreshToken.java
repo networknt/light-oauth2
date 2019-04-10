@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import io.swagger.annotations.ApiModelProperty;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -37,7 +36,6 @@ public class RefreshToken implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "refresh token")
   @JsonProperty("refreshToken")
   public String getRefreshToken() {
     return refreshToken;
@@ -52,7 +50,6 @@ public class RefreshToken implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "user id")
   @JsonProperty("userId")
   public String getUserId() {
     return userId;
@@ -68,7 +65,6 @@ public class RefreshToken implements IdentifiedDataSerializable {
   }
 
 
-  @ApiModelProperty(example = "null", required = true, value = "user type")
   @JsonProperty("userType")
   public String getUserType() {
     return userType;
@@ -85,7 +81,6 @@ public class RefreshToken implements IdentifiedDataSerializable {
   }
 
 
-  @ApiModelProperty(example = "null", value = "user roles")
   @JsonProperty("roles")
   public String getRoles() {
     return roles;
@@ -101,7 +96,6 @@ public class RefreshToken implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "client id")
   @JsonProperty("clientId")
   public String getClientId() {
     return clientId;
@@ -116,7 +110,6 @@ public class RefreshToken implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", value = "service scopes separated by space")
   @JsonProperty("scope")
   public String getScope() {
     return scope;

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import io.swagger.annotations.ApiModelProperty;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -30,7 +29,6 @@ public class Provider implements IdentifiedDataSerializable {
   }
 
 
-  @ApiModelProperty(example = "null", required = true, value = "provider id")
   @JsonProperty("providerId")
   public String getProviderId() {
     return providerId;
@@ -41,7 +39,6 @@ public class Provider implements IdentifiedDataSerializable {
 
 
 
-  @ApiModelProperty(example = "null", required = true, value = "serverUrl")
   @JsonProperty("serverUrl")
   public String getServerUrl() {
     return serverUrl;
@@ -51,7 +48,6 @@ public class Provider implements IdentifiedDataSerializable {
   }
 
 
-  @ApiModelProperty(example = "null", required = true, value = "uri")
   @JsonProperty("uri")
   public String getUri() {
     return uri;
@@ -61,7 +57,6 @@ public class Provider implements IdentifiedDataSerializable {
   }
 
 
-  @ApiModelProperty(example = "null", value = "provider name")
   @JsonProperty("providerName")
   public String getProviderName() {
     return providerName;

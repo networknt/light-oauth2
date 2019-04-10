@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import io.swagger.annotations.ApiModelProperty;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -63,7 +62,6 @@ public class Service implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "a unique service id")
   @JsonProperty("serviceId")
   public String getServiceId() {
     return serviceId;
@@ -78,7 +76,6 @@ public class Service implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "service type")
   @JsonProperty("serviceType")
   public ServiceTypeEnum getServiceType() {
     return serviceType;
@@ -93,7 +90,6 @@ public class Service implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "service name")
   @JsonProperty("serviceName")
   public String getServiceName() {
     return serviceName;
@@ -108,7 +104,6 @@ public class Service implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", value = "service description")
   @JsonProperty("serviceDesc")
   public String getServiceDesc() {
     return serviceDesc;
@@ -123,7 +118,6 @@ public class Service implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", value = "service owner userId")
   @JsonProperty("ownerId")
   public String getOwnerId() {
     return ownerId;
@@ -138,7 +132,6 @@ public class Service implements IdentifiedDataSerializable {
   }
 
   
-  @ApiModelProperty(example = "null", required = true, value = "service scopes separated by space")
   @JsonProperty("scope")
   public String getScope() {
     return scope;
