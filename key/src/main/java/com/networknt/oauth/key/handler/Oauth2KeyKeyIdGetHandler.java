@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2016 Network New Technologies Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.networknt.oauth.key.handler;
 
 import com.hazelcast.core.IMap;
@@ -22,7 +38,6 @@ import org.slf4j.LoggerFactory;
 
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -30,12 +45,15 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static io.undertow.util.Headers.AUTHORIZATION;
 import static io.undertow.util.Headers.BASIC;
 
+/**
+ * Get certificate that is used to verify the particular kid passed as a parameter.
+ *
+ * @author Steve Hu
+ */
 public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements LightHttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2KeyKeyIdGetHandler.class);
 
@@ -164,7 +182,7 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
         String key = null;
 
         if(provider != null) {
-            KeyRequest keyRequest = new KeyRequest();
+            KeyRequest keyRequest = new KeyRequest(keyId);
             keyRequest.setServerUrl(provider.getServerUrl());
             keyRequest.setUri(provider.getUri() + "/00" + keyId);
             keyRequest.setEnableHttp2(true);
