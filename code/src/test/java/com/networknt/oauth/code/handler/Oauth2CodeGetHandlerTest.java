@@ -15,6 +15,7 @@ import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
 import org.junit.Assert;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -513,7 +514,8 @@ public class Oauth2CodeGetHandlerTest {
 
     }
 
-    //@Test
+    @Test
+    @Ignore
     public void testMarketPlaceClient() throws Exception {
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);

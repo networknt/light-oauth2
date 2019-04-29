@@ -139,3 +139,17 @@ paths:
                 - j_password
                 - response_type
                 - client_id
+  /health/{serviceId}:
+    get:
+      description: Return OK with response code 200 to indicate healthy
+      operationId: getHealth
+      parameters:
+        - name: serviceId
+          description: 'serviceId for the code service'
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Operation
