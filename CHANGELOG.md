@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.6.1](https://github.com/networknt/light-oauth2/tree/1.6.1) (2019-05-03)
+
+
+**Merged pull requests:**
+
+
+- fixes \#160 oauth2-code health check path does not have service ID [\#168](https://github.com/networknt/light-oauth2/pull/168) ([stevehu](https://github.com/stevehu))
+- fixes \#166 update KeyRequest constructor with kid parameter [\#167](https://github.com/networknt/light-oauth2/pull/167) ([stevehu](https://github.com/stevehu))
+- fixes \#164 remove swagger dependencies and use light-4j version only [\#165](https://github.com/networknt/light-oauth2/pull/165) ([stevehu](https://github.com/stevehu))
 ## [1.6.0](https://github.com/networknt/light-oauth2/tree/1.6.0) (2019-04-06)
 
 
