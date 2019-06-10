@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.networknt</groupId>
         <artifactId>light-oauth2</artifactId>
-        <version>1.6.3-SNAPSHOT</version>
+        <version>1.6.3</version>
         <relativePath>..</relativePath>
     </parent>
 
