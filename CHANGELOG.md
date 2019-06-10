@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.6.4](https://github.com/networknt/light-oauth2/tree/1.6.4) (2019-06-10)
+
+
+**Merged pull requests:**
+
+
+- fixes \#169 add both release and snapshot repositories [\#170](https://github.com/networknt/light-oauth2/pull/170) ([stevehu](https://github.com/stevehu))
 ## [1.6.2](https://github.com/networknt/light-oauth2/tree/1.6.2) (2019-05-17)
 
 
