@@ -2,13 +2,12 @@
 package com.networknt.oauth.provider.handler;
 
 import com.networknt.client.Http2Client;
-import com.networknt.exception.ApiException;
-import com.networknt.exception.ClientException;
+import com.networknt.status.exception.ApiException;
+import com.networknt.status.exception.ClientException;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
-import io.undertow.util.Headers;
 import io.undertow.util.Methods;
 import org.junit.Assert;
 import org.junit.ClassRule;

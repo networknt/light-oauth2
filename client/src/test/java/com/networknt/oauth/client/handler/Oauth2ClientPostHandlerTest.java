@@ -1,12 +1,10 @@
 package com.networknt.oauth.client.handler;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
-import com.networknt.exception.ApiException;
-import com.networknt.exception.ClientException;
 import com.networknt.status.Status;
+import com.networknt.status.exception.ApiException;
+import com.networknt.status.exception.ClientException;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
