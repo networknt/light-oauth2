@@ -106,6 +106,7 @@
         <versions.maven-version>2.4</versions.maven-version>
         <version.mariadb>1.1.7</version.mariadb>
         <version.javadoc-packagelist-plugin>1.0.0</version.javadoc-packagelist-plugin>
+        <version.maven-javadoc>3.1.0</version.maven-javadoc>
     </properties>
  
     <modules>
@@ -517,7 +518,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
+                <version>${version.maven-javadoc}</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
