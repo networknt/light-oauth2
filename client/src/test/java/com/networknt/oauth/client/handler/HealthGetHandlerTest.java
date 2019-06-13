@@ -1,8 +1,8 @@
 
 package com.networknt.oauth.client.handler;
 
-import com.networknt.status.exception.ApiException;
-import com.networknt.status.exception.ClientException;
+import com.networknt.exception.ApiException;
+import com.networknt.exception.ClientException;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;

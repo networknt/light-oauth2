@@ -27,8 +27,8 @@ import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.*;
 import com.networknt.status.Status;
-import com.networknt.status.exception.ApiException;
-import com.networknt.status.exception.ClientException;
+import com.networknt.exception.ApiException;
+import com.networknt.exception.ClientException;
 import com.networknt.utility.HashUtil;
 
 import io.undertow.server.HttpServerExchange;

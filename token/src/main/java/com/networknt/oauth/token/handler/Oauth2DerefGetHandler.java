@@ -5,7 +5,7 @@ import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.status.Status;
-import com.networknt.status.exception.ApiException;
+import com.networknt.exception.ApiException;
 import com.networknt.utility.HashUtil;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.FlexBase64;

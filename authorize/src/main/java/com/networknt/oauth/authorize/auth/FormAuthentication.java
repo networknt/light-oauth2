@@ -1,6 +1,6 @@
 package com.networknt.oauth.authorize.auth;
 
-import com.networknt.status.exception.ApiException;
+import com.networknt.exception.ApiException;
 import io.undertow.server.HttpServerExchange;
 
 /**

@@ -17,7 +17,7 @@ import com.networknt.security.JwtConfig;
 import com.networknt.security.JwtIssuer;
 import com.networknt.service.SingletonServiceFactory;
 import com.networknt.status.Status;
-import com.networknt.status.exception.ApiException;
+import com.networknt.exception.ApiException;
 import com.networknt.utility.CodeVerifierUtil;
 import com.networknt.utility.HashUtil;
 import com.networknt.utility.Util;

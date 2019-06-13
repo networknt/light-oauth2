@@ -4,7 +4,7 @@ import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.status.exception.ClientException;
+import com.networknt.exception.ClientException;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;

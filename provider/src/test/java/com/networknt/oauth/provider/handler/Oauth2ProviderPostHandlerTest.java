@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.networknt.client.Http2Client;
 import com.networknt.oauth.cache.model.Provider;
-import com.networknt.status.exception.ClientException;
+import com.networknt.exception.ClientException;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
