@@ -12,7 +12,7 @@ ENV JAVA_MINIMAL=/opt/jre
 RUN jlink \
     --verbose \
     --add-modules \
-        java.base,java.sql,java.naming,java.desktop,java.xml,jdk.crypto.cryptoki,jdk.unsupported,java.management \
+        java.base,java.sql,java.naming,java.desktop,java.xml,jdk.crypto.cryptoki,jdk.unsupported,java.management,java.security.jgss \
     --compress 2 \
     --strip-debug \
     --no-header-files \
