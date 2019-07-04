@@ -64,6 +64,9 @@ public class Oauth2CodePostHandlerTest {
             latch.await(10, TimeUnit.SECONDS);
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            System.out.println("statusCode = " + statusCode);
+            System.out.println("body = " + body);
+
             //Assert.assertEquals(statusCode, 302);
             // at this moment, an exception will help as it is redirected to localhost:8080 and it is not up.
         } catch (Exception e) {
