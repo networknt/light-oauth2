@@ -1,0 +1,8 @@
+path: /
+# This is the base used by docker
+# base: /login-view/build
+# This is the base that is used for IDE debugging
+base: /home/steve/networknt/light-oauth2/login-view/build
+prefix: true
+transferMinSize: 10485760
+directoryListingEnabled: false
