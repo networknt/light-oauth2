@@ -8,11 +8,21 @@ import { createStore, applyMiddleware } from 'redux';
 import rootReducer from './reducers';
 import thunk from 'redux-thunk';
 import logger from 'redux-logger';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
+const theme = createMuiTheme({
+    typography: {
+        useNextVariants: true,
+    },
+});
 
 const store = createStore(rootReducer, applyMiddleware(thunk, logger));
+
 ReactDOM.render(
     <Provider store={store}>
-        <App />
+        <MuiThemeProvider theme={theme}>
+            <App />
+        </MuiThemeProvider>
     </Provider>,
     document.getElementById('root')
 );
