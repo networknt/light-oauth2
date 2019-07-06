@@ -2,6 +2,7 @@ package com.networknt.oauth.code.handler;
 
 import com.networknt.config.Config;
 import com.networknt.oauth.security.LightBasicAuthenticationMechanism;
+import com.networknt.oauth.security.LightFormAuthenticationMechanism;
 import com.networknt.oauth.security.LightGSSAPIAuthenticationMechanism;
 import com.networknt.oauth.security.LightIdentityManager;
 import io.undertow.security.api.AuthenticationMechanism;
@@ -67,7 +68,7 @@ public class BaseWrapper {
         handler = new AuthenticationConstraintHandler(handler);
         final List<AuthenticationMechanism> mechanisms = new ArrayList<>();
         mechanisms.add(new CachedAuthenticatedSessionMechanism());
-        mechanisms.add(new FormAuthenticationMechanism("oauth2", "/login", "/error", "/oauth2/code"));
+        mechanisms.add(new LightFormAuthenticationMechanism("oauth2", "/login", "/error", "/oauth2/code"));
         handler = new AuthenticationMechanismsHandler(handler, mechanisms);
         handler = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, identityManager, handler);
         handler = new SessionAttachmentHandler(handler, new InMemorySessionManager("oauth2"), new SessionCookieConfig());

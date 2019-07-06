@@ -6,6 +6,7 @@ import com.networknt.service.SingletonServiceFactory;
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.IdentityManager;
+import io.undertow.security.idm.PasswordCredential;
 import org.ietf.jgss.GSSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
