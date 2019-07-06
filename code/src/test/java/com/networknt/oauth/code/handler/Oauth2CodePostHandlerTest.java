@@ -6,8 +6,12 @@ import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
 import io.undertow.client.ClientResponse;
+import io.undertow.server.handlers.form.FormEncodedDataDefinition;
 import io.undertow.util.Headers;
 import io.undertow.util.Methods;
+import org.apache.hc.core5.http.copied.NameValuePair;
+import org.apache.hc.core5.http.message.copied.BasicNameValuePair;
+import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -16,11 +20,15 @@ import org.xnio.IoUtils;
 import org.xnio.OptionMap;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static com.networknt.client.oauth.OauthHelper.encodeCredentials;
 
 
 /**
@@ -32,13 +40,22 @@ public class Oauth2CodePostHandlerTest {
 
     static final Logger logger = LoggerFactory.getLogger(Oauth2CodePostHandlerTest.class);
 
+    /**
+     * This is to simulate the incorrect credentials. It should redirect back to the login page
+     * to collect the user's credential.
+     *
+     * @throws Exception
+     */
     @Test
-    public void testAuthorizationCode() throws Exception {
+    public void testAuthorizationCodeWrongPassword() throws Exception {
         Map<String, String> params = new HashMap<>();
         params.put("j_username", "admin");
-        params.put("j_password", "123456");
+        // params.put("j_password", "123456");
+        params.put("j_password", "wrong");
         params.put("response_type", "code");
+        params.put("user_type", "employee");
         params.put("client_id", "59f347a0-c92d-11e6-9d9d-cec0c932ce01");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
 
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
@@ -56,7 +73,7 @@ public class Oauth2CodePostHandlerTest {
                 public void run() {
                     final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/code");
                     request.getRequestHeaders().put(Headers.HOST, "localhost");
-                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/json");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, FormEncodedDataDefinition.APPLICATION_X_WWW_FORM_URLENCODED);
                     request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
                     connection.sendRequest(request, client.createClientCallback(reference, latch, s));
                 }
@@ -65,9 +82,8 @@ public class Oauth2CodePostHandlerTest {
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             System.out.println("statusCode = " + statusCode);
-            System.out.println("body = " + body);
-
-            //Assert.assertEquals(statusCode, 302);
+            System.out.println("headers = " + reference.get().getResponseHeaders());
+            Assert.assertEquals(statusCode, 307);
             // at this moment, an exception will help as it is redirected to localhost:8080 and it is not up.
         } catch (Exception e) {
             logger.error("IOException: ", e);
@@ -77,4 +93,58 @@ public class Oauth2CodePostHandlerTest {
         }
 
     }
+
+    /**
+     * In this test, we pass in the correct form parameters to with the right credential. The result should be
+     * a 302 redirect back to the client application with the authorization code as well as other parameters.
+     * This test is to simulate the scenario that the login form is filled in and the request is send back again.
+     * @throws Exception
+     */
+    @Test
+    public void testAuthorizationCode() throws Exception {
+        Map<String, String> params = new HashMap<>();
+        params.put("j_username", "admin");
+        params.put("j_password", "123456");
+        params.put("response_type", "code");
+        params.put("user_type", "employee");
+        params.put("client_id", "59f347a0-c92d-11e6-9d9d-cec0c932ce01");
+        params.put("redirect_uri", "http://localhost:8080/authorization");
+
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6881"), Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+        String s = Http2Client.getFormDataString(params);
+        try {
+            connection.getIoThread().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/code");
+                    request.getRequestHeaders().put(Headers.HOST, "localhost");
+                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, FormEncodedDataDefinition.APPLICATION_X_WWW_FORM_URLENCODED);
+                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
+                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
+                }
+            });
+            latch.await(10, TimeUnit.SECONDS);
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            System.out.println("statusCode = " + statusCode);
+            System.out.println("headers = " + reference.get().getResponseHeaders());
+            Assert.assertEquals(statusCode, 302);
+            // at this moment, an exception will help as it is redirected to localhost:8080 and it is not up.
+        } catch (Exception e) {
+            logger.error("IOException: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+
+    }
+
 }
