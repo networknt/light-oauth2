@@ -12,7 +12,7 @@
 set -ex
 
 VERSION=$1
-IMAGE_NAME="networknt/oauth2-token"
+IMAGE_NAME="networknt/oauth2-provider"
 
 showHelp() {
     echo " "
