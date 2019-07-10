@@ -1,5 +1,20 @@
 # Change Log
 
+## [2.0.2](https://github.com/networknt/light-oauth2/tree/2.0.2) (2019-07-10)
+
+
+**Merged pull requests:**
+
+
+- fixes \#188 update Dockerfile and build.sh to image publishing [\#189](https://github.com/networknt/light-oauth2/pull/189) ([stevehu](https://github.com/stevehu))
+- fixes \#186 update login-view for code service to submit the form [\#187](https://github.com/networknt/light-oauth2/pull/187) ([stevehu](https://github.com/stevehu))
+- fixes \#184 add LightFormAuthenticationMechanism to handler the form a… [\#185](https://github.com/networknt/light-oauth2/pull/185) ([stevehu](https://github.com/stevehu))
+- fixes \#180 upgrade code service to use handler.yml and introduce the … [\#181](https://github.com/networknt/light-oauth2/pull/181) ([stevehu](https://github.com/stevehu))
+- fixes \#178 add java.security.jgss to the Docker jlink module [\#179](https://github.com/networknt/light-oauth2/pull/179) ([stevehu](https://github.com/stevehu))
+- fixes \#176 add java.management module to the docker jlink [\#177](https://github.com/networknt/light-oauth2/pull/177) ([stevehu](https://github.com/stevehu))
+- fixes \#174 update Dockerfile for java 11 [\#175](https://github.com/networknt/light-oauth2/pull/175) ([stevehu](https://github.com/stevehu))
+- fixes \#172 add client.keystore and client.truststore to the test config [\#173](https://github.com/networknt/light-oauth2/pull/173) ([stevehu](https://github.com/stevehu))
+- fixes \#169 add both release and snapshot repositories [\#170](https://github.com/networknt/light-oauth2/pull/170) ([stevehu](https://github.com/stevehu))
 ## [1.6.4](https://github.com/networknt/light-oauth2/tree/1.6.4) (2019-06-10)
 
 
