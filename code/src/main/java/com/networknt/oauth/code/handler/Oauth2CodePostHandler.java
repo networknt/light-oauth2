@@ -4,12 +4,8 @@ import com.hazelcast.core.IMap;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
-import com.networknt.status.Status;
 import com.networknt.utility.Util;
-import io.undertow.UndertowLogger;
-import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.SecurityContext;
-import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormData;
 import io.undertow.server.handlers.form.FormDataParser;
@@ -18,7 +14,9 @@ import io.undertow.util.StatusCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class Oauth2CodePostHandler extends CodeAuditHandler implements LightHttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2CodeGetHandler.class);
@@ -39,16 +37,20 @@ public class Oauth2CodePostHandler extends CodeAuditHandler implements LightHttp
         final String clientId = jClientId.getValue();
         String redirectUri = jRedirectUri == null ? null : jRedirectUri.getValue();
         final String state = jState == null ? null : jState.getValue();
-
+        if(logger.isDebugEnabled()) {
+            logger.debug("client_id = " + clientId + " state = " + state + " redirectUri = " + redirectUri);
+        }
         // check if the client_id is valid
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         Client client = clients.get(clientId);
         if(client == null) {
+            if(logger.isDebugEnabled()) logger.debug("client is not found for clientId = " + clientId);
             setExchangeStatus(exchange, CLIENT_NOT_FOUND, clientId);
             processAudit(exchange);
         } else {
             final SecurityContext context = exchange.getSecurityContext();
             String userId = context.getAuthenticatedAccount().getPrincipal().getName();
+            if(logger.isDebugEnabled()) logger.debug("userId = " + userId);
             Set<String> roles = context.getAuthenticatedAccount().getRoles();
             Map<String, String> codeMap = new HashMap<>();
             codeMap.put("userId", userId);
