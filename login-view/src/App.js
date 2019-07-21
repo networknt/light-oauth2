@@ -89,14 +89,21 @@ function App() {
 
     fetch("/oauth2/code", {
       method: 'POST',
+      redirect: 'follow',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: formData
     })
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .catch(error => console.log(error));
+    .then(response => {
+      // HTTP redirect.
+      if (response.ok && response.redirected) {
+        window.location.href = response.url;
+      } else {
+        throw Error(response.statusText);
+      }
+    })
+    .catch(error => console.log("error=", error));
   };
 
 
