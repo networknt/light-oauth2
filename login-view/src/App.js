@@ -9,6 +9,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import ErrorMessage from './components/ErrorMessage';
 
 const useStyles = makeStyles(theme => ({
   '@global': {
@@ -48,6 +49,7 @@ function App() {
   const [clientId] = useState(params.get('client_id') == null ? '' : params.get('client_id'));
   const [userType] = useState(params.get('user_type') == null ? '' : params.get('user_type'));
   const [redirectUri] = useState(params.get('redirect_uri') == null ? '' : params.get('redirect_uri'));
+  const [error, setError] = useState('');
 
   const handleChangeUsername = e => {
     setUsername(e.target.value)
@@ -78,14 +80,6 @@ function App() {
     const formData = Object.keys(data).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])).join('&');
 
     console.log(formData);
-    // const formData = new URLSearchParams();
-    // formData.append('j_username', {username});
-    // formData.append('j_password', {password});
-
-    // var formData = new FormData();
-    // for (var k in data) {
-    //   formData.append(k, data[k]);
-    // }
 
     fetch("/oauth2/code", {
       method: 'POST',
@@ -103,7 +97,10 @@ function App() {
         throw Error(response.statusText);
       }
     })
-    .catch(error => console.log("error=", error));
+    .catch(error => {
+        console.log("error=", error);
+        setError(error.toString());
+    });
   };
 
 
@@ -117,6 +114,7 @@ function App() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
+          <ErrorMessage error={error}/>
           <form className={classes.form} noValidate onSubmit={handleSubmit}>
             <TextField
                 variant="outlined"
