@@ -269,7 +269,7 @@ public class Oauth2TokenPostHandlerTest {
             Assert.assertEquals(400, statusCode);
             Status status = Config.getInstance().getMapper().readValue(body, Status.class);
             Assert.assertNotNull(status);
-            Assert.assertEquals("ERR12001", status.getCode());
+            Assert.assertEquals("ERR11004", status.getCode());
         } catch (Exception e) {
             logger.error("IOException: ", e);
             throw new ClientException(e);
