@@ -1,5 +1,14 @@
 # Change Log
 
+## [2.0.3](https://github.com/networknt/light-oauth2/tree/2.0.3) (2019-07-31)
+
+
+**Merged pull requests:**
+
+
+- fixes \#198 update login-view to handle the redirect [\#199](https://github.com/networknt/light-oauth2/pull/199) ([stevehu](https://github.com/stevehu))
+- Issue194 [\#197](https://github.com/networknt/light-oauth2/pull/197) ([stevehu](https://github.com/stevehu))
+- fixes \#194 fix a typo in the Dockerfile-Slim of oauth2-provider [\#195](https://github.com/networknt/light-oauth2/pull/195) ([stevehu](https://github.com/stevehu))
 ## [2.0.2](https://github.com/networknt/light-oauth2/tree/2.0.2) (2019-07-10)
 
 
