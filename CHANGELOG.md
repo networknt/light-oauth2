@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.0.4](https://github.com/networknt/light-oauth2/tree/2.0.4) (2019-08-16)
+
+
+**Merged pull requests:**
+
+
+- fixes \#207 upgrade jackson databind to 2.9.9.3 [\#208](https://github.com/networknt/light-oauth2/pull/208) ([stevehu](https://github.com/stevehu))
+- fixes \#202 upgrade login-view with the latest create-react-app [\#203](https://github.com/networknt/light-oauth2/pull/203) ([stevehu](https://github.com/stevehu))
 ## [2.0.3](https://github.com/networknt/light-oauth2/tree/2.0.3) (2019-07-31)
 
 
