@@ -139,7 +139,7 @@ public class Oauth2TokenPostHandlerTest {
         String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
         Assert.assertEquals(200, statusCode);
         logger.debug("response body = " + body);
-        Map<String, Object> map = Config.getInstance().getMapper().readValue(body, new TypeReference<Map<String, String>>(){});
+        Map<String, Object> map = Config.getInstance().getMapper().readValue(body, new TypeReference<Map<String, Object>>(){});
         String accessToken = (String)map.get("access_token");
         // make sure that this token is not in JWT format.
         Assert.assertTrue(accessToken.indexOf(".") < 0);
@@ -269,7 +269,7 @@ public class Oauth2TokenPostHandlerTest {
             Assert.assertEquals(400, statusCode);
             Status status = Config.getInstance().getMapper().readValue(body, Status.class);
             Assert.assertNotNull(status);
-            Assert.assertEquals("ERR11004", status.getCode());
+            Assert.assertEquals("ERR12001", status.getCode());
         } catch (Exception e) {
             logger.error("IOException: ", e);
             throw new ClientException(e);
@@ -1363,7 +1363,7 @@ public class Oauth2TokenPostHandlerTest {
         String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
         Assert.assertEquals(200, statusCode);
         logger.debug("response body = " + body);
-        Map<String, Object> map = Config.getInstance().getMapper().readValue(body, new TypeReference<Map<String, String>>(){});
+        Map<String, Object> map = Config.getInstance().getMapper().readValue(body, new TypeReference<Map<String, Object>>(){});
         String accessToken = (String)map.get("access_token");
         // make sure that this token is not in JWT format.
         Assert.assertTrue(accessToken.indexOf(".") < 0);
