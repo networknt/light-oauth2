@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.6.11](https://github.com/networknt/light-oauth2/tree/1.6.11) (2019-11-27)
+
+
+**Merged pull requests:**
+
+
 ## [1.6.10](https://github.com/networknt/light-oauth2/tree/1.6.10) (2019-10-26)
 
 
