@@ -431,7 +431,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                     newToken.setRoles(roles);
                     newToken.setClientId(client.getClientId());
                     newToken.setScope(scope);
-                    tokens.put(refreshToken, newToken);
+                    tokens.put(newRefreshToken, newToken);
                     // if the client type is external, save the jwt to reference map and send the reference
                     if(Client.ClientTypeEnum.EXTERNAL == client.getClientType()) {
                         jwt = jwtReference(jwt, client.getDerefClientId());
