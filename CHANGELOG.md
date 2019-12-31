@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.0.9](https://github.com/networknt/light-oauth2/tree/2.0.9) (2019-12-31)
+
+
+**Merged pull requests:**
+
+
+- New refresh tokens given old key [\#216](https://github.com/networknt/light-oauth2/pull/216) ([miklish](https://github.com/miklish))
 ## [2.0.8](https://github.com/networknt/light-oauth2/tree/2.0.8) (2019-11-27)
 
 
