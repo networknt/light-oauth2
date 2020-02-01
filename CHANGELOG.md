@@ -7,6 +7,8 @@
 
 
 - fixes \#219 remove Oracle database support [\#220](https://github.com/networknt/light-oauth2/pull/220) ([stevehu](https://github.com/stevehu))
+
+
 ## [2.0.9](https://github.com/networknt/light-oauth2/tree/2.0.9) (2019-12-31)
 
 
