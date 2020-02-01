@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.6.14](https://github.com/networknt/light-oauth2/tree/1.6.14) (2020-02-01)
+
+
+**Merged pull requests:**
+
+
+- fixes \#219 remove Oracle database support [\#220](https://github.com/networknt/light-oauth2/pull/220) ([stevehu](https://github.com/stevehu))
 ## [1.6.13](https://github.com/networknt/light-oauth2/tree/1.6.13) (2019-12-31)
 
 
