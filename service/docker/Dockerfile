@@ -3,13 +3,13 @@ FROM azul/zulu-openjdk-alpine:11 as packager
 RUN { \
         java --version ; \
         echo "jlink version:" && \
-        jlink --version ; \
+        $JAVA_HOME/bin/jlink --version ; \
     }
 
 ENV JAVA_MINIMAL=/opt/jre
 
 # build modules distribution
-RUN jlink \
+RUN $JAVA_HOME/bin/jlink \
     --verbose \
     --add-modules \
         java.base,java.sql,java.naming,java.desktop,java.xml,jdk.crypto.cryptoki,jdk.unsupported,java.management,java.security.jgss \
