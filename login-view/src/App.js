@@ -84,6 +84,7 @@ function App() {
     fetch("/oauth2/code", {
       method: 'POST',
       redirect: 'follow',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
