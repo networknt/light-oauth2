@@ -93,6 +93,7 @@ function App() {
     .then(response => {
       // HTTP redirect.
       if (response.ok && response.redirected) {
+        console.log(response.url);
         window.location.href = response.url;
       } else {
         throw Error(response.statusText);
