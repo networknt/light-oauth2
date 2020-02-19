@@ -7,6 +7,10 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
+import Divider from '@material-ui/core/Divider';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import ErrorMessage from './components/ErrorMessage';
@@ -50,6 +54,9 @@ function App() {
   const [userType] = useState(params.get('user_type') == null ? '' : params.get('user_type'));
   const [redirectUri] = useState(params.get('redirect_uri') == null ? '' : params.get('redirect_uri'));
   const [error, setError] = useState('');
+  const [redirectUrl, setRedirectUrl] = useState(null);
+  const [denyUrl, setDenyUrl] = useState(null);
+  const [scopes, setScopes] = useState([]);
 
   const handleChangeUsername = e => {
     setUsername(e.target.value)
@@ -62,6 +69,45 @@ function App() {
   const handleChangeRemember = e => {
     setRemember(e.target.value)
   };
+
+  const handleAccept = event => {
+    event.preventDefault();
+    console.log("handleAccept is called");
+    window.location.href = redirectUrl;
+  }
+
+  const handleCancel = event => {
+    event.preventDefault();
+    console.log("redirectUrl = ", redirectUrl);
+    let pathArray = redirectUrl.split('/');
+    let denyUrl = pathArray[0] + '//' + pathArray[2] + '/deny';
+    console.log("fetch url = ", denyUrl);
+    // remove the server set cookies as the Javascript cannot access some of them. 
+    fetch(denyUrl, { credentials: 'include'})
+    .then(response => {
+      if(response.ok) {
+        window.location.href = denyUrl;
+      } else {
+        throw Error(response.statusText);
+      }
+    })
+    .catch(error => {
+        console.log("error=", error);
+        setError(error.toString());
+    });
+  }
+
+  function ScopeItems() {
+    return (
+      <List component="nav" aria-label="secondary mailbox folders">
+        {scopes.map((item, index) => (
+          <ListItem button>
+            <ListItemText key={index} primary={item} />
+          </ListItem>
+        ))}
+      </List>
+    )
+  }
 
   const handleSubmit = event => {
     console.log("username = " + username + " password = " + password + " remember = " + remember);
@@ -91,20 +137,63 @@ function App() {
       body: formData
     })
     .then(response => {
-      // HTTP redirect.
-      if (response.ok && response.redirected) {
-        console.log(response.url);
-        window.location.href = response.url;
+      if (response.ok) {
+        return response.json();
       } else {
         throw Error(response.statusText);
       }
+    })
+    .then(json => {
+      console.log(json);
+      setRedirectUrl(json.redirectUri);
+      setDenyUrl(json.denyUri);
+      setScopes(json.scopes);
     })
     .catch(error => {
         console.log("error=", error);
         setError(error.toString());
     });
   };
-
+  
+  if(redirectUrl !== null) {
+    console.log("display consent");
+    console.log(scopes);
+    return (
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <div className={classes.paper}>
+          <form className={classes.form} noValidate onSubmit={handleAccept}>
+            <Typography component="h1" variant="h5">
+              Consent
+            </Typography>  
+            This application would like to access: 
+            <Divider/>
+            <List component="nav" aria-label="secondary mailbox folders">
+              <ScopeItems/>
+             </List>
+            <Divider/>
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={handleCancel}
+              className={classes.submit}
+            >
+              Deny
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              onClick={handleAccept}
+              className={classes.submit}
+            >
+              Accept
+            </Button>
+          </form>  
+        </div>
+      </Container>  
+    )
+  } 
 
   return (
       <Container component="main" maxWidth="xs">
