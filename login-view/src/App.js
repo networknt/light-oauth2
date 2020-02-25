@@ -78,12 +78,14 @@ function App() {
 
   const handleCancel = event => {
     event.preventDefault();
+    // here we use the redirectUrl to construct the deny url because the cookies
+    // are saved to the redirect domain instead of signin.lightapi.net domain.
     console.log("redirectUrl = ", redirectUrl);
     let pathArray = redirectUrl.split('/');
-    let denyUrl = pathArray[0] + '//' + pathArray[2] + '/deny';
-    console.log("fetch url = ", denyUrl);
+    let logoutPath = pathArray[0] + '//' + pathArray[2] + '/logout';
+    console.log("fetch url = ", logoutPath);
     // remove the server set cookies as the Javascript cannot access some of them. 
-    fetch(denyUrl, { credentials: 'include'})
+    fetch(logoutPath, { credentials: 'include'})
     .then(response => {
       if(response.ok) {
         window.location.href = denyUrl;
@@ -114,15 +116,15 @@ function App() {
     console.log("state = " + state + " clientId = " + clientId + " userType = " + userType + " redirectUri = " + redirectUri);
     event.preventDefault();
 
+    // state, user_type and redirect_uri might be empty
     let data = {
       j_username: username,
       j_password: password,
-      state: state,
-      client_id: clientId,
-      user_type: userType,
-      redirect_uri: redirectUri
+      client_id: clientId
     };
 
+    Object.assign(data, (state) && { state: state}, (userType) && {user_type: userType}, (redirectUri) && {redirect_uri: redirectUri})
+    console.log("data = " + data);
     const formData = Object.keys(data).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])).join('&');
 
     console.log(formData);
