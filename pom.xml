@@ -73,7 +73,6 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-        <!-- Repository for ORACLE ojdbc6. -->
     </repositories>
 
     <properties>
@@ -95,7 +94,6 @@
         <version.h2>1.4.196</version.h2>
         <version.hazelcast>3.12</version.hazelcast>
         <version.hazelcast-kubernetes>1.1.0</version.hazelcast-kubernetes>
-        <version.oracle>11.2.0.3</version.oracle>
         <version.mysql>6.0.5</version.mysql>
         <version.postgres>9.4.1211</version.postgres>
         <version.sqlserver>6.5.1.jre8-preview</version.sqlserver>
@@ -383,11 +381,6 @@
                 <groupId>com.hazelcast</groupId>
                 <artifactId>hazelcast-kubernetes</artifactId>
                 <version>${version.hazelcast-kubernetes}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.oracle</groupId>
-                <artifactId>ojdbc6</artifactId>
-                <version>${version.oracle}</version>
             </dependency>
             <dependency>
                 <groupId>mysql</groupId>
