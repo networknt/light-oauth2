@@ -1,5 +1,15 @@
 # Change Log
 
+## [2.0.11](https://github.com/networknt/light-oauth2/tree/2.0.11) (2020-02-29)
+
+
+**Merged pull requests:**
+
+
+- fixes \#229 remove oracle dependency from the parent pom.xml [\#230](https://github.com/networknt/light-oauth2/pull/230) ([stevehu](https://github.com/stevehu))
+- fixes \#225 update login-view to remove redux components [\#226](https://github.com/networknt/light-oauth2/pull/226) ([stevehu](https://github.com/stevehu))
+- fixes \#223 update the fetch to /oauth2/code with credentials include [\#224](https://github.com/networknt/light-oauth2/pull/224) ([stevehu](https://github.com/stevehu))
+- fixes \#221 update Dockerfile to resolve jlink not found [\#222](https://github.com/networknt/light-oauth2/pull/222) ([stevehu](https://github.com/stevehu))
 ## [2.0.10](https://github.com/networknt/light-oauth2/tree/2.0.10) (2020-02-01)
 
 
