@@ -20,6 +20,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build-dev": "REACT_APP_SAAS_URL=https://dev.oauth.lightapi.net react-scripts build",
+    "build-prd": "REACT_APP_SAAS_URL=https://oauth.lightapi.net react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

@@ -128,14 +128,17 @@ function App() {
     const formData = Object.keys(data).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])).join('&');
 
     console.log(formData);
+    const headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        ...(process.env.REACT_APP_SAAS_URL) && {'service_url': process.env.REACT_APP_SAAS_URL}
+    };
+    console.log(headers);
 
     fetch("/oauth2/code", {
       method: 'POST',
       redirect: 'follow',
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers: headers,
       body: formData
     })
     .then(response => {
