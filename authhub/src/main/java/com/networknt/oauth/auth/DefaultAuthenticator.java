@@ -17,6 +17,7 @@ import java.security.Principal;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class DefaultAuthenticator extends AuthenticatorBase<DefaultAuth> {
@@ -63,7 +64,7 @@ public class DefaultAuthenticator extends AuthenticatorBase<DefaultAuth> {
         IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
         if (users.containsKey(id)) {
             return new Account() {
-                private Set<String> roles = Collections.emptySet();
+                private Set<String> roles = parseRoles(users.get(id).getRoles());
                 private final Principal principal = () -> id;
                 @Override
                 public Principal getPrincipal() {
@@ -74,5 +75,22 @@ public class DefaultAuthenticator extends AuthenticatorBase<DefaultAuth> {
             };
         }
         return null;
+    }
+
+    public Set<String> parseRoles(String roles) {
+        Set<String> set = Collections.EMPTY_SET;
+        if(roles != null) {
+            // remove the leading and trailing spaces.
+            roles = roles.trim();
+            if(roles.contains(" ")) {
+                // multiple roles in a format separated by " ".
+                set = new HashSet<>(Arrays.asList(roles.split("\\s+")));
+            } else {
+                // only one role is available
+                set = new HashSet<>();
+                set.add(roles);
+            }
+        }
+        return set;
     }
 }
