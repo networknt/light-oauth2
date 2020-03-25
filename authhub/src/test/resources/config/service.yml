@@ -1,9 +1,27 @@
 singletons:
+- com.networknt.registry.URL:
+  - com.networknt.registry.URLImpl:
+      protocol: light
+      host: localhost
+      port: 8080
+      path: consul
+      parameters:
+        registryRetryPeriod: '30000'
+- com.networknt.consul.client.ConsulClient:
+  - com.networknt.consul.client.ConsulClientImpl
+- com.networknt.registry.Registry:
+  - com.networknt.consul.ConsulRegistry
+- com.networknt.balance.LoadBalance:
+  - com.networknt.balance.RoundRobinLoadBalance
+- com.networknt.cluster.Cluster:
+  - com.networknt.cluster.LightCluster
 # Authenticator implementation mapping
 - com.networknt.oauth.auth.Authenticator<com.networknt.oauth.auth.DefaultAuth>:
   - com.networknt.oauth.auth.DefaultAuthenticator
 - com.networknt.oauth.auth.Authenticator<com.networknt.oauth.auth.MarketPlaceAuth>:
   - com.networknt.oauth.auth.MarketPlaceAuthenticator
+- com.networknt.oauth.auth.Authenticator<com.networknt.oauth.auth.LightPortalAuth>:
+  - com.networknt.oauth.auth.LightPortalAuthenticator
 - javax.sql.DataSource:
   - com.zaxxer.hikari.HikariDataSource:
       DriverClassName: org.h2.jdbcx.JdbcDataSource
