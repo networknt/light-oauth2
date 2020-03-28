@@ -10,10 +10,12 @@ const useStyles = makeStyles(theme => ({
 function ErrorMessage(props) {
     const classes = useStyles();
     return (
-        <div className={classes.error}>
-            {props.error}
-        </div>
+        <div className={classes.error}  dangerouslySetInnerHTML={ createMarkup(props.error) } />
     )
+}
+
+function createMarkup(error) {
+  return {__html: error};
 }
 
 export default ErrorMessage;
