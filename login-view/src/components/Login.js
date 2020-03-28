@@ -158,7 +158,20 @@ function Login() {
     })
     .catch(error => {
         console.log("error=", error);
-        setError(error.toString());
+        const data = {
+          email: username,
+          password: password
+        };
+        const cmd = {
+          host: 'lightapi.net',
+          service: 'user',
+          action: 'loginUser',
+          version: '0.1.0',
+          data: data
+        };
+        const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
+        const message = 'Login Failed! Click <a href="link">here</a> to identify root cause.'
+        setError(message.replace('link', url));
     });
   };
   
