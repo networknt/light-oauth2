@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { HashRouter } from 'react-router-dom'
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
@@ -12,9 +13,11 @@ const theme = createMuiTheme({
 });
 
 ReactDOM.render(
-    <MuiThemeProvider theme={theme}>
-        <App />
-    </MuiThemeProvider>,
+    <HashRouter>
+        <MuiThemeProvider theme={theme}>
+            <App />
+        </MuiThemeProvider>
+    </HashRouter>,
     document.getElementById('root')
 );
 
