@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.6.18](https://github.com/networknt/light-oauth2/tree/1.6.18) (2020-03-31)
+
+
+**Merged pull requests:**
+
+
+- fixes \#238 remove oauth2-console as it is part of the light-portal [\#239](https://github.com/networknt/light-oauth2/pull/239) ([stevehu](https://github.com/stevehu))
+- fixes \#236 add a new authenticator for light-portal user management i… [\#237](https://github.com/networknt/light-oauth2/pull/237) ([stevehu](https://github.com/stevehu))
+- fixes \#232 default authenticator return the roles for after authentic… [\#234](https://github.com/networknt/light-oauth2/pull/234) ([stevehu](https://github.com/stevehu))
 ## [1.6.17](https://github.com/networknt/light-oauth2/tree/1.6.17) (2020-02-29)
 
 
