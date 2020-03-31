@@ -1,5 +1,17 @@
 # Change Log
 
+## [2.0.12](https://github.com/networknt/light-oauth2/tree/2.0.12) (2020-03-31)
+
+
+**Merged pull requests:**
+
+
+- fixes \#242 add a link to the login error message to access API directly [\#243](https://github.com/networknt/light-oauth2/pull/243) ([stevehu](https://github.com/stevehu))
+- fixes \#240 add forget password and reset password components to login… [\#241](https://github.com/networknt/light-oauth2/pull/241) ([stevehu](https://github.com/stevehu))
+- fixes \#238 remove oauth2-console as it is part of the light-portal [\#239](https://github.com/networknt/light-oauth2/pull/239) ([stevehu](https://github.com/stevehu))
+- fixes \#236 add a new authenticator for light-portal user management i… [\#237](https://github.com/networknt/light-oauth2/pull/237) ([stevehu](https://github.com/stevehu))
+- Bump acorn from 5.7.3 to 5.7.4 in /login-view [\#233](https://github.com/networknt/light-oauth2/pull/233) ([dependabot](https://github.com/apps/dependabot))
+- fixes \#232 default authenticator return the roles for after authentic… [\#234](https://github.com/networknt/light-oauth2/pull/234) ([stevehu](https://github.com/stevehu))
 ## [2.0.11](https://github.com/networknt/light-oauth2/tree/2.0.11) (2020-02-29)
 
 
