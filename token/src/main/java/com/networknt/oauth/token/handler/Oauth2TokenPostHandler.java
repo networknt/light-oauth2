@@ -583,7 +583,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
         return claims;
     }
 
-    private JwtClaims mockAcClaims(String clientId, String scopeString, String userId, String userType, String roleString, String csrf, Map<String, Object> formMap) {
+    private JwtClaims mockAcClaims(String clientId, String scopeString, String userId, String userType, String roles, String csrf, Map<String, Object> formMap) {
         JwtClaims claims = JwtIssuer.getDefaultJwtClaims();
         claims.setClaim("user_id", userId);
         claims.setClaim("user_type", userType);
@@ -593,9 +593,8 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
             List<String> scope = Arrays.asList(scopeString.split("\\s+"));
             claims.setStringListClaim("scope", scope); // multi-valued claims work too and will end up as a JSON array
         }
-        if(roleString != null && roleString.trim().length() > 0) {
-            List<String> roles = Arrays.asList(roleString.split("\\s+"));
-            claims.setStringListClaim("roles", roles); // multi-valued claims work too and will end up as a JSON array
+        if(roles != null && roles.trim().length() > 0) {
+            claims.setClaim("roles", roles);
         }
 
         if(formMap != null) {
