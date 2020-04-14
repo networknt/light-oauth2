@@ -1,11 +1,17 @@
 package com.networknt.oauth.auth;
 
+import com.networknt.client.ClientConfig;
+import com.networknt.client.ClientRequestCarrier;
 import com.networknt.client.Http2Client;
 import com.networknt.cluster.Cluster;
 import com.networknt.config.JsonMapper;
+import com.networknt.httpstring.AttachmentConstants;
 import com.networknt.oauth.security.LightPasswordCredential;
 import com.networknt.server.Server;
 import com.networknt.service.SingletonServiceFactory;
+import io.opentracing.Tracer;
+import io.opentracing.propagation.Format;
+import io.opentracing.tag.Tags;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
@@ -82,6 +88,16 @@ public class LightPortalAuthenticator extends AuthenticatorBase<LightPortalAuth>
             String message = "/portal/query?cmd=" + URLEncoder.encode(s, "UTF-8");
             final ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath(message);
             request.getRequestHeaders().put(Headers.HOST, "localhost");
+            boolean injectOpenTracing = ClientConfig.get().isInjectOpenTracing();
+            if(injectOpenTracing) {
+                Tracer tracer = passwordCredential.getExchange().getAttachment(AttachmentConstants.EXCHANGE_TRACER);
+                if(tracer != null && tracer.activeSpan() != null) {
+                    Tags.SPAN_KIND.set(tracer.activeSpan(), Tags.SPAN_KIND_CLIENT);
+                    Tags.HTTP_METHOD.set(tracer.activeSpan(), request.getMethod().toString());
+                    Tags.HTTP_URL.set(tracer.activeSpan(), request.getPath());
+                    tracer.inject(tracer.activeSpan().context(), Format.Builtin.HTTP_HEADERS, new ClientRequestCarrier(request));
+                }
+            }
             connection.sendRequest(request, client.createClientCallback(reference, latch));
             latch.await();
             int statusCode = reference.get().getResponseCode();

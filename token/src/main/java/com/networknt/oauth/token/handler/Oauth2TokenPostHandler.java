@@ -333,7 +333,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                         }
                         Authenticator authenticator = SingletonServiceFactory.getBean(Authenticator.class, clazz);
 
-                        Account account = authenticator.authenticate(userId, new LightPasswordCredential(password, clientAuthClass, userType));
+                        Account account = authenticator.authenticate(userId, new LightPasswordCredential(password, clientAuthClass, userType, exchange));
                         if(account == null) {
                             throw new ApiException(new Status(INCORRECT_PASSWORD));
                         } else {

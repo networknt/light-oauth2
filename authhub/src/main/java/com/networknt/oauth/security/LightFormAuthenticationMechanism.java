@@ -130,7 +130,7 @@ public class LightFormAuthenticationMechanism implements AuthenticationMechanism
             }
 
             AuthenticationMechanismOutcome outcome = null;
-            LightPasswordCredential credential = new LightPasswordCredential(password.toCharArray(), clientAuthClass, userType);
+            LightPasswordCredential credential = new LightPasswordCredential(password.toCharArray(), clientAuthClass, userType, exchange);
             try {
                 IdentityManager identityManager = getIdentityManager(securityContext);
                 Account account = identityManager.verify(userName, credential);
