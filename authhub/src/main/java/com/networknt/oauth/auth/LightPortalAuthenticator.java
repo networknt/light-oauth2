@@ -94,7 +94,8 @@ public class LightPortalAuthenticator extends AuthenticatorBase<LightPortalAuth>
                 if(tracer != null && tracer.activeSpan() != null) {
                     Tags.SPAN_KIND.set(tracer.activeSpan(), Tags.SPAN_KIND_CLIENT);
                     Tags.HTTP_METHOD.set(tracer.activeSpan(), request.getMethod().toString());
-                    Tags.HTTP_URL.set(tracer.activeSpan(), request.getPath());
+                    // remove the url as it contains password which is sensitive.
+                    // Tags.HTTP_URL.set(tracer.activeSpan(), request.getPath());
                     tracer.inject(tracer.activeSpan().context(), Format.Builtin.HTTP_HEADERS, new ClientRequestCarrier(request));
                 }
             }
