@@ -190,7 +190,8 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
             String roles = codeMap.get("roles");
             String uri = codeMap.get("redirectUri");
             String scope = codeMap.get("scope");
-            if(logger.isDebugEnabled()) logger.debug("variable from codeMap cache userId = " + userId + " redirectUri = " + redirectUri + " scope = " + scope + " userType = " + userType + " roles = " + roles);
+            String remember = codeMap.get("remember");
+            if(logger.isDebugEnabled()) logger.debug("variable from codeMap cache userId = " + userId + " redirectUri = " + redirectUri + " scope = " + scope + " userType = " + userType + " roles = " + roles + " remember = " + remember);
 
             // PKCE
             String codeChallenge = codeMap.get(OAuth2Constants.CODE_CHALLENGE);
@@ -284,6 +285,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                 resMap.put("token_type", "bearer");
                 resMap.put("expires_in", config.getExpiredInMinutes()*60);
                 resMap.put("refresh_token", refreshToken);
+                if(remember != null) resMap.put("remember", remember);  // StatelessAuthHandler will set refresh_token cookie to 90 days if it is 'Y'
                 return resMap;
             } else {
                 throw new ApiException(new Status(INVALID_AUTHORIZATION_CODE, code));
@@ -438,6 +440,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                     resMap.put("token_type", "bearer");
                     resMap.put("expires_in", config.getExpiredInMinutes()*60);
                     resMap.put("refresh_token", newRefreshToken);
+                    resMap.put("remember", "Y"); // when refresh token is used, the remember is always true.
                     return resMap;
 
                 } else {

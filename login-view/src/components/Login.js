@@ -122,6 +122,7 @@ function Login() {
     let data = {
       j_username: username,
       j_password: password,
+      remember: remember ? 'Y' : 'N',
       client_id: clientId
     };
 

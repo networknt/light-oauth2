@@ -34,11 +34,13 @@ public class Oauth2CodePostHandler extends CodeAuditHandler implements LightHttp
         final FormData.FormValue jClientId = data.getFirst("client_id");
         final FormData.FormValue jRedirectUri = data.getFirst("redirect_uri");
         final FormData.FormValue jState = data.getFirst("state");
+        final FormData.FormValue jRemember = data.getFirst("remember");
         final String clientId = jClientId.getValue();
+        final String remember = jRemember == null ? null : jRemember.getValue();  // should be 'Y' or 'N' if not null.
         String redirectUri = jRedirectUri == null ? null : jRedirectUri.getValue();
         final String state = jState == null ? null : jState.getValue();
         if(logger.isDebugEnabled()) {
-            logger.debug("client_id = " + clientId + " state = " + state + " redirectUri = " + redirectUri);
+            logger.debug("client_id = " + clientId + " state = " + state + " redirectUri = " + redirectUri + " remember = " + remember);
         }
         // check if the client_id is valid
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
@@ -64,6 +66,7 @@ public class Oauth2CodePostHandler extends CodeAuditHandler implements LightHttp
             } else {
                 codeMap.put("redirectUri", redirectUri);
             }
+            if(remember != null) codeMap.put("remember", remember); // pass the remember checkbox value to the token service
             CacheStartupHookProvider.hz.getMap("codes").set(code, codeMap);
 
             redirectUri = redirectUri + "?code=" + code;
