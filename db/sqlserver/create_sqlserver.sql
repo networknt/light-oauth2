@@ -83,6 +83,7 @@ CREATE TABLE refresh_token (
   scope VARCHAR(64) NOT NULL,
   remember VARCHAR(1) NOT NULL,
   refresh_token VARCHAR(256) NOT NULL,
+  start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (client_id, refresh_token),
   FOREIGN KEY (client_id) REFERENCES client(client_id)
 );
