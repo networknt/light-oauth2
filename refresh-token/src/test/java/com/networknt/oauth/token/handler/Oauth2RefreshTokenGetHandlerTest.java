@@ -77,6 +77,7 @@ public class Oauth2RefreshTokenGetHandlerTest {
         token.setUserId("admin");
         token.setClientId("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d");
         token.setScope("petstore.r petstore.w");
+        token.setRemember("N");
         IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
         tokens.put("86c0a39f-0789-4b71-9fed-d99fe6dc9281", token);
 

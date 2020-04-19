@@ -895,6 +895,7 @@ public class Oauth2TokenPostHandlerTest {
         token.setUserType("employee");
         token.setClientId("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d");
         token.setScope("petstore.r petstore.w");
+        token.setRemember("N");
         CacheStartupHookProvider.hz.getMap("tokens").put("86c0a39f-0789-4b71-9fed-d99fe6dc9281", token);
 
         Map<String, String> params = new HashMap<>();
@@ -957,6 +958,7 @@ public class Oauth2TokenPostHandlerTest {
         token.setUserType("employee");
         token.setClientId("78cd9a2e-7690-11e8-adc0-fa7ae01bbebc");
         token.setScope("petstore.r petstore.w");
+        token.setRemember("N");
         CacheStartupHookProvider.hz.getMap("tokens").put("86c0a39f-0789-4b71-9fed-d99fe6dc9281", token);
 
         Map<String, String> params = new HashMap<>();
@@ -1025,6 +1027,7 @@ public class Oauth2TokenPostHandlerTest {
         token.setRoles("user admin");
         token.setClientId("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d");
         token.setScope("petstore.r petstore.w");
+        token.setRemember("N");
         CacheStartupHookProvider.hz.getMap("tokens").put("86c0a39f-0789-4b71-9fed-d99fe6dc9281", token);
 
         Map<String, String> params = new HashMap<>();
