@@ -274,6 +274,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                 token.setRoles(roles);
                 token.setClientId(client.getClientId());
                 token.setScope(scope);
+                token.setRemember(remember != null && remember.equals("Y") ? "Y" : "N");
                 IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
                 tokens.set(refreshToken, token);
                 // if the client type is external, save the jwt to reference map and send the reference
@@ -354,6 +355,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                                 token.setUserId(userId);
                                 token.setClientId(client.getClientId());
                                 token.setScope(scope);
+                                token.setRemember("N"); // set this to N by default for password
                                 IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
                                 tokens.set(refreshToken, token);
 
@@ -399,6 +401,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                 String roles = token.getRoles();
                 String clientId = token.getClientId();
                 String oldScope = token.getScope();
+                String remember = token.getRemember();
 
                 if(client.getClientId().equals(clientId)) {
                     if(scope == null) {
@@ -430,6 +433,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                     newToken.setRoles(roles);
                     newToken.setClientId(client.getClientId());
                     newToken.setScope(scope);
+                    newToken.setRemember(remember);
                     tokens.put(newRefreshToken, newToken);
                     // if the client type is external, save the jwt to reference map and send the reference
                     if(Client.ClientTypeEnum.EXTERNAL == client.getClientType()) {
@@ -440,7 +444,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                     resMap.put("token_type", "bearer");
                     resMap.put("expires_in", config.getExpiredInMinutes()*60);
                     resMap.put("refresh_token", newRefreshToken);
-                    resMap.put("remember", "Y"); // when refresh token is used, the remember is always true.
+                    resMap.put("remember", remember);
                     return resMap;
 
                 } else {
@@ -511,6 +515,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                 token.setRoles(roles);
                 token.setClientId(client.getClientId());
                 token.setScope(scope);
+                token.setRemember("N"); // default to N
                 IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
                 tokens.set(refreshToken, token);
 

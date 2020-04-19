@@ -18,10 +18,9 @@ import java.util.*;
 public class RefreshTokenMapStore implements MapStore<String, RefreshToken> {
     static final Logger logger = LoggerFactory.getLogger(RefreshTokenMapStore.class);
     static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
-    private static final String insert = "INSERT INTO refresh_token (user_id, user_type, roles, client_id, scope, refresh_token) VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String insert = "INSERT INTO refresh_token (user_id, user_type, roles, client_id, scope, remember, refresh_token) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String delete = "DELETE FROM refresh_token WHERE refresh_token = ?";
     private static final String select = "SELECT * FROM refresh_token WHERE refresh_token = ?";
-    private static final String update = "UPDATE refresh_token SET  scope=? WHERE refresh_token = ?";
     private static final String loadall = "SELECT refresh_token FROM refresh_token";
 
 
@@ -46,7 +45,8 @@ public class RefreshTokenMapStore implements MapStore<String, RefreshToken> {
                 stmt.setString(3, token.getRoles());
                 stmt.setString(4, token.getClientId());
                 stmt.setString(5, token.getScope());
-                stmt.setString(6, token.getRefreshToken());
+                stmt.setString(6, token.getRemember());
+                stmt.setString(7, token.getRefreshToken());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logger.error("Exception:", e);
@@ -82,6 +82,7 @@ public class RefreshTokenMapStore implements MapStore<String, RefreshToken> {
                     token.setRoles(rs.getString("roles"));
                     token.setClientId(rs.getString("client_id"));
                     token.setScope(rs.getString("scope"));
+                    token.setRemember(rs.getString("remember"));
                 }
             }
         } catch (SQLException e) {

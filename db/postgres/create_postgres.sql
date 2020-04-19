@@ -73,6 +73,7 @@ CREATE TABLE refresh_token (
   roles VARCHAR(2048),
   client_id VARCHAR(36) NOT NULL,
   scope VARCHAR(64) NOT NULL,
+  remember VARCHAR(1) NOT NULL,
   refresh_token VARCHAR(256) NOT NULL,
   PRIMARY KEY (client_id, refresh_token),
   FOREIGN KEY (client_id) REFERENCES client(client_id)
