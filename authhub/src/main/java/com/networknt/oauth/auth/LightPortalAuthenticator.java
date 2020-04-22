@@ -64,10 +64,14 @@ public class LightPortalAuthenticator extends AuthenticatorBase<LightPortalAuth>
         // Get the singleton Cluster instance
         cluster = SingletonServiceFactory.getBean(Cluster.class);
         String host = cluster.serviceToUrl("https", queryServiceId, tag, null);
-        try {
-            connection = client.connect(new URI(host), Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
-        } catch (Exception e) {
-            logger.error("Exception:", e);
+        if(host != null) {
+            // we only need to try to establish a connection if we can find a host. Due to service startup sequence, we might not have hybrid-query service available in the beginning.
+            try {
+                connection = client.connect(new URI(host), Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+            } catch (Exception e) {
+                // ignore the error here. Just log it as the target server might not be up and running in the case of direct registry. In that case, we get Connection refused error.
+                logger.error("Exception:", e);
+            }
         }
     }
 
