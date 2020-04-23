@@ -47,7 +47,7 @@ function Login() {
 
   let search = window.location.search;
   let params = new URLSearchParams(search);
-  console.log("client_id = ", params.get('client_id'));
+  //console.log("client_id = ", params.get('client_id'));
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
@@ -60,7 +60,7 @@ function Login() {
   const [denyUrl, setDenyUrl] = useState(null);
   const [scopes, setScopes] = useState([]);
 
-    const handleChangeUsername = e => {
+  const handleChangeUsername = e => {
     setUsername(e.target.value)
   };
 
@@ -74,7 +74,7 @@ function Login() {
 
   const handleAccept = event => {
     event.preventDefault();
-    console.log("handleAccept is called");
+    //console.log("handleAccept is called");
     window.location.href = redirectUrl;
   }
 
@@ -82,10 +82,10 @@ function Login() {
     event.preventDefault();
     // here we use the redirectUrl to construct the deny url because the cookies
     // are saved to the redirect domain instead of signin.lightapi.net domain.
-    console.log("redirectUrl = ", redirectUrl);
+    //console.log("redirectUrl = ", redirectUrl);
     let pathArray = redirectUrl.split('/');
     let logoutPath = pathArray[0] + '//' + pathArray[2] + '/logout';
-    console.log("fetch url = ", logoutPath);
+    //console.log("fetch url = ", logoutPath);
     // remove the server set cookies as the Javascript cannot access some of them. 
     fetch(logoutPath, { credentials: 'include'})
     .then(response => {
@@ -114,8 +114,8 @@ function Login() {
   }
 
   const handleSubmit = event => {
-    console.log("username = " + username + " password = " + password + " remember = " + remember);
-    console.log("state = " + state + " clientId = " + clientId + " userType = " + userType + " redirectUri = " + redirectUri);
+    //console.log("username = " + username + " password = " + password + " remember = " + remember);
+    //console.log("state = " + state + " clientId = " + clientId + " userType = " + userType + " redirectUri = " + redirectUri);
     event.preventDefault();
 
     // state, user_type and redirect_uri might be empty
@@ -127,15 +127,15 @@ function Login() {
     };
 
     Object.assign(data, (state) && { state: state}, (userType) && {user_type: userType}, (redirectUri) && {redirect_uri: redirectUri})
-    console.log("data = " + data);
+    //console.log("data = " + data);
     const formData = Object.keys(data).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])).join('&');
 
-    console.log(formData);
+    //console.log(formData);
     const headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
         ...(process.env.REACT_APP_SAAS_URL) && {'service_url': process.env.REACT_APP_SAAS_URL}
     };
-    console.log(headers);
+    //console.log(headers);
 
     fetch("/oauth2/code", {
       method: 'POST',
@@ -152,7 +152,7 @@ function Login() {
       }
     })
     .then(json => {
-      console.log(json);
+      //console.log(json);
       setRedirectUrl(json.redirectUri);
       setDenyUrl(json.denyUri);
       setScopes(json.scopes);
@@ -177,8 +177,8 @@ function Login() {
   };
   
   if(redirectUrl !== null) {
-    console.log("display consent");
-    console.log(scopes);
+    //console.log("display consent");
+    //console.log(scopes);
     return (
       <Container component="main" maxWidth="xs">
         <CssBaseline />

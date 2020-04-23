@@ -37,8 +37,8 @@ const useStyles = makeStyles(theme => ({
 
 function ResetPassword(props) {
   let params = new URLSearchParams(props.location.search);
-  console.log("token = ", params.get('token'));
-  console.log("email = ", params.get('email'));
+  //console.log("token = ", params.get('token'));
+  //console.log("email = ", params.get('email'));
 
   const classes = useStyles();
   const [newPassword, setNewPassword] = useState('');
@@ -58,10 +58,10 @@ function ResetPassword(props) {
   };
 
   const handleSubmit = event => {
-    console.log("email = " + email + " token = " + token);
+    //console.log("email = " + email + " token = " + token);
     event.preventDefault();
     const data = { email, token, newPassword, passwordConfirm };
-    console.log("data = ", data);
+    //console.log("data = ", data);
     const action = {
       'host': 'lightapi.net',
       'service': 'user',
@@ -82,7 +82,7 @@ function ResetPassword(props) {
         throw response;
       }
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       setError("The password has been reset.");
     } catch (e) {
       const error = await e.json();
