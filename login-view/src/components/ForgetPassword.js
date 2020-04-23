@@ -45,10 +45,10 @@ function ForgetPassword() {
   };
 
   const handleSubmit = event => {
-    console.log("email = ", email);
+    //console.log("email = ", email);
     event.preventDefault();
     const data = { email };
-    console.log("data = ", data);
+    //console.log("data = ", data);
     const action = {
       'host': 'lightapi.net',
       'service': 'user',
@@ -69,7 +69,7 @@ function ForgetPassword() {
         throw response;
       }
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       setError("An Email has been sent.");
     } catch (e) {
       const error = await e.json();
