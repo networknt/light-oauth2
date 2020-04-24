@@ -145,11 +145,10 @@ function Login() {
       body: formData
     })
     .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw Error(response.statusText);
+      if (!response.ok) {
+        throw response;
       }
+      return response.json();
     })
     .then(json => {
       //console.log(json);
@@ -158,7 +157,8 @@ function Login() {
       setScopes(json.scopes);
     })
     .catch(error => {
-        console.log("error=", error);
+        error.text().then(errorMessage => {
+        console.log("error=", errorMessage);
         const data = {
           email: username,
           password: password
@@ -173,6 +173,7 @@ function Login() {
         const url = '/portal/query?cmd=' + encodeURIComponent(JSON.stringify(cmd));
         const message = 'Login Failed! Click <a href="link">here</a> to identify root cause.'
         setError(message.replace('link', url));
+      })
     });
   };
   
