@@ -53,32 +53,38 @@ public class Oauth2CodePostHandler extends CodeAuditHandler implements LightHttp
             final SecurityContext context = exchange.getSecurityContext();
             String userId = context.getAuthenticatedAccount().getPrincipal().getName();
             if(logger.isDebugEnabled()) logger.debug("userId = " + userId);
-            Set<String> roles = context.getAuthenticatedAccount().getRoles();
-            Map<String, String> codeMap = new HashMap<>();
-            codeMap.put("userId", userId);
-            if(roles != null && !roles.isEmpty()) {
-                codeMap.put("roles", String.join(" ", roles));
-            }
-            // generate auth code
-            String code = Util.getUUID();
-            if(redirectUri == null) {
-                redirectUri = client.getRedirectUri();
+            if("error".equals(userId)) {
+                exchange.setStatusCode(StatusCodes.BAD_REQUEST);
+                exchange.getResponseSender().send(context.getAuthenticatedAccount().getRoles().iterator().next());
+                processAudit(exchange);
             } else {
-                codeMap.put("redirectUri", redirectUri);
-            }
-            if(remember != null) codeMap.put("remember", remember); // pass the remember checkbox value to the token service
-            CacheStartupHookProvider.hz.getMap("codes").set(code, codeMap);
+                Set<String> roles = context.getAuthenticatedAccount().getRoles();
+                Map<String, String> codeMap = new HashMap<>();
+                codeMap.put("userId", userId);
+                if(roles != null && !roles.isEmpty()) {
+                    codeMap.put("roles", String.join(" ", roles));
+                }
+                // generate auth code
+                String code = Util.getUUID();
+                if(redirectUri == null) {
+                    redirectUri = client.getRedirectUri();
+                } else {
+                    codeMap.put("redirectUri", redirectUri);
+                }
+                if(remember != null) codeMap.put("remember", remember); // pass the remember checkbox value to the token service
+                CacheStartupHookProvider.hz.getMap("codes").set(code, codeMap);
 
-            redirectUri = redirectUri + "?code=" + code;
-            if(state != null) {
-                redirectUri = redirectUri + "&state=" + state;
+                redirectUri = redirectUri + "?code=" + code;
+                if(state != null) {
+                    redirectUri = redirectUri + "&state=" + state;
+                }
+                if(logger.isDebugEnabled()) logger.debug("redirectUri = " + redirectUri);
+                // now redirect here.
+                exchange.setStatusCode(StatusCodes.FOUND);
+                exchange.getResponseHeaders().put(Headers.LOCATION, redirectUri);
+                exchange.endExchange();
+                processAudit(exchange);
             }
-            if(logger.isDebugEnabled()) logger.debug("redirectUri = " + redirectUri);
-            // now redirect here.
-            exchange.setStatusCode(StatusCodes.FOUND);
-            exchange.getResponseHeaders().put(Headers.LOCATION, redirectUri);
-            exchange.endExchange();
-            processAudit(exchange);
         }
     }
 }

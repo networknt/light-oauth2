@@ -110,7 +110,6 @@ public class LightPortalAuthenticator extends AuthenticatorBase<LightPortalAuth>
             if(statusCode == 200) {
                 Map<String, Object> map = JsonMapper.string2Map(body);
                 // {"roles":"user","id":"stevehu@gmail.com"}
-                String roles = (String)map.get("roles");
                 Account account = new Account() {
                     private Set<String> roles = splitRoles((String)map.get("roles"));
                     private final Principal principal = () -> id;
@@ -125,12 +124,43 @@ public class LightPortalAuthenticator extends AuthenticatorBase<LightPortalAuth>
                     }
                 };
                 return account;
+            } else {
+                // create a dummy account to return the error the the StatelessAuthHandler in light-spa-4j
+                Map<String, Object> map = JsonMapper.string2Map(body);
+                Account account = new Account() {
+                    private final Principal principal = () -> "error";
+                    @Override
+                    public Principal getPrincipal() {
+                        return principal;
+                    }
+
+                    @Override
+                    public Set<String> getRoles() {
+                        Set<String> roles = new HashSet<>();
+                        roles.add((String)map.get("description"));
+                        return roles;
+                    }
+                };
+                return account;
             }
         } catch (Exception e) {
             logger.error("Exception:", e);
-            return null;
+            Account account = new Account() {
+                private final Principal principal = () -> "error";
+                @Override
+                public Principal getPrincipal() {
+                    return principal;
+                }
+
+                @Override
+                public Set<String> getRoles() {
+                    Set<String> roles = new HashSet<>();
+                    roles.add(e.getMessage());
+                    return roles;
+                }
+            };
+            return account;
         }
-        return null;
     }
 
     public Set<String> splitRoles(String roles) {
