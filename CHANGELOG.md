@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.6.19](https://github.com/networknt/light-oauth2/tree/1.6.19) (2020-05-01)
+
+
+**Merged pull requests:**
+
+
+- fixes \#244 change roles to string in the JWT from array of strings [\#245](https://github.com/networknt/light-oauth2/pull/245) ([stevehu](https://github.com/stevehu))
 ## [1.6.18](https://github.com/networknt/light-oauth2/tree/1.6.18) (2020-03-31)
 
 
