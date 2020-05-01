@@ -1,5 +1,23 @@
 # Change Log
 
+## [2.0.13](https://github.com/networknt/light-oauth2/tree/2.0.13) (2020-05-01)
+
+
+**Merged pull requests:**
+
+
+- fixes \#266 use fake account to return error message so that code serv… [\#267](https://github.com/networknt/light-oauth2/pull/267) ([stevehu](https://github.com/stevehu))
+- fixes \#264 remove console log from login-view [\#265](https://github.com/networknt/light-oauth2/pull/265) ([stevehu](https://github.com/stevehu))
+- fixes \#262 update Dockerfile to resolve the warning of Hazelcast for … [\#263](https://github.com/networknt/light-oauth2/pull/263) ([stevehu](https://github.com/stevehu))
+- fixes \#260 add jdk.management module to the Dockerfile for Hazelcast [\#261](https://github.com/networknt/light-oauth2/pull/261) ([stevehu](https://github.com/stevehu))
+- fixes \#258 update LightPortalAuthenticator to handle the downstream a… [\#259](https://github.com/networknt/light-oauth2/pull/259) ([stevehu](https://github.com/stevehu))
+- fixes \#256 add start_time to refresh_token table with default [\#257](https://github.com/networknt/light-oauth2/pull/257) ([stevehu](https://github.com/stevehu))
+- fixes \#254 add remember to the refresh_token table to indicate if the… [\#255](https://github.com/networknt/light-oauth2/pull/255) ([stevehu](https://github.com/stevehu))
+- fixes \#252 handle remember me and code and token service for form bas… [\#253](https://github.com/networknt/light-oauth2/pull/253) ([stevehu](https://github.com/stevehu))
+- fixes \#250 remove http_url tag for Jaeger tracer as it contains password [\#251](https://github.com/networknt/light-oauth2/pull/251) ([stevehu](https://github.com/stevehu))
+- fixes \#248 pass the exchange to PortalAuthenticator for jaeger tracer [\#249](https://github.com/networknt/light-oauth2/pull/249) ([stevehu](https://github.com/stevehu))
+- fixes \#246 add jaeger tracing dependency to the light-oauth2 services [\#247](https://github.com/networknt/light-oauth2/pull/247) ([stevehu](https://github.com/stevehu))
+- fixes \#244 change roles to string in the JWT from array of strings [\#245](https://github.com/networknt/light-oauth2/pull/245) ([stevehu](https://github.com/stevehu))
 ## [2.0.12](https://github.com/networknt/light-oauth2/tree/2.0.12) (2020-03-31)
 
 
