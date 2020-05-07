@@ -235,7 +235,7 @@ function Login() {
                 required
                 fullWidth
                 id="j_username"
-                label="User Id"
+                label="Email"
                 name="j_username"
                 value={username}
                 autoComplete="username"
