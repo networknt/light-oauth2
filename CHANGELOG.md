@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.0.14](https://github.com/networknt/light-oauth2/tree/2.0.14) (2020-05-29)
+
+
+**Merged pull requests:**
+
+
+- fixes \#269 update login-view username label to Email from User Id [\#270](https://github.com/networknt/light-oauth2/pull/270) ([stevehu](https://github.com/stevehu))
 ## [2.0.13](https://github.com/networknt/light-oauth2/tree/2.0.13) (2020-05-01)
 
 
