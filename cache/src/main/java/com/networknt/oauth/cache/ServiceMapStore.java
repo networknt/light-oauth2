@@ -19,10 +19,10 @@ import java.util.*;
 public class ServiceMapStore implements MapStore<String, Service> {
     private static final Logger logger = LoggerFactory.getLogger(ServiceMapStore.class);
     private static final DataSource ds = (DataSource) SingletonServiceFactory.getBean(DataSource.class);
-    private static final String insert = "INSERT INTO service (service_id, service_type, service_name, service_desc, scope, owner_id) VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String insert = "INSERT INTO service (service_id, service_type, service_name, service_desc, scope, owner_id, host) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String delete = "DELETE FROM service WHERE service_id = ?";
     private static final String select = "SELECT * FROM service WHERE service_id = ?";
-    private static final String update = "UPDATE service SET service_type = ?, service_name=?, service_desc=?, scope=?, owner_id=? WHERE service_id=?";
+    private static final String update = "UPDATE service SET service_type = ?, service_name=?, service_desc=?, scope=?, owner_id=?, host=? WHERE service_id=?";
     private static final String loadall = "SELECT service_id FROM service";
 
     @Override
@@ -47,6 +47,7 @@ public class ServiceMapStore implements MapStore<String, Service> {
                 stmt.setString(4, service.getServiceDesc());
                 stmt.setString(5, service.getScope());
                 stmt.setString(6, service.getOwnerId());
+                stmt.setString(7, service.getHost());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logger.error("Exception:", e);
@@ -59,7 +60,8 @@ public class ServiceMapStore implements MapStore<String, Service> {
                 stmt.setString(3, service.getServiceDesc());
                 stmt.setString(4, service.getScope());
                 stmt.setString(5, service.getOwnerId());
-                stmt.setString(6, service.getServiceId());
+                stmt.setString(6, service.getHost());
+                stmt.setString(7, service.getServiceId());
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logger.error("Exception:", e);
@@ -91,6 +93,7 @@ public class ServiceMapStore implements MapStore<String, Service> {
                     service.setServiceDesc(rs.getString("service_desc"));
                     service.setScope(rs.getString("scope"));
                     service.setOwnerId(rs.getString("owner_id"));
+                    service.setHost(rs.getString("host"));
                 }
             }
         } catch (SQLException e) {

@@ -19,7 +19,6 @@ import java.util.Map;
 public class Oauth2ClientPutHandler  extends ClientAuditHandler implements LightHttpHandler {
     static Logger logger = LoggerFactory.getLogger(Oauth2ClientPutHandler.class);
     static final String CLIENT_NOT_FOUND = "ERR12014";
-    static final String USER_NOT_FOUND = "ERR12013";
     static final String DEREF_NOT_EXTERNAL = "ERR12043";
 
     @SuppressWarnings("unchecked")
@@ -40,18 +39,6 @@ public class Oauth2ClientPutHandler  extends ClientAuditHandler implements Light
         if(originalClient == null) {
             setExchangeStatus(exchange, CLIENT_NOT_FOUND, clientId);
         } else {
-            // make sure the owner_id exists in users map.
-            String ownerId = client.getOwnerId();
-            if(ownerId != null) {
-                IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
-                if(!users.containsKey(ownerId)) {
-                    Status status = new Status(USER_NOT_FOUND, ownerId);
-                    exchange.setStatusCode(status.getStatusCode());
-                    exchange.getResponseSender().send(status.toString());
-                    processAudit(exchange);
-                    return;
-                }
-            }
             // set client secret as it is not returned by query.
             client.setClientSecret(originalClient.getClientSecret());
             clients.set(clientId, client);
