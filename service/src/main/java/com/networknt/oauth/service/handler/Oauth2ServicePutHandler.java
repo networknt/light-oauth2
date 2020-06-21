@@ -17,9 +17,8 @@ import java.sql.Date;
 import java.util.Map;
 
 public class Oauth2ServicePutHandler extends ServiceAuditHandler implements LightHttpHandler {
-    static Logger logger = LoggerFactory.getLogger(Oauth2ServicePostHandler.class);
+    static Logger logger = LoggerFactory.getLogger(Oauth2ServicePutHandler.class);
     static final String SERVICE_NOT_FOUND = "ERR12015";
-    static final String USER_NOT_FOUND = "ERR12013";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -33,16 +32,6 @@ public class Oauth2ServicePutHandler extends ServiceAuditHandler implements Ligh
         if(services.get(serviceId) == null) {
             setExchangeStatus(exchange, SERVICE_NOT_FOUND, serviceId);
         } else {
-            // make sure the owner_id exists in users map.
-            String ownerId = service.getOwnerId();
-            if(ownerId != null) {
-                IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
-                if(!users.containsKey(ownerId)) {
-                    setExchangeStatus(exchange, USER_NOT_FOUND, ownerId);
-                    processAudit(exchange);
-                    return;
-                }
-            }
             services.set(serviceId, service);
         }
         processAudit(exchange);

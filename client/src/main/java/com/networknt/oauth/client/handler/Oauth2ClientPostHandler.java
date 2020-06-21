@@ -23,7 +23,6 @@ public class Oauth2ClientPostHandler  extends ClientAuditHandler implements Ligh
 
     static Logger logger = LoggerFactory.getLogger(Oauth2ClientPostHandler.class);
     static final String CLIENT_ID_EXISTS = "ERR12019";
-    static final String USER_NOT_FOUND = "ERR12013";
     static final String DEREF_NOT_EXTERNAL = "ERR12043";
 
     @SuppressWarnings("unchecked")
@@ -44,16 +43,6 @@ public class Oauth2ClientPostHandler  extends ClientAuditHandler implements Ligh
 
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         if(clients.get(clientId) == null) {
-            // make sure the owner_id exists in users map.
-            String ownerId = client.getOwnerId();
-            if(ownerId != null) {
-                IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
-                if(!users.containsKey(ownerId)) {
-                    setExchangeStatus(exchange, USER_NOT_FOUND, ownerId);
-                    processAudit(exchange);
-                    return;
-                }
-            }
             clients.set(clientId, client);
             // send the client back with client_id and client_secret
             Client c = Client.copyClient(client);

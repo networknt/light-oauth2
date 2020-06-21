@@ -54,6 +54,8 @@ public class Service implements IdentifiedDataSerializable {
 
   private String ownerId = null;
 
+  private String host = null;
+
   private String scope = null;
 
   public Service serviceId(String serviceId) {
@@ -126,6 +128,20 @@ public class Service implements IdentifiedDataSerializable {
     this.ownerId = ownerId;
   }
 
+  public Service host(String host) {
+    this.host = host;
+    return this;
+  }
+
+
+  @JsonProperty("host")
+  public String getHost() {
+    return host;
+  }
+  public void setHost(String host) {
+    this.host = host;
+  }
+
   public Service scope(String scope) {
     this.scope = scope;
     return this;
@@ -154,12 +170,13 @@ public class Service implements IdentifiedDataSerializable {
         Objects.equals(serviceName, service.serviceName) &&
         Objects.equals(serviceDesc, service.serviceDesc) &&
         Objects.equals(ownerId, service.ownerId) &&
+        Objects.equals(host, service.host) &&
         Objects.equals(scope, service.scope);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(serviceId, serviceType, serviceName, serviceDesc, ownerId, scope);
+    return Objects.hash(serviceId, serviceType, serviceName, serviceDesc, ownerId, host, scope);
   }
 
   @Override
@@ -172,6 +189,7 @@ public class Service implements IdentifiedDataSerializable {
     sb.append("    serviceName: ").append(toIndentedString(serviceName)).append("\n");
     sb.append("    serviceDesc: ").append(toIndentedString(serviceDesc)).append("\n");
     sb.append("    ownerId: ").append(toIndentedString(ownerId)).append("\n");
+    sb.append("    host: ").append(toIndentedString(host)).append("\n");
     sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -199,6 +217,7 @@ public class Service implements IdentifiedDataSerializable {
     this.serviceName = in.readUTF();
     this.serviceDesc = in.readUTF();
     this.ownerId = in.readUTF();
+    this.host = in.readUTF();
     this.scope = in.readUTF();
   }
 
@@ -209,6 +228,7 @@ public class Service implements IdentifiedDataSerializable {
     out.writeUTF(this.serviceName);
     out.writeUTF(this.serviceDesc);
     out.writeUTF(this.ownerId);
+    out.writeUTF(this.host);
     out.writeUTF(this.scope);
   }
 

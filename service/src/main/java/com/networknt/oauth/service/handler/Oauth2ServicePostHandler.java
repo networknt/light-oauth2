@@ -30,16 +30,6 @@ public class Oauth2ServicePostHandler extends ServiceAuditHandler implements Lig
         String serviceId = service.getServiceId();
         IMap<String, Service> services = CacheStartupHookProvider.hz.getMap("services");
         if(services.get(serviceId) == null) {
-            // make sure the owner_id exists in users map.
-            String ownerId = service.getOwnerId();
-            if(ownerId != null) {
-                IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
-                if(!users.containsKey(ownerId)) {
-                    setExchangeStatus(exchange, USER_NOT_FOUND, ownerId);
-                    processAudit(exchange);
-                    return;
-                }
-            }
             services.set(serviceId, service);
         } else {
             setExchangeStatus(exchange, SERVICE_ID_EXISTS, serviceId);
