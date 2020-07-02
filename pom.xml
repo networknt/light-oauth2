@@ -93,7 +93,7 @@
         <version.h2>1.4.196</version.h2>
         <version.hazelcast>3.9.2</version.hazelcast>
         <version.hazelcast-kubernetes>1.1.0</version.hazelcast-kubernetes>
-        <version.mysql>6.0.5</version.mysql>
+        <version.mysql>8.0.16</version.mysql>
         <version.postgres>9.4.1211</version.postgres>
         <version.sqlserver>6.5.1.jre8-preview</version.sqlserver>
         <version.org.apache.directory.server>2.0.0-M15</version.org.apache.directory.server>
