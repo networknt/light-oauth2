@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.0.15](https://github.com/networknt/light-oauth2/tree/2.0.15) (2020-07-01)
+
+
+**Merged pull requests:**
+
+
+- fixes \#275 add host to client and service table for multi-tenancy sup… [\#276](https://github.com/networknt/light-oauth2/pull/276) ([stevehu](https://github.com/stevehu))
+- fixes \#273 remove the temporary version.jackson-databind in the pom.xml [\#274](https://github.com/networknt/light-oauth2/pull/274) ([stevehu](https://github.com/stevehu))
 ## [2.0.14](https://github.com/networknt/light-oauth2/tree/2.0.14) (2020-05-29)
 
 
