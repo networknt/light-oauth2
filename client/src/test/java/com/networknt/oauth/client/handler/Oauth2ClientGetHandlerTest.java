@@ -3,6 +3,7 @@ package com.networknt.oauth.client.handler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
+import com.networknt.config.JsonMapper;
 import com.networknt.status.Status;
 import com.networknt.exception.ApiException;
 import com.networknt.exception.ClientException;
@@ -21,6 +22,7 @@ import org.xnio.OptionMap;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -54,13 +56,16 @@ public class Oauth2ClientGetHandlerTest {
             logger.debug("body = " + body);
             Assert.assertEquals(200, statusCode);
             if(statusCode == 200) {
-                // make sure that there are two services in the result.
-                List<com.networknt.oauth.cache.model.Client> clients = Config.getInstance().getMapper().readValue(body, new TypeReference<List<com.networknt.oauth.cache.model.Client>>(){});
+                // make sure that there are two clients in the clients list.
+                Map<String, Object> map = JsonMapper.string2Map(body);
+                int total = (Integer)map.get("total");
+                Assert.assertTrue(total > 5);
+                List<Map<String, Object>> clients = (List)map.get("clients");
                 Assert.assertTrue(clients.size() >= 1 && clients.size() <= 10);
                 // make sure that the first is AACT0001
                 // Assert.assertEquals("PetStore Web Server", clients.get(0).getClientName());
                 // make sure that client_secret is null.
-                Assert.assertNull(clients.get(0).getClientSecret());
+                Assert.assertNull(clients.get(0).get("clientSecret"));
             }
         } catch (Exception e) {
             logger.error("Exception: ", e);

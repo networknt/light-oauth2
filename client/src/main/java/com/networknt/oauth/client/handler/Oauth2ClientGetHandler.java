@@ -4,6 +4,7 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.query.PagingPredicate;
 import com.hazelcast.query.impl.predicates.LikePredicate;
 import com.networknt.config.Config;
+import com.networknt.config.JsonMapper;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
@@ -14,10 +15,7 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 public class Oauth2ClientGetHandler  extends ClientAuditHandler implements LightHttpHandler {
     static final Logger logger = LoggerFactory.getLogger(Oauth2ClientGetHandler.class);
@@ -43,8 +41,11 @@ public class Oauth2ClientGetHandler  extends ClientAuditHandler implements Light
             c.setClientSecret(null);
             results.add(c);
         }
+        Map<String, Object> map = new HashMap<>();
+        map.put("clients", results);
+        map.put("total", clients.size());
         exchange.getResponseHeaders().add(new HttpString("Content-Type"), "application/json");
-        exchange.getResponseSender().send(Config.getInstance().getMapper().writeValueAsString(results));
+        exchange.getResponseSender().send(JsonMapper.toJson(map));
         processAudit(exchange);
     }
 }
