@@ -47,7 +47,47 @@ public class Oauth2ClientGetHandlerTest {
         }
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         try {
-            ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath("/oauth2/client?page=1");
+            ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath("/oauth2/client?page=0");
+            connection.sendRequest(request, client.createClientCallback(reference, latch));
+            latch.await();
+            int statusCode = reference.get().getResponseCode();
+            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            logger.debug("statusCode = " + statusCode);
+            logger.debug("body = " + body);
+            Assert.assertEquals(200, statusCode);
+            if(statusCode == 200) {
+                // make sure that there are two clients in the clients list.
+                Map<String, Object> map = JsonMapper.string2Map(body);
+                int total = (Integer)map.get("total");
+                Assert.assertTrue(total > 5);
+                List<Map<String, Object>> clients = (List)map.get("clients");
+                Assert.assertTrue(clients.size() >= 1 && clients.size() <= 10);
+                // make sure that the first is AACT0001
+                // Assert.assertEquals("PetStore Web Server", clients.get(0).getClientName());
+                // make sure that client_secret is null.
+                Assert.assertNull(clients.get(0).get("clientSecret"));
+            }
+        } catch (Exception e) {
+            logger.error("Exception: ", e);
+            throw new ClientException(e);
+        } finally {
+            IoUtils.safeClose(connection);
+        }
+    }
+
+    @Test
+    public void testOauth2ClientGetPagination() throws ClientException, ApiException {
+        final Http2Client client = Http2Client.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ClientConnection connection;
+        try {
+            connection = client.connect(new URI("https://localhost:6884"), Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+        } catch (Exception e) {
+            throw new ClientException(e);
+        }
+        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
+        try {
+            ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath("/oauth2/client?page=0&pageSize=25");
             connection.sendRequest(request, client.createClientCallback(reference, latch));
             latch.await();
             int statusCode = reference.get().getResponseCode();
