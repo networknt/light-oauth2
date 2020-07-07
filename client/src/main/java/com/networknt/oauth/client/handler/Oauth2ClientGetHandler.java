@@ -25,7 +25,7 @@ public class Oauth2ClientGetHandler  extends ClientAuditHandler implements Light
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         Deque<String> clientNameDeque = exchange.getQueryParameters().get("clientName");
         String clientName = clientNameDeque == null? "%" : clientNameDeque.getFirst() + "%";
-        int page = Integer.valueOf(exchange.getQueryParameters().get("page").getFirst()) - 1;
+        int page = Integer.valueOf(exchange.getQueryParameters().get("page").getFirst());
         Deque<String> pageSizeDeque = exchange.getQueryParameters().get("pageSize");
         int pageSize = pageSizeDeque == null? 10 : Integer.valueOf(pageSizeDeque.getFirst());
 
