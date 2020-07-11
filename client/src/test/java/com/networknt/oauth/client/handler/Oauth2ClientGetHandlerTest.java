@@ -59,7 +59,7 @@ public class Oauth2ClientGetHandlerTest {
                 // make sure that there are two clients in the clients list.
                 Map<String, Object> map = JsonMapper.string2Map(body);
                 int total = (Integer)map.get("total");
-                Assert.assertTrue(total > 5);
+                Assert.assertTrue(total >= 5);
                 List<Map<String, Object>> clients = (List)map.get("clients");
                 Assert.assertTrue(clients.size() >= 1 && clients.size() <= 10);
                 // make sure that the first is AACT0001
@@ -99,7 +99,7 @@ public class Oauth2ClientGetHandlerTest {
                 // make sure that there are two clients in the clients list.
                 Map<String, Object> map = JsonMapper.string2Map(body);
                 int total = (Integer)map.get("total");
-                Assert.assertTrue(total > 5);
+                Assert.assertTrue(total >= 5);
                 List<Map<String, Object>> clients = (List)map.get("clients");
                 Assert.assertTrue(clients.size() >= 1 && clients.size() <= 10);
                 // make sure that the first is AACT0001

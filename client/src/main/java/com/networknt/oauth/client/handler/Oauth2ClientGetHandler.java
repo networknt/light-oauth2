@@ -23,13 +23,14 @@ public class Oauth2ClientGetHandler  extends ClientAuditHandler implements Light
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
-        Deque<String> clientNameDeque = exchange.getQueryParameters().get("clientName");
-        String clientName = clientNameDeque == null? "%" : clientNameDeque.getFirst() + "%";
+        Deque<String> hostDeque = exchange.getQueryParameters().get("host");
+        String host = hostDeque == null ? "%" : hostDeque.getFirst() + "%";
+
         int page = Integer.valueOf(exchange.getQueryParameters().get("page").getFirst());
         Deque<String> pageSizeDeque = exchange.getQueryParameters().get("pageSize");
         int pageSize = pageSizeDeque == null? 10 : Integer.valueOf(pageSizeDeque.getFirst());
 
-        LikePredicate likePredicate = new LikePredicate("clientName", clientName);
+        LikePredicate likePredicate = new LikePredicate("host", host);
 
         PagingPredicate pagingPredicate = new PagingPredicate(likePredicate, new ClientComparator(), pageSize);
         pagingPredicate.setPage(page);
