@@ -1,5 +1,16 @@
 # Change Log
 
+## [2.0.16](https://github.com/networknt/light-oauth2/tree/2.0.16) (2020-08-01)
+
+
+**Merged pull requests:**
+
+
+- Bump websocket-extensions from 0.1.3 to 0.1.4 in /login-view [\#271](https://github.com/networknt/light-oauth2/pull/271) ([dependabot](https://github.com/apps/dependabot))
+- Bump elliptic from 6.5.2 to 6.5.3 in /login-view [\#287](https://github.com/networknt/light-oauth2/pull/287) ([dependabot](https://github.com/apps/dependabot))
+- fixes \#282 update Oauth2ClientGetHandler to start page from 0 instead… [\#283](https://github.com/networknt/light-oauth2/pull/283) ([stevehu](https://github.com/stevehu))
+- fixes \#280 exclude module-info.class in the shade plugin to avoid dup… [\#281](https://github.com/networknt/light-oauth2/pull/281) ([stevehu](https://github.com/stevehu))
+- fixes \#278 add total to the Oauth2ClientGetHandler to support UI pagi… [\#279](https://github.com/networknt/light-oauth2/pull/279) ([stevehu](https://github.com/stevehu))
 ## [2.0.15](https://github.com/networknt/light-oauth2/tree/2.0.15) (2020-07-01)
 
 
