@@ -3,10 +3,13 @@ package com.networknt.oauth.client.handler;
 import com.hazelcast.core.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
+import com.networknt.config.JsonMapper;
 import com.networknt.handler.LightHttpHandler;
+import com.networknt.httpstring.AttachmentConstants;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
 import com.networknt.oauth.cache.model.User;
+import com.networknt.security.JwtVerifier;
 import com.networknt.status.Status;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -17,10 +20,22 @@ import java.sql.Date;
 import java.util.Map;
 
 public class Oauth2ClientPutHandler  extends ClientAuditHandler implements LightHttpHandler {
-    static Logger logger = LoggerFactory.getLogger(Oauth2ClientPutHandler.class);
-    static final String CLIENT_NOT_FOUND = "ERR12014";
-    static final String USER_NOT_FOUND = "ERR12013";
-    static final String DEREF_NOT_EXTERNAL = "ERR12043";
+    private static Logger logger = LoggerFactory.getLogger(Oauth2ClientPutHandler.class);
+    private static final String CLIENT_NOT_FOUND = "ERR12014";
+    private static final String DEREF_NOT_EXTERNAL = "ERR12043";
+    private static final String INCORRECT_TOKEN_TYPE = "ERR11601";
+    private static final String PERMISSION_DENIED = "ERR11620";
+
+    private static final String OPENAPI_SECURITY_CONFIG = "openapi-security";
+    private static final String ENABLE_VERIFY_JWT = "enableVerifyJwt";
+    private static boolean enableSecurity = false;
+    static {
+        Map<String, Object> config = Config.getInstance().getJsonMapConfig(OPENAPI_SECURITY_CONFIG);
+        // fallback to generic security.yml
+        if(config == null) config = Config.getInstance().getJsonMapConfig(JwtVerifier.SECURITY_CONFIG);
+        Object object = config.get(ENABLE_VERIFY_JWT);
+        enableSecurity = object != null && Boolean.valueOf(object.toString());
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -35,26 +50,34 @@ public class Oauth2ClientPutHandler  extends ClientAuditHandler implements Light
 
         String clientId = client.getClientId();
 
+        if(enableSecurity) {
+            String ownerId = client.getOwnerId();
+            Map<String, Object> auditInfo = exchange.getAttachment(AttachmentConstants.AUDIT_INFO);
+            String userId = (String)auditInfo.get("user_id");
+            String roles = (String)auditInfo.get("roles");
+            if(userId == null) {
+                setExchangeStatus(exchange, INCORRECT_TOKEN_TYPE, "Authorization Code Token");
+                return;
+            }
+            if(!userId.equals(ownerId)) {
+                // only the same user or admin can update.
+                if(roles == null || !roles.contains("admin")) {
+                    setExchangeStatus(exchange, PERMISSION_DENIED, roles);
+                    return;
+                }
+            }
+        }
+
         IMap<String, Client> clients = CacheStartupHookProvider.hz.getMap("clients");
         Client originalClient = clients.get(clientId);
         if(originalClient == null) {
             setExchangeStatus(exchange, CLIENT_NOT_FOUND, clientId);
         } else {
-            // make sure the owner_id exists in users map.
-            String ownerId = client.getOwnerId();
-            if(ownerId != null) {
-                IMap<String, User> users = CacheStartupHookProvider.hz.getMap("users");
-                if(!users.containsKey(ownerId)) {
-                    Status status = new Status(USER_NOT_FOUND, ownerId);
-                    exchange.setStatusCode(status.getStatusCode());
-                    exchange.getResponseSender().send(status.toString());
-                    processAudit(exchange);
-                    return;
-                }
-            }
             // set client secret as it is not returned by query.
+            Client c = Client.copyClient(client);
             client.setClientSecret(originalClient.getClientSecret());
             clients.set(clientId, client);
+            exchange.getResponseSender().send(JsonMapper.toJson(c));
         }
         processAudit(exchange);
     }

@@ -270,6 +270,7 @@ components:
         - clientName
         - clientDesc
         - ownerId
+        - host
         - scope
       properties:
         clientId:
@@ -304,6 +305,9 @@ components:
         ownerId:
           type: string
           description: client owner id
+        host:
+          type: string
+          description: client host
         scope:
           type: string
           description: client scope separated by space

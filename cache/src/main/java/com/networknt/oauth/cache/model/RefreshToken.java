@@ -30,6 +30,8 @@ public class RefreshToken implements IdentifiedDataSerializable {
 
   private String scope = null;
 
+  private String remember = null;
+
   public RefreshToken refreshToken(String refreshToken) {
     this.refreshToken = refreshToken;
     return this;
@@ -109,13 +111,25 @@ public class RefreshToken implements IdentifiedDataSerializable {
     return this;
   }
 
-  
   @JsonProperty("scope")
   public String getScope() {
     return scope;
   }
   public void setScope(String scope) {
     this.scope = scope;
+  }
+
+  public RefreshToken remember(String remember) {
+    this.remember = remember;
+    return this;
+  }
+
+  @JsonProperty("remember")
+  public String getRemember() {
+    return remember;
+  }
+  public void setRemember(String remember) {
+    this.remember = remember;
   }
 
   @Override
@@ -132,13 +146,14 @@ public class RefreshToken implements IdentifiedDataSerializable {
         Objects.equals(userType, token.userType) &&
         Objects.equals(roles, token.roles) &&
         Objects.equals(clientId, token.clientId) &&
+        Objects.equals(remember, token.remember) &&
         Objects.equals(scope, token.scope);
 
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(refreshToken, userId, userType, roles, clientId, scope);
+    return Objects.hash(refreshToken, userId, userType, roles, clientId, scope, remember);
   }
 
   @Override
@@ -152,6 +167,7 @@ public class RefreshToken implements IdentifiedDataSerializable {
     sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
     sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
     sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
+    sb.append("    remember: ").append(toIndentedString(remember)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -179,6 +195,7 @@ public class RefreshToken implements IdentifiedDataSerializable {
     this.roles = in.readUTF();
     this.clientId = in.readUTF();
     this.scope = in.readUTF();
+    this.remember = in.readUTF();
   }
 
   @Override
@@ -189,6 +206,7 @@ public class RefreshToken implements IdentifiedDataSerializable {
     out.writeUTF(this.roles);
     out.writeUTF(this.clientId);
     out.writeUTF(this.scope);
+    out.writeUTF(this.remember);
   }
 
   @JsonIgnore

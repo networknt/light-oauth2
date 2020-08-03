@@ -175,7 +175,7 @@ public class LightBasicAuthenticationMechanism implements AuthenticationMechanis
                         }
 
                         IdentityManager idm = getIdentityManager(securityContext);
-                        LightPasswordCredential credential = new LightPasswordCredential(password, clientAuthClass, userType);
+                        LightPasswordCredential credential = new LightPasswordCredential(password, clientAuthClass, userType, exchange);
                         try {
                             final AuthenticationMechanismOutcome result;
                             Account account = idm.verify(userName, credential);

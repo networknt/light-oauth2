@@ -3,15 +3,11 @@ package com.networknt.oauth.token.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hazelcast.core.ClientType;
 import com.hazelcast.core.IMap;
-import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
-import com.networknt.exception.ApiException;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.auth.Authenticator;
 import com.networknt.oauth.auth.DefaultAuth;
-import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.OAuth2Constants;
 import com.networknt.oauth.cache.model.*;
@@ -21,6 +17,7 @@ import com.networknt.security.JwtConfig;
 import com.networknt.security.JwtIssuer;
 import com.networknt.service.SingletonServiceFactory;
 import com.networknt.status.Status;
+import com.networknt.exception.ApiException;
 import com.networknt.utility.CodeVerifierUtil;
 import com.networknt.utility.HashUtil;
 import com.networknt.utility.Util;
@@ -193,7 +190,8 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
             String roles = codeMap.get("roles");
             String uri = codeMap.get("redirectUri");
             String scope = codeMap.get("scope");
-            if(logger.isDebugEnabled()) logger.debug("variable from codeMap cache userId = " + userId + " redirectUri = " + redirectUri + " scope = " + scope + " userType = " + userType + " roles = " + roles);
+            String remember = codeMap.get("remember");
+            if(logger.isDebugEnabled()) logger.debug("variable from codeMap cache userId = " + userId + " redirectUri = " + redirectUri + " scope = " + scope + " userType = " + userType + " roles = " + roles + " remember = " + remember);
 
             // PKCE
             String codeChallenge = codeMap.get(OAuth2Constants.CODE_CHALLENGE);
@@ -276,6 +274,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                 token.setRoles(roles);
                 token.setClientId(client.getClientId());
                 token.setScope(scope);
+                token.setRemember(remember != null && remember.equals("Y") ? "Y" : "N");
                 IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
                 tokens.set(refreshToken, token);
                 // if the client type is external, save the jwt to reference map and send the reference
@@ -287,6 +286,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                 resMap.put("token_type", "bearer");
                 resMap.put("expires_in", config.getExpiredInMinutes()*60);
                 resMap.put("refresh_token", refreshToken);
+                if(remember != null) resMap.put("remember", remember);  // StatelessAuthHandler will set refresh_token cookie to 90 days if it is 'Y'
                 return resMap;
             } else {
                 throw new ApiException(new Status(INVALID_AUTHORIZATION_CODE, code));
@@ -336,7 +336,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                         }
                         Authenticator authenticator = SingletonServiceFactory.getBean(Authenticator.class, clazz);
 
-                        Account account = authenticator.authenticate(userId, new LightPasswordCredential(password, clientAuthClass, userType));
+                        Account account = authenticator.authenticate(userId, new LightPasswordCredential(password, clientAuthClass, userType, exchange));
                         if(account == null) {
                             throw new ApiException(new Status(INCORRECT_PASSWORD));
                         } else {
@@ -355,6 +355,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                                 token.setUserId(userId);
                                 token.setClientId(client.getClientId());
                                 token.setScope(scope);
+                                token.setRemember("N"); // set this to N by default for password
                                 IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
                                 tokens.set(refreshToken, token);
 
@@ -400,6 +401,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                 String roles = token.getRoles();
                 String clientId = token.getClientId();
                 String oldScope = token.getScope();
+                String remember = token.getRemember();
 
                 if(client.getClientId().equals(clientId)) {
                     if(scope == null) {
@@ -431,6 +433,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                     newToken.setRoles(roles);
                     newToken.setClientId(client.getClientId());
                     newToken.setScope(scope);
+                    newToken.setRemember(remember);
                     tokens.put(newRefreshToken, newToken);
                     // if the client type is external, save the jwt to reference map and send the reference
                     if(Client.ClientTypeEnum.EXTERNAL == client.getClientType()) {
@@ -441,6 +444,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                     resMap.put("token_type", "bearer");
                     resMap.put("expires_in", config.getExpiredInMinutes()*60);
                     resMap.put("refresh_token", newRefreshToken);
+                    resMap.put("remember", remember);
                     return resMap;
 
                 } else {
@@ -511,6 +515,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                 token.setRoles(roles);
                 token.setClientId(client.getClientId());
                 token.setScope(scope);
+                token.setRemember("N"); // default to N
                 IMap<String, RefreshToken> tokens = CacheStartupHookProvider.hz.getMap("tokens");
                 tokens.set(refreshToken, token);
 

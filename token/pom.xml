@@ -135,12 +135,10 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${version.jackson}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${version.jackson}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -216,6 +214,7 @@
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
+                                        <exclude>module-info.class</exclude>
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>

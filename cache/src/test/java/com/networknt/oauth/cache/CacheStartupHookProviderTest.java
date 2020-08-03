@@ -193,6 +193,7 @@ public class CacheStartupHookProviderTest {
         token.setClientId("59f347a0-c92d-11e6-9d9d-cec0c932ce01");
 
         token.setScope("todo.r");
+        token.setRemember("N");
         token.setRefreshToken("token1");
 
 

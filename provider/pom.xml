@@ -2,16 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>light-oauth2</artifactId>
         <groupId>com.networknt</groupId>
         <version>1.6.27-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.networknt</groupId>
     <artifactId>oauth2-provider</artifactId>
-
+    <packaging>jar</packaging>
+    <description>A micro service server that supports multiple OAuth 2.0 providers work in concert.</description>
 
     <dependencies>
         <dependency>
@@ -137,27 +137,22 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${version.jackson}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${version.jackson}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>${version.logback}</version>
         </dependency>
         <dependency>
             <groupId>io.undertow</groupId>
             <artifactId>undertow-core</artifactId>
-            <version>${version.undertow}</version>
         </dependency>
         <dependency>
             <groupId>org.bitbucket.b_c</groupId>
             <artifactId>jose4j</artifactId>
-            <version>${version.jose4j}</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -219,6 +214,7 @@
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
+                                        <exclude>module-info.class</exclude>
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
