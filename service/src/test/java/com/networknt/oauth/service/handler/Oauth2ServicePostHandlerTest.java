@@ -36,7 +36,7 @@ public class Oauth2ServicePostHandlerTest {
 
     @Test
     public void testOauth2ServicePostHandler() throws ClientException, ApiException, UnsupportedEncodingException {
-        String service = "{\"serviceId\":\"AACT0005\",\"serviceType\":\"swagger\",\"serviceName\":\"Retail Account\",\"serviceDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\",\"ownerId\":\"admin\",\"host\":\"lightapi.net\"}";
+        String service = "{\"serviceId\":\"AACT0005\",\"serviceType\":\"openapi\",\"serviceName\":\"Retail Account\",\"serviceDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\",\"ownerId\":\"admin\",\"host\":\"lightapi.net\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -61,6 +61,7 @@ public class Oauth2ServicePostHandlerTest {
             latch.await(10, TimeUnit.SECONDS);
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
+            System.out.println(body);
             Assert.assertEquals(200, statusCode);
             if(statusCode == 200) {
                 Assert.assertNotNull(body);

@@ -36,7 +36,7 @@ public class Oauth2ServicePutHandlerTest {
 
     @Test
     public void testOauth2ServicePutHandler() throws ClientException, ApiException, UnsupportedEncodingException {
-        String service = "{\"serviceId\":\"AACT0001\",\"serviceType\":\"swagger\",\"serviceName\":\"Retail Account\",\"serviceDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\",\"ownerId\":\"admin\",\"host\":\"lightapi.net\"}";
+        String service = "{\"serviceId\":\"AACT0001\",\"serviceType\":\"openapi\",\"serviceName\":\"Retail Account\",\"serviceDesc\":\"Microservices for Retail Account\",\"scope\":\"act.r act.w\",\"ownerId\":\"admin\",\"host\":\"lightapi.net\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
