@@ -240,6 +240,9 @@ components:
         ownerId:
           type: string
           description: service owner userId
+        host:
+          type: string
+          description: service host
         scope:
           type: string
           description: service scopes separated by space

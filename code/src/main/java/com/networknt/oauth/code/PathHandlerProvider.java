@@ -36,6 +36,12 @@ import io.undertow.server.session.SessionAttachmentHandler;
 import io.undertow.server.session.SessionCookieConfig;
 import io.undertow.util.Methods;
 
+/**
+ * Please don't use this in the service.yml but use handler.yml instead. Please check test/resources/config
+ * for more details. We will gradually update all the extenalized config files.
+ *
+ * @deprecated
+ */
 public class PathHandlerProvider implements HandlerProvider {
     private static final String SPNEGO_SERVICE_PASSWORD = "spnegoServicePassword";
     private static final String SECRET_CONFIG = "secret";

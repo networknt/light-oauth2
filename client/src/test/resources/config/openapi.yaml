@@ -24,7 +24,7 @@ paths:
                 $ref: '#/components/schemas/Client'
       security:
         - client_auth:
-            - oauth.client.w
+            - portal.w
       requestBody:
         $ref: '#/components/requestBodies/Client'
     put:
@@ -39,7 +39,7 @@ paths:
                 $ref: '#/components/schemas/Client'
       security:
         - client_auth:
-            - oauth.client.w
+            - portal.w
       requestBody:
         $ref: '#/components/requestBodies/Client'
     get:
@@ -77,7 +77,7 @@ paths:
                   $ref: '#/components/schemas/Client'
       security:
         - client_auth:
-            - oauth.client.r
+            - portal.r
   '/oauth2/client/{clientId}':
     delete:
       description: Delete a client by Id
@@ -96,7 +96,7 @@ paths:
           description: Client not found
       security:
         - client_auth:
-            - oauth.client.w
+            - portal.w
     get:
       description: Get a client by Id
       operationId: getClient
@@ -120,8 +120,7 @@ paths:
           description: Client not found
       security:
         - client_auth:
-            - oauth.client.r
-            - oauth.client.w
+            - portal.r
   '/oauth2/client/{clientId}/service':
     delete:
       description: Delete all associated services for a client by clientId
@@ -140,7 +139,7 @@ paths:
           description: Client not found
       security:
         - client_auth:
-            - oauth.client.w
+            - portal.w
     get:
       description: Get all associated services and endpoints by clientId
       operationId: getAllClientService
@@ -158,8 +157,7 @@ paths:
           description: Client not found
       security:
         - client_auth:
-            - oauth.client.r
-            - oauth.client.w
+            - portal.r
   '/oauth2/client/{clientId}/service/{serviceId}':
     post:
       description: Link a service and its endpoints to a client
@@ -184,7 +182,7 @@ paths:
           description: Client or service not found
       security:
         - client_auth:
-            - oauth.client.w
+            - portal.w
       requestBody:
         content:
           application/json:
@@ -217,7 +215,7 @@ paths:
           description: Client or service not found
       security:
         - client_auth:
-            - oauth.client.w
+            - portal.w
     get:
       description: Get linked endpoints of a service from a client
       operationId: getClientService
@@ -241,8 +239,7 @@ paths:
           description: Client or service not found
       security:
         - client_auth:
-            - oauth.client.r
-            - oauth.client.w
+            - portal.r
 components:
   requestBodies:
     Client:
@@ -259,8 +256,8 @@ components:
         implicit:
           authorizationUrl: 'http://localhost:8888/oauth2/code'
           scopes:
-            oauth.client.w: write oauth client
-            oauth.client.r: read oauth client
+            portal.w: write from light-portal
+            portal.r: read from light-portal
   schemas:
     Client:
       type: object
@@ -269,7 +266,7 @@ components:
         - clientProfile
         - clientName
         - clientDesc
-        - ownerId
+        - host
         - scope
       properties:
         clientId:
@@ -304,6 +301,9 @@ components:
         ownerId:
           type: string
           description: client owner id
+        host:
+          type: string
+          description: client host
         scope:
           type: string
           description: client scope separated by space

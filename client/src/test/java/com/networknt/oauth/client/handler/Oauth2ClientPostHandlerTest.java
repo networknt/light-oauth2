@@ -1,12 +1,10 @@
 package com.networknt.oauth.client.handler;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
+import com.networknt.status.Status;
 import com.networknt.exception.ApiException;
 import com.networknt.exception.ClientException;
-import com.networknt.status.Status;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;
@@ -39,7 +37,7 @@ public class Oauth2ClientPostHandlerTest {
 
     @Test
     public void testOauth2ClientPostHandler() throws ClientException, ApiException, UnsupportedEncodingException {
-        String s = "{\"clientType\":\"public\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"customClaim\":\"{\\\"consumer_application_id\\\": \\\"361\\\", \\\"request_transit\\\": \\\"67\\\"}\",\"redirectUri\":\"https://localhost:8080/authorization\",\"ownerId\":\"admin\"}";
+        String s = "{\"clientType\":\"public\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"customClaim\":\"{\\\"consumer_application_id\\\": \\\"361\\\", \\\"request_transit\\\": \\\"67\\\"}\",\"redirectUri\":\"https://localhost:8080/authorization\",\"ownerId\":\"admin\",\"host\":\"lightapi.net\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -78,7 +76,7 @@ public class Oauth2ClientPostHandlerTest {
 
     @Test
     public void testAuthClassDerefHandler() throws ClientException, ApiException, UnsupportedEncodingException {
-        String s = "{\"clientType\":\"external\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\":\"https://localhost:8080/authorization\",\"authenticateClass\":\"com.networknt.oauth.code.auth.MarketPlaceAuth\",\"derefClientId\":\"59f347a0-c92d-11e6-9d9d-cec0c932ce03\",\"ownerId\":\"admin\"}";
+        String s = "{\"clientType\":\"external\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\":\"https://localhost:8080/authorization\",\"authenticateClass\":\"com.networknt.oauth.code.auth.MarketPlaceAuth\",\"derefClientId\":\"59f347a0-c92d-11e6-9d9d-cec0c932ce03\",\"ownerId\":\"admin\",\"host\":\"lightapi.net\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -111,51 +109,9 @@ public class Oauth2ClientPostHandlerTest {
     }
 
     @Test
-    public void testOwnerNotFound() throws ClientException, ApiException, UnsupportedEncodingException {
-        String s = "{\"clientType\":\"public\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\": \"http://localhost:8080/authorization\",\"ownerId\":\"fake\"}";
-        final AtomicReference<ClientResponse> reference = new AtomicReference<>();
-        final Http2Client client = Http2Client.getInstance();
-        final CountDownLatch latch = new CountDownLatch(1);
-        final ClientConnection connection;
-        try {
-            connection = client.connect(new URI("https://localhost:6884"), Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
-        } catch (Exception e) {
-            throw new ClientException(e);
-        }
-
-        try {
-            connection.getIoThread().execute(new Runnable() {
-                @Override
-                public void run() {
-                    final ClientRequest request = new ClientRequest().setMethod(Methods.POST).setPath("/oauth2/client");
-                    request.getRequestHeaders().put(Headers.HOST, "localhost");
-                    request.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                    request.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
-                    connection.sendRequest(request, client.createClientCallback(reference, latch, s));
-                }
-            });
-            latch.await();
-            int statusCode = reference.get().getResponseCode();
-            String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
-            Assert.assertEquals(404, statusCode);
-            if(statusCode == 404) {
-                Status status = Config.getInstance().getMapper().readValue(body, Status.class);
-                Assert.assertNotNull(status);
-                Assert.assertEquals("ERR12013", status.getCode());
-                Assert.assertEquals("USER_NOT_FOUND", status.getMessage()); // response_type missing
-            }
-        } catch (Exception e) {
-            logger.error("IOException: ", e);
-            throw new ClientException(e);
-        } finally {
-            IoUtils.safeClose(connection);
-        }
-    }
-
-    @Test
     public void testDerefNotExternal() throws ClientException, IOException {
         // The input has derefClientId but the client type is public not external which is the only type that needs optional derefClientId
-        String s = "{\"clientType\":\"public\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\":\"http://localhost:8080/authorization\",\"derefClientId\":\"47b943db-a4d5-4df5-b21f-c3cfb44b1bb3\",\"ownerId\":\"admin\"}";
+        String s = "{\"clientType\":\"public\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\":\"http://localhost:8080/authorization\",\"derefClientId\":\"47b943db-a4d5-4df5-b21f-c3cfb44b1bb3\",\"ownerId\":\"admin\",\"host\":\"lightapi.net\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -193,7 +149,7 @@ public class Oauth2ClientPostHandlerTest {
 
     @Test
     public void testInvalidClientType() throws ClientException, ApiException, UnsupportedEncodingException {
-        String s = "{\"clientType\":\"fake\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\": \"http://localhost:8080/authorization\",\"ownerId\":\"fake\"}";
+        String s = "{\"clientType\":\"fake\",\"clientProfile\":\"mobile\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\": \"http://localhost:8080/authorization\",\"ownerId\":\"fake\",\"host\":\"lightapi.net\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -235,7 +191,7 @@ public class Oauth2ClientPostHandlerTest {
 
     @Test
     public void testInvalidClientProfile() throws ClientException, ApiException, UnsupportedEncodingException {
-        String s = "{\"clientType\":\"public\",\"clientProfile\":\"fake\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\": \"http://localhost:8080/authorization\",\"ownerId\":\"fake\"}";
+        String s = "{\"clientType\":\"public\",\"clientProfile\":\"fake\",\"clientName\":\"AccountViewer\",\"clientDesc\":\"Retail Online Banking Account Viewer\",\"scope\":\"act.r act.w\",\"redirectUri\": \"http://localhost:8080/authorization\",\"ownerId\":\"fake\",\"host\":\"lightapi.net\"}";
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
         final CountDownLatch latch = new CountDownLatch(1);

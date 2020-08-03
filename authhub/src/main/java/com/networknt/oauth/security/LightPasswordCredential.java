@@ -1,6 +1,8 @@
 package com.networknt.oauth.security;
 
+import com.sun.net.httpserver.HttpServer;
 import io.undertow.security.idm.Credential;
+import io.undertow.server.HttpServerExchange;
 
 /**
  * For the OAuth 2.0 authorization code grant type, we need to pass the client specific authentication
@@ -22,11 +24,13 @@ public class LightPasswordCredential implements Credential {
     private final char[] password;
     private final String clientAuthClass;
     private final String userType;
+    private HttpServerExchange exchange;
 
-    public LightPasswordCredential(char[] password, String clientAuthClass, String userType) {
+    public LightPasswordCredential(char[] password, String clientAuthClass, String userType, HttpServerExchange exchange) {
         this.password = password;
         this.clientAuthClass = clientAuthClass;
         this.userType = userType;
+        this.exchange = exchange;
     }
 
     public char[] getPassword() { return this.password; }
@@ -34,4 +38,8 @@ public class LightPasswordCredential implements Credential {
     public String getClientAuthClass() { return this.clientAuthClass; }
 
     public String getUserType() { return this.userType; }
+
+    public HttpServerExchange getExchange() {
+        return exchange;
+    }
 }

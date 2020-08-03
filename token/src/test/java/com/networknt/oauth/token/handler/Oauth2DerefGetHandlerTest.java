@@ -2,10 +2,10 @@ package com.networknt.oauth.token.handler;
 
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
-import com.networknt.exception.ApiException;
-import com.networknt.exception.ClientException;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.status.Status;
+import com.networknt.exception.ApiException;
+import com.networknt.exception.ClientException;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
 import io.undertow.client.ClientRequest;

@@ -38,7 +38,7 @@ public class LightPortalAuthenticatorTest {
         }
         Authenticator authenticator = SingletonServiceFactory.getBean(Authenticator.class, clazz);
         Assert.assertTrue(authenticator != null);
-        Account account = authenticator.authenticate("stevehu@gmail.com", new LightPasswordCredential("123456".toCharArray(), null, null));
+        Account account = authenticator.authenticate("stevehu@gmail.com", new LightPasswordCredential("123456".toCharArray(), null, null, null));
         Assert.assertTrue(account != null);
     }
 }

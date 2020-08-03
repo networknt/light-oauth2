@@ -3,10 +3,10 @@ package com.networknt.oauth.token.handler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
-import com.networknt.exception.ClientException;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.RefreshToken;
 import com.networknt.status.Status;
+import com.networknt.exception.ClientException;
 import com.networknt.utility.Util;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;
@@ -895,6 +895,7 @@ public class Oauth2TokenPostHandlerTest {
         token.setUserType("employee");
         token.setClientId("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d");
         token.setScope("petstore.r petstore.w");
+        token.setRemember("N");
         CacheStartupHookProvider.hz.getMap("tokens").put("86c0a39f-0789-4b71-9fed-d99fe6dc9281", token);
 
         Map<String, String> params = new HashMap<>();
@@ -957,6 +958,7 @@ public class Oauth2TokenPostHandlerTest {
         token.setUserType("employee");
         token.setClientId("78cd9a2e-7690-11e8-adc0-fa7ae01bbebc");
         token.setScope("petstore.r petstore.w");
+        token.setRemember("N");
         CacheStartupHookProvider.hz.getMap("tokens").put("86c0a39f-0789-4b71-9fed-d99fe6dc9281", token);
 
         Map<String, String> params = new HashMap<>();
@@ -1025,6 +1027,7 @@ public class Oauth2TokenPostHandlerTest {
         token.setRoles("user admin");
         token.setClientId("6e9d1db3-2feb-4c1f-a5ad-9e93ae8ca59d");
         token.setScope("petstore.r petstore.w");
+        token.setRemember("N");
         CacheStartupHookProvider.hz.getMap("tokens").put("86c0a39f-0789-4b71-9fed-d99fe6dc9281", token);
 
         Map<String, String> params = new HashMap<>();

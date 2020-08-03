@@ -1,10 +1,10 @@
 package com.networknt.oauth.user.handler;
 
 import com.networknt.client.Http2Client;
-import com.networknt.exception.ApiException;
-import com.networknt.exception.ClientException;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.User;
+import com.networknt.exception.ApiException;
+import com.networknt.exception.ClientException;
 import com.networknt.utility.HashUtil;
 import io.undertow.UndertowOptions;
 import io.undertow.client.ClientConnection;

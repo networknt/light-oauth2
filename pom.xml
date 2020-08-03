@@ -291,6 +291,11 @@
             </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
+                <artifactId>resource</artifactId>
+                <version>${version.light-4j}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
                 <artifactId>server</artifactId>
                 <version>${version.light-4j}</version>
             </dependency>
@@ -334,11 +339,6 @@
                 <groupId>com.networknt</groupId>
                 <artifactId>openapi-validator</artifactId>
                 <version>${version.light-4j}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-parser</artifactId>
-                <version>${version.swagger-parser}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>

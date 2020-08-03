@@ -58,10 +58,14 @@ public class LightPortalAuthenticator extends AuthenticatorBase<LightPortalAuth>
         // Get the singleton Cluster instance
         cluster = SingletonServiceFactory.getBean(Cluster.class);
         String host = cluster.serviceToUrl("https", queryServiceId, tag, null);
-        try {
-            connection = client.connect(new URI(host), Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
-        } catch (Exception e) {
-            logger.error("Exception:", e);
+        if(host != null) {
+            // we only need to try to establish a connection if we can find a host. Due to service startup sequence, we might not have hybrid-query service available in the beginning.
+            try {
+                connection = client.connect(new URI(host), Http2Client.WORKER, Http2Client.SSL, Http2Client.BUFFER_POOL, OptionMap.create(UndertowOptions.ENABLE_HTTP2, true)).get();
+            } catch (Exception e) {
+                // ignore the error here. Just log it as the target server might not be up and running in the case of direct registry. In that case, we get Connection refused error.
+                logger.error("Exception:", e);
+            }
         }
     }
 
@@ -89,7 +93,6 @@ public class LightPortalAuthenticator extends AuthenticatorBase<LightPortalAuth>
             if(statusCode == 200) {
                 Map<String, Object> map = JsonMapper.string2Map(body);
                 // {"roles":"user","id":"stevehu@gmail.com"}
-                String roles = (String)map.get("roles");
                 Account account = new Account() {
                     private Set<String> roles = splitRoles((String)map.get("roles"));
                     private final Principal principal = () -> id;
@@ -104,12 +107,43 @@ public class LightPortalAuthenticator extends AuthenticatorBase<LightPortalAuth>
                     }
                 };
                 return account;
+            } else {
+                // create a dummy account to return the error the the StatelessAuthHandler in light-spa-4j
+                Map<String, Object> map = JsonMapper.string2Map(body);
+                Account account = new Account() {
+                    private final Principal principal = () -> "error";
+                    @Override
+                    public Principal getPrincipal() {
+                        return principal;
+                    }
+
+                    @Override
+                    public Set<String> getRoles() {
+                        Set<String> roles = new HashSet<>();
+                        roles.add((String)map.get("description"));
+                        return roles;
+                    }
+                };
+                return account;
             }
         } catch (Exception e) {
             logger.error("Exception:", e);
-            return null;
+            Account account = new Account() {
+                private final Principal principal = () -> "error";
+                @Override
+                public Principal getPrincipal() {
+                    return principal;
+                }
+
+                @Override
+                public Set<String> getRoles() {
+                    Set<String> roles = new HashSet<>();
+                    roles.add(e.getMessage());
+                    return roles;
+                }
+            };
+            return account;
         }
-        return null;
     }
 
     public Set<String> splitRoles(String roles) {
