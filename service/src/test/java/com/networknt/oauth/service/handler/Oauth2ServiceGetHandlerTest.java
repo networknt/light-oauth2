@@ -3,6 +3,7 @@ package com.networknt.oauth.service.handler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
+import com.networknt.config.JsonMapper;
 import com.networknt.oauth.cache.model.Service;
 import com.networknt.status.Status;
 import com.networknt.exception.ApiException;
@@ -22,6 +23,7 @@ import org.xnio.OptionMap;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -78,19 +80,19 @@ public class Oauth2ServiceGetHandlerTest {
         }
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         try {
-            ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath("/oauth2/service?page=1");
+            ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath("/oauth2/service?page=0");
             connection.sendRequest(request, client.createClientCallback(reference, latch));
             latch.await();
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(200, statusCode);
             if(statusCode == 200) {
-                // make sure that there are two services in the result.
-                List<Service> services = Config.getInstance().getMapper().readValue(body, new TypeReference<List<Service>>(){});
+                Map<String, Object> map = JsonMapper.string2Map(body);
+                int total = (Integer)map.get("total");
+                Assert.assertTrue(total >= 2);
+                List<Map<String, Object>> services = (List)map.get("services");
                 Assert.assertTrue(services.size() > 0);
-                // make sure that the first is AACT0001
-                Service service = services.get(0);
-                Assert.assertEquals("AACT0001", service.getServiceId());
+                Assert.assertEquals("AACT0001", services.get(0).get("serviceId"));
             }
         } catch (Exception e) {
             logger.error("Exception: ", e);
@@ -112,16 +114,18 @@ public class Oauth2ServiceGetHandlerTest {
         }
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         try {
-            ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath("/oauth2/service?page=2");
+            ClientRequest request = new ClientRequest().setMethod(Methods.GET).setPath("/oauth2/service?page=1");
             connection.sendRequest(request, client.createClientCallback(reference, latch));
             latch.await();
             int statusCode = reference.get().getResponseCode();
             String body = reference.get().getAttachment(Http2Client.RESPONSE_BODY);
             Assert.assertEquals(200, statusCode);
             if(statusCode == 200) {
-                // make sure that there are two services in the result.
-                List<Service> services = Config.getInstance().getMapper().readValue(body, new TypeReference<List<Service>>(){});
-                Assert.assertEquals(0, services.size());
+                Map<String, Object> map = JsonMapper.string2Map(body);
+                int total = (Integer)map.get("total");
+                Assert.assertTrue(total >= 2);
+                List<Map<String, Object>> services = (List)map.get("services");
+                Assert.assertTrue(services.size() == 0);
             }
         } catch (Exception e) {
             logger.error("Exception: ", e);
