@@ -218,7 +218,6 @@ components:
         - serviceId
         - serviceName
         - serviceType
-        - ownerId
         - host
       properties:
         serviceId:

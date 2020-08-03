@@ -16,6 +16,8 @@
 package com.networknt.oauth.service.handler;
 
 import com.hazelcast.core.IMap;
+import com.networknt.config.Config;
+import com.networknt.config.JsonMapper;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Service;
@@ -25,6 +27,9 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Delete a service by a serviceId, if there are endpoints associated with the service
@@ -45,6 +50,9 @@ public class Oauth2ServiceServiceIdDeleteHandler extends ServiceAuditHandler imp
         } else {
             serviceEndpoints.delete(serviceId);
             services.delete(serviceId);
+            Map<String, Object> result = new HashMap<>();
+            result.put("serviceId", serviceId);
+            exchange.getResponseSender().send(JsonMapper.toJson(result));
         }
         processAudit(exchange);
     }
