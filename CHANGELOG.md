@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.6.27](https://github.com/networknt/light-oauth2/tree/1.6.27) (2020-08-28)
+
+
+**Merged pull requests:**
+
+
+- fixes \#291 sync 1.6.x branch with master to finalize the db based imp… [\#292](https://github.com/networknt/light-oauth2/pull/292) ([stevehu](https://github.com/stevehu))
 ## [1.6.26](https://github.com/networknt/light-oauth2/tree/1.6.26) (2020-08-01)
 
 
