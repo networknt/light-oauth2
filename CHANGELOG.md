@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.0.17](https://github.com/networknt/light-oauth2/tree/2.0.17) (2020-08-28)
+
+
+**Merged pull requests:**
+
+
+- fixes \#289 refactor light-oauth2 service to ensure integration with l… [\#290](https://github.com/networknt/light-oauth2/pull/290) ([stevehu](https://github.com/stevehu))
 ## [2.0.16](https://github.com/networknt/light-oauth2/tree/2.0.16) (2020-08-01)
 
 
