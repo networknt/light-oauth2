@@ -123,7 +123,11 @@ function Login() {
 
   const onGoogleSuccess = (res) => {
     console.log('Google Login Success: authorization code:', res.code);
-    fetch('/google?code=' + res.code)
+    console.log('referrer: ', document.referrer);
+    let pathArray = document.referrer.split('/');
+    let host = pathArray[0] + '//' + pathArray[2];
+    console.log('host = ', host);
+    fetch(host + '/google?code=' + res.code, {redirect: 'follow', credentials: 'include'})
       .then(response => response.json())
       .then(data => {
         console.log("data =", data);
@@ -135,7 +139,11 @@ function Login() {
 
   const onFacebookSuccess = (res) => {
     console.log('Login Success: accessToken:', res.accessToken);
-    fetch('/facebook?accessToken=' + res.accessToken)
+    console.log('referrer: ', document.referrer);
+    let pathArray = document.referrer.split('/');
+    let host = pathArray[0] + '//' + pathArray[2];
+    console.log('host = ', host);
+    fetch(host + '/facebook?accessToken=' + res.accessToken, {redirect: 'follow', credentials: 'include'})
       .then(response => response.json())
       .then(data => {
         console.log("data =", data);
