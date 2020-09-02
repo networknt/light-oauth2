@@ -14,7 +14,10 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { FacebookLoginButton, GoogleLoginButton, GithubLoginButton } from 'react-social-login-buttons';
 import ErrorMessage from './ErrorMessage';
+import GoogleLogin from './GoogleLogin';
+import FbLogin from './FbLogin';
 
 const useStyles = makeStyles(theme => ({
   '@global': {
@@ -39,6 +42,10 @@ const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  loginButtons: {
+    width: '100%',
+    marginTop: theme.spacing(1),
+  }
 }));
 
 
@@ -102,16 +109,41 @@ function Login() {
   }
 
   function ScopeItems() {
+    console.log("scopes =", scopes);
     return (
       <List component="nav" aria-label="secondary mailbox folders">
         {scopes.map((item, index) => (
-          <ListItem button>
-            <ListItemText key={index} primary={item} />
+          <ListItem key={index} button>
+            <ListItemText primary={item} />
           </ListItem>
         ))}
       </List>
     )
   }
+
+  const onGoogleSuccess = (res) => {
+    console.log('Google Login Success: authorization code:', res.code);
+    fetch('/google?code=' + res.code)
+      .then(response => response.json())
+      .then(data => {
+        console.log("data =", data);
+        setRedirectUrl(data.redirectUri);
+        setDenyUrl(data.denyUri);
+        setScopes(data.scopes);
+      });
+  };
+
+  const onFacebookSuccess = (res) => {
+    console.log('Login Success: accessToken:', res.accessToken);
+    fetch('/facebook?accessToken=' + res.accessToken)
+      .then(response => response.json())
+      .then(data => {
+        console.log("data =", data);
+        setRedirectUrl(data.redirectUri);
+        setDenyUrl(data.denyUri);
+        setScopes(data.scopes);
+      });
+  };
 
   const handleSubmit = event => {
     //console.log("username = " + username + " password = " + password + " remember = " + remember);
@@ -295,6 +327,10 @@ function Login() {
             </Button>
           </form>
           <div>Forget your password? <Link to="/forget">Reset Here</Link></div>
+          <div className={classes.loginButtons}>
+            <GoogleLogin onSuccess={onGoogleSuccess}/>
+            <FbLogin onSuccess={onFacebookSuccess}/>
+          </div>
         </div>
       </Container>
   );
