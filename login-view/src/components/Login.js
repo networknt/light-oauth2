@@ -128,12 +128,23 @@ function Login() {
     let host = pathArray[0] + '//' + pathArray[2];
     console.log('host = ', host);
     fetch(host + '/google?code=' + res.code, {redirect: 'follow', credentials: 'include'})
-      .then(response => response.json())
+      .then(response => {
+        if(response.ok) {
+          return response.json();
+        } else {
+          throw response;
+        }
+      })
       .then(data => {
         console.log("data =", data);
         setRedirectUrl(data.redirectUri);
         setDenyUrl(data.denyUri);
         setScopes(data.scopes);
+      })
+      .catch(err => {
+        err.text().then(errorMessage => {
+          setError(errorMessage);
+        })
       });
   };
 
@@ -144,12 +155,23 @@ function Login() {
     let host = pathArray[0] + '//' + pathArray[2];
     console.log('host = ', host);
     fetch(host + '/facebook?accessToken=' + res.accessToken, {redirect: 'follow', credentials: 'include'})
-      .then(response => response.json())
+      .then(response => {
+        if(response.ok) {
+          return response.json();
+        } else {
+          throw response;
+        }
+      })
       .then(data => {
-        console.log("data =", data);
-        setRedirectUrl(data.redirectUri);
-        setDenyUrl(data.denyUri);
-        setScopes(data.scopes);
+          console.log("data =", data);
+          setRedirectUrl(data.redirectUri);
+          setDenyUrl(data.denyUri);
+          setScopes(data.scopes);
+      })
+      .catch(err => {
+        err.text().then(errorMessage => {
+          setError(errorMessage);
+        })
       });
   };
 
