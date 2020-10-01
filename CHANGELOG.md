@@ -1,5 +1,14 @@
 # Change Log
 
+## [2.0.18](https://github.com/networknt/light-oauth2/tree/2.0.18) (2020-10-01)
+
+
+**Merged pull requests:**
+
+
+- fixes \#293 add google and facebook login for the login-view [\#294](https://github.com/networknt/light-oauth2/pull/294) ([stevehu](https://github.com/stevehu))
+
+
 ## [2.0.17](https://github.com/networknt/light-oauth2/tree/2.0.17) (2020-08-28)
 
 
