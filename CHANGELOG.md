@@ -7,6 +7,8 @@
 
 
 - Bump junit from 4.12 to 4.13.1 [\#298](https://github.com/networknt/light-oauth2/pull/298) ([dependabot](https://github.com/apps/dependabot))
+
+
 ## [2.0.18](https://github.com/networknt/light-oauth2/tree/2.0.18) (2020-10-01)
 
 
