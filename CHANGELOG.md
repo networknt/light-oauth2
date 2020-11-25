@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.0.21](https://github.com/networknt/light-oauth2/tree/2.0.21) (2020-11-25)
+
+
+**Merged pull requests:**
+
+
+- fixes \#301 update server.yml to add keystore and truststore passwords [\#302](https://github.com/networknt/light-oauth2/pull/302) ([stevehu](https://github.com/stevehu))
+- fixes \#299 add password to the jwt.yml as the secret.yml is removed [\#300](https://github.com/networknt/light-oauth2/pull/300) ([stevehu](https://github.com/stevehu))
 ## [2.0.20](https://github.com/networknt/light-oauth2/tree/2.0.20) (2020-11-05)
 
 
