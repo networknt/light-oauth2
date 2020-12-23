@@ -1,12 +1,14 @@
 # Change Log
 
-## [2.0.22](https://github.com/networknt/light-oauth2/tree/2.0.22) (2020-12-22)
+## [2.0.22](https://github.com/networknt/light-oauth2/tree/2.0.22) (2020-12-23)
 
 
 **Merged pull requests:**
 
 
 - Bump ini from 1.3.5 to 1.3.7 in /login-view [\#303](https://github.com/networknt/light-oauth2/pull/303) ([dependabot](https://github.com/apps/dependabot))
+
+
 ## [2.0.21](https://github.com/networknt/light-oauth2/tree/2.0.21) (2020-11-25)
 
 
