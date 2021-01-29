@@ -6,6 +6,8 @@
 **Merged pull requests:**
 
 
+
+
 ## [1.6.30](https://github.com/networknt/light-oauth2/tree/1.6.30) (2020-12-22)
 
 
