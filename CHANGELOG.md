@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.0.24](https://github.com/networknt/light-oauth2/tree/2.0.24) (2021-02-24)
+
+
+**Merged pull requests:**
+
+
+- Bump version.jackson from 2.10.4 to 2.12.1 [\#304](https://github.com/networknt/light-oauth2/pull/304) ([dependabot](https://github.com/apps/dependabot))
 ## [2.0.23](https://github.com/networknt/light-oauth2/tree/2.0.23) (2021-01-29)
 
 
