@@ -77,7 +77,7 @@ public class Oauth2ServiceServiceIdEndpointGetHandlerTest {
         }
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         try {
-            ClientRequest request = new ClientRequest().setPath("/oauth2/service/AACT0003/endpoint").setMethod(Methods.GET);
+            ClientRequest request = new ClientRequest().setPath("/oauth2/service/AACT0004/endpoint").setMethod(Methods.GET);
             connection.sendRequest(request, client.createClientCallback(reference, latch));
             latch.await();
         } catch (Exception e) {
