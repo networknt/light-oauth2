@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.6.33](https://github.com/networknt/light-oauth2/tree/1.6.33) (2021-03-28)
+
+
+**Merged pull requests:**
+
+
+- fixes \#305 update test case to eliminate the interference on a faster… [\#306](https://github.com/networknt/light-oauth2/pull/306) ([stevehu](https://github.com/stevehu))
 ## [1.6.32](https://github.com/networknt/light-oauth2/tree/1.6.32) (2021-02-24)
 
 
