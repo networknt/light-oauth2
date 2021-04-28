@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.0.26](https://github.com/networknt/light-oauth2/tree/2.0.26) (2021-04-27)
+
+
+**Merged pull requests:**
+
+
+- Bump elliptic from 6.5.3 to 6.5.4 in /login-view [\#307](https://github.com/networknt/light-oauth2/pull/307) ([dependabot](https://github.com/apps/dependabot))
+- Bump ssri from 6.0.1 to 6.0.2 in /login-view [\#308](https://github.com/networknt/light-oauth2/pull/308) ([dependabot](https://github.com/apps/dependabot))
 ## [2.0.25](https://github.com/networknt/light-oauth2/tree/2.0.25) (2021-03-28)
 
 
