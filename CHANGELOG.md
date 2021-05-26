@@ -1,5 +1,16 @@
 # Change Log
 
+## [2.0.27](https://github.com/networknt/light-oauth2/tree/2.0.27) (2021-05-25)
+
+
+**Merged pull requests:**
+
+
+- Bump hosted-git-info from 2.8.8 to 2.8.9 in /login-view [\#313](https://github.com/networknt/light-oauth2/pull/313) ([dependabot](https://github.com/apps/dependabot))
+- Bump url-parse from 1.4.7 to 1.5.1 in /login-view [\#312](https://github.com/networknt/light-oauth2/pull/312) ([dependabot](https://github.com/apps/dependabot))
+- fixes \#310 rollback the change to the parent pom.xml to recover autho… [\#311](https://github.com/networknt/light-oauth2/pull/311) ([stevehu](https://github.com/stevehu))
+
+
 ## [2.0.26](https://github.com/networknt/light-oauth2/tree/2.0.26) (2021-04-27)
 
 
