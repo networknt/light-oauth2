@@ -1,5 +1,17 @@
 # Change Log
 
+## [2.0.28](https://github.com/networknt/light-oauth2/tree/2.0.28) (2021-06-27)
+
+
+**Merged pull requests:**
+
+
+- Bump color-string from 1.5.3 to 1.5.5 in /login-view [\#316](https://github.com/networknt/light-oauth2/pull/316) ([dependabot](https://github.com/apps/dependabot))
+- Bump ws from 5.2.2 to 5.2.3 in /login-view [\#317](https://github.com/networknt/light-oauth2/pull/317) ([dependabot](https://github.com/apps/dependabot))
+- Bump merge-deep from 3.0.2 to 3.0.3 in /login-view [\#315](https://github.com/networknt/light-oauth2/pull/315) ([dependabot](https://github.com/apps/dependabot))
+- Bump dns-packet from 1.3.1 to 1.3.4 in /login-view [\#314](https://github.com/networknt/light-oauth2/pull/314) ([dependabot](https://github.com/apps/dependabot))
+
+
 ## [2.0.27](https://github.com/networknt/light-oauth2/tree/2.0.27) (2021-05-25)
 
 
