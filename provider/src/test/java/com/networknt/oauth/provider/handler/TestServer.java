@@ -52,7 +52,7 @@ public class TestServer extends ExternalResource {
     }
 
     public ServerConfig getServerConfig() {
-        return Server.config;
+        return Server.getServerConfig();
     }
 
     @Override
