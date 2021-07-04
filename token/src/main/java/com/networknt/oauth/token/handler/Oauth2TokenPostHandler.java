@@ -81,6 +81,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
     private static final String CODE_VERIFIER_FAILED = "ERR12041";
     private static final String INVALID_CODE_CHALLENGE_METHOD = "ERR12033";
     private static final String CLIENT_AUTHENTICATE_CLASS_NOT_FOUND = "ERR10043";
+    private static final String AUTHORIZATION_CODE_NOT_FOUND = "ERR12052";
 
     static JwtConfig config = (JwtConfig)Config.getInstance().getJsonObjectConfig("jwt", JwtConfig.class);
     private final static String CONFIG = "oauth_token";
@@ -184,6 +185,10 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
         if(client != null) {
             // authorization code can only be used once for security reason.
             Map<String, String> codeMap = (Map<String, String>)CacheStartupHookProvider.hz.getMap("codes").remove(code);
+            if(codeMap == null) {
+                // In most cases, it happens with curl tutorial or incorrect implementation in code
+                throw new ApiException(new Status(AUTHORIZATION_CODE_NOT_FOUND, code));
+            }
             String userId = codeMap.get("userId");
             // get userType and roles from code map as there are some authenticators doesn't support user_profile table.
             String userType = codeMap.get("userType");
