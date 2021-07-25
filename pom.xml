@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.networknt</groupId>
     <artifactId>light-oauth2</artifactId>
-    <version>2.0.29-SNAPSHOT</version>
+    <version>2.0.29</version>
     <packaging>pom</packaging>
     <name>Parent POM</name>
     <description>OAuth2 provider microservices based on Light-Java and SQL</description>
@@ -78,7 +78,7 @@
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.light-4j>2.0.29-SNAPSHOT</version.light-4j>
+        <version.light-4j>2.0.29</version.light-4j>
         <version.json-schema-validator>1.0.49</version.json-schema-validator>
         <version.jackson>2.12.1</version.jackson>
         <version.slf4j>1.7.25</version.slf4j>
