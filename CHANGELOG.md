@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.0.29](https://github.com/networknt/light-oauth2/tree/2.0.29) (2021-07-25)
+
+
+**Merged pull requests:**
+
+
+- fixes \#321 potential NPE when users follow the tutorial with curl com… [\#322](https://github.com/networknt/light-oauth2/pull/322) ([stevehu](https://github.com/stevehu))
+- fixes \#318 update TestServer to replace Server.config with Server.get… [\#319](https://github.com/networknt/light-oauth2/pull/319) ([stevehu](https://github.com/stevehu))
 ## [2.0.28](https://github.com/networknt/light-oauth2/tree/2.0.28) (2021-06-27)
 
 
