@@ -46,7 +46,7 @@ publish() {
     docker build -t $IMAGE_NAME:$VERSION-slim -f ./docker/Dockerfile-Slim . --no-cache=true
     echo "Images built with version $VERSION"
     echo "Pushing image to DockerHub"
-    docker push $IMAGE_NAME -a -a
+    docker push $IMAGE_NAME -a
     echo "Image successfully published!"
 }
 
