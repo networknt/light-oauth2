@@ -46,7 +46,7 @@ publish() {
     docker build -t $IMAGE_NAME:$VERSION-redhat -f ./docker/Dockerfile-Redhat . --no-cache=true
     echo "Images built with version $VERSION"
     echo "Pushing image to DockerHub"
-    docker push $IMAGE_NAME
+    docker push $IMAGE_NAME -a
     echo "Image successfully published!"
 }
 
