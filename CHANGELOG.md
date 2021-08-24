@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.0.30](https://github.com/networknt/light-oauth2/tree/2.0.30) (2021-08-24)
+
+
+**Merged pull requests:**
+
+
+- Bump url-parse from 1.5.1 to 1.5.3 in /login-view [\#324](https://github.com/networknt/light-oauth2/pull/324) ([dependabot](https://github.com/apps/dependabot))
+- Bump path-parse from 1.0.6 to 1.0.7 in /login-view [\#323](https://github.com/networknt/light-oauth2/pull/323) ([dependabot](https://github.com/apps/dependabot))
 ## [2.0.29](https://github.com/networknt/light-oauth2/tree/2.0.29) (2021-07-25)
 
 
