@@ -2,7 +2,7 @@
 
 # Handler middleware chain configuration
 ---
-enabled: true
+enabled: ${handler.enabled:true}
 
 #------------------------------------------------------------------------------
 # Support individual handler chains for each separate endpoint. It allows framework

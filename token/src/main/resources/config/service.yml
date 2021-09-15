@@ -1,0 +1,24 @@
+# Singleton service factory configuration/IoC injection
+singletons:
+- com.networknt.registry.URL:
+  - com.networknt.registry.URLImpl:
+      parameters:
+        com.networknt.portal.hybrid.query-1.0.0: https://192.168.1.102:8440,https://192.168.1.102:8441,https://192.168.1.102:8442
+        com.networknt.portal.hybrid.command-1.0.0: https://192.168.1.102:8439
+- com.networknt.registry.Registry:
+  - com.networknt.registry.support.DirectRegistry
+- com.networknt.balance.LoadBalance:
+  - com.networknt.balance.RoundRobinLoadBalance
+- com.networknt.cluster.Cluster:
+  - com.networknt.cluster.LightCluster
+# Default decryptor implementation
+- com.networknt.utility.Decryptor:
+  - com.networknt.decrypt.AESDecryptor
+# StartupHookProvider implementations, there are one to many and they are called in the same sequence defined.
+# - com.networknt.server.StartupHookProvider:
+  # - com.networknt.oauth.cache.CacheStartupHookProvider
+# ShutdownHookProvider implementations, there are one to many and they are called in the same sequence defined.
+# - com.networknt.server.ShutdownHookProvider:
+  # - com.networknt.oauth.cache.CacheShutdownHookProvider
+- com.networknt.oauth.auth.Authenticator<com.networknt.oauth.auth.LightPortalAuth>:
+  - com.networknt.oauth.auth.LightPortalAuthenticator

@@ -1,0 +1,13 @@
+# This is the default JWT configuration and need to be updated when used to issue JWT tokens. It is a component that used to
+# issue JWT token. Normally, it should be used by light-oauth2 only but can be used to issue tokens distributely.
+---
+# Signature private key that used to sign JWT tokens.
+key:
+  kid: ${jwt.key.kid:100}                               # kid that used to sign the JWT tokens. It will be shown up in the token header.
+  filename: ${jwt.key.filename:primary.jks}             # private key that is used to sign JWT tokens.
+  keyName: ${jwt.key.keyName:selfsigned}                # key name that is used to identify the right key in keystore.
+  password: ${JWT_KEY_PASSWORD:password}                # private key store password and private key password is the same
+issuer: ${jwt.issuer:urn:com:networknt:oauth2:v1}       # default issuer of the JWT token
+audience: ${jwt.audience:urn:com.networknt}             # default audience of the JWT token
+expiredInMinutes: ${jwt.expiredInMinutes:10}            # expired in 10 minutes by default for issued JWT tokens
+version: ${jwt.version:1.0}                             # JWT token version
