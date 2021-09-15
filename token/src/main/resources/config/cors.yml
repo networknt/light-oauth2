@@ -1,0 +1,13 @@
+# Cors Http Handler Configuration. This is to support connection
+# from light-portal single page application which might served
+# from another domain/host. You may need to update allowedOrigins.
+---
+description: Cors Http Handler
+enabled: true
+allowedOrigins:
+- https://localhost:3000
+allowedMethods:
+- GET
+- POST
+- PUT
+- DELETE

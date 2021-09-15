@@ -51,6 +51,10 @@ import java.util.regex.Matcher;
  */
 public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2TokenPostHandler.class);
+    public static final String CLIENT_TYPE_TRUSTED = "trusted";
+    public static final String CLIENT_TYPE_EXTERNAL = "external";
+
+    public static final int TEN_YEAR_IN_SECOND = 315360000;
 
     private static final String UNABLE_TO_PARSE_FORM_DATA = "ERR12000";
     private static final String UNSUPPORTED_GRANT_TYPE = "ERR12001";
@@ -84,8 +88,7 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
     private static final String AUTHORIZATION_CODE_NOT_FOUND = "ERR12052";
 
     static JwtConfig config = (JwtConfig)Config.getInstance().getJsonObjectConfig("jwt", JwtConfig.class);
-    private final static String CONFIG = "oauth_token";
-    private final static OauthTokenConfig oauth_config = (OauthTokenConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthTokenConfig.class);
+    private final static OauthTokenConfig oauthTokenConfig = (OauthTokenConfig) Config.getInstance().getJsonObjectConfig(OauthTokenConfig.CONFIG_NAME, OauthTokenConfig.class);
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         ObjectMapper mapper = Config.getInstance().getMapper();
@@ -120,6 +123,8 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
                 exchange.getResponseSender().send(mapper.writeValueAsString(handleRefreshToken(exchange, formMap)));
             } else if("client_authenticated_user".equals(grantType)) {
                 exchange.getResponseSender().send(mapper.writeValueAsString(handleClientAuthenticatedUser(exchange, formMap)));
+            } else if("bootstrap_token".equals(grantType)) {
+                exchange.getResponseSender().send(mapper.writeValueAsString(handleBootstrapToken(exchange, formMap)));
             } else {
                 setExchangeStatus(exchange, UNSUPPORTED_GRANT_TYPE, grantType);
             }
@@ -133,6 +138,43 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
             exchange.getResponseSender().send(e.getStatus().toString());
         }
         processAudit(exchange);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> handleBootstrapToken(HttpServerExchange exchange, Map<String, Object> formMap) throws ApiException {
+        String scope = (String)formMap.remove("scope");
+        if(logger.isDebugEnabled()) logger.debug("scope = " + scope);
+        // validate the client_id and client_secret against the configuration.
+        String clientId = authenticateBootstrapClient(exchange, formMap);
+        if(clientId != null) {
+            if(logger.isDebugEnabled()) logger.debug("Passed client_id and client_secret validation.");
+            // check if the scope is matched from the input to the scope in the config.
+            if(scope == null) {
+                scope = oauthTokenConfig.getBootstrapScope();
+            } else {
+                // make sure scope is the same as the scope in the config.
+                if(!matchScope(scope, oauthTokenConfig.getBootstrapScope())) {
+                    throw new ApiException(new Status(MISMATCH_SCOPE, scope, oauthTokenConfig.getBootstrapScope()));
+                }
+            }
+            // generate long-lived jwt token.
+            if(logger.isDebugEnabled()) logger.debug("scope is matched.");
+            String jwt;
+            try {
+                // since we have removed scope, client_id and client_secret from the formMap, the rest of properties are custom claims.
+                jwt = JwtIssuer.getJwt(mockBsClaims(clientId, scope, formMap));
+            } catch (Exception e) {
+                logger.error("Exception:", e);
+                throw new ApiException(new Status(GENERIC_EXCEPTION, e.getMessage()));
+            }
+            Map<String, Object> resMap = new HashMap<>();
+            resMap.put("access_token", jwt);
+            resMap.put("token_type", "bearer");
+            resMap.put("expires_in", TEN_YEAR_IN_SECOND);
+            return resMap;
+        } else {
+            return new HashMap<>(); // return an empty hash map. this is actually not reachable at all.
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -583,8 +625,59 @@ public class Oauth2TokenPostHandler extends TokenAuditHandler implements LightHt
         }
     }
 
+    private String authenticateBootstrapClient(HttpServerExchange exchange, Map<String, Object> formMap) throws ApiException {
+        HttpAuth httpAuth = new HttpAuth(exchange);
+
+        String clientId;
+        String clientSecret;
+        if(!httpAuth.isHeaderAvailable()) {
+            clientId = (String)formMap.remove("client_id");
+            clientSecret = (String)formMap.remove("client_secret");
+        } else {
+            clientId = httpAuth.getClientId();
+            clientSecret = httpAuth.getClientSecret();
+        }
+
+        if(clientId == null || clientId.trim().isEmpty() || clientSecret == null || clientSecret.trim().isEmpty()) {
+            if(!httpAuth.isHeaderAvailable()) {
+                throw new ApiException(new Status(MISSING_AUTHORIZATION_HEADER));
+            } else if(httpAuth.isInvalidCredentials()) {
+                throw new ApiException(new Status(INVALID_BASIC_CREDENTIALS, httpAuth.getCredentials()));
+            } else {
+                throw new ApiException(new Status(INVALID_AUTHORIZATION_HEADER, httpAuth.getAuth()));
+            }
+        }
+
+        return validateBootstrapClientSecret(clientId, clientSecret);
+    }
+
+    private String validateBootstrapClientSecret(String clientId, String clientSecret) throws ApiException {
+        try {
+            if(oauthTokenConfig.getBootstrapClientId().equals(clientId) && HashUtil.validatePassword(clientSecret.toCharArray(), oauthTokenConfig.getBootstrapClientSecret())) {
+                return clientId;
+            }
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            logger.error("Exception:", e);
+            throw new ApiException(new Status(RUNTIME_EXCEPTION));
+        }
+        return null;
+    }
+
     private JwtClaims mockCcClaims(String clientId, String scopeString, Map<String, Object> formMap) {
         JwtClaims claims = JwtIssuer.getDefaultJwtClaims();
+        claims.setClaim("client_id", clientId);
+        List<String> scope = Arrays.asList(scopeString.split("\\s+"));
+        claims.setStringListClaim("scope", scope); // multi-valued claims work too and will end up as a JSON array
+        if(formMap != null) {
+            for(Map.Entry<String, Object> entry : formMap.entrySet()) {
+                claims.setClaim(entry.getKey(), entry.getValue());
+            }
+        }
+        return claims;
+    }
+
+    private JwtClaims mockBsClaims(String clientId, String scopeString, Map<String, Object> formMap) {
+        JwtClaims claims = JwtIssuer.getJwtClaimsWithExpiresIn(TEN_YEAR_IN_SECOND);  // 10 years in seconds
         claims.setClaim("client_id", clientId);
         List<String> scope = Arrays.asList(scopeString.split("\\s+"));
         claims.setStringListClaim("scope", scope); // multi-valued claims work too and will end up as a JSON array

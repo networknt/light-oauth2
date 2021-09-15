@@ -11,12 +11,12 @@ import org.slf4j.LoggerFactory;
 
 public class TokenAuditHandler extends AuditInfoHandler {
     static final Logger logger = LoggerFactory.getLogger(TokenAuditHandler.class);
-    private final static String CONFIG = "oauth_token";
-    private final static OauthTokenConfig oauth_config = (OauthTokenConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthTokenConfig.class);
+    private final static String CONFIG = "oauth-token";
+    private final static OauthTokenConfig oauthTokenConfig = (OauthTokenConfig) Config.getInstance().getJsonObjectConfig(CONFIG, OauthTokenConfig.class);
 
 
     protected void processAudit(HttpServerExchange exchange) throws Exception{
-        if (oauth_config.isEnableAudit() ) {
+        if (oauthTokenConfig.isEnableAudit() ) {
             AuditInfo auditInfo = new AuditInfo();
             auditInfo.setServiceId(Oauth2Service.TOKEN);
             auditInfo.setEndpoint(exchange.getHostName() + exchange.getRelativePath());
