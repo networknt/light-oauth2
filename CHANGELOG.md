@@ -1,5 +1,13 @@
 # Change Log
 
+## [2.0.31](https://github.com/networknt/light-oauth2/tree/2.0.31) (2021-09-22)
+
+
+**Merged pull requests:**
+
+
+- Bump tmpl from 1.0.4 to 1.0.5 in /login-view [\#327](https://github.com/networknt/light-oauth2/pull/327) ([dependabot](https://github.com/apps/dependabot))
+- fixes \#325 implement a new grant type bootstrap_token to create long-… [\#326](https://github.com/networknt/light-oauth2/pull/326) ([stevehu](https://github.com/stevehu))
 ## [2.0.30](https://github.com/networknt/light-oauth2/tree/2.0.30) (2021-08-24)
 
 
