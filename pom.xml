@@ -79,7 +79,7 @@
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.light-4j>2.0.33-SNAPSHOT</version.light-4j>
-        <version.json-schema-validator>1.0.49</version.json-schema-validator>
+        <version.json-schema-validator>1.0.63</version.json-schema-validator>
         <version.jackson>2.12.1</version.jackson>
         <version.slf4j>1.7.25</version.slf4j>
         <version.jose4j>0.6.3</version.jose4j>
