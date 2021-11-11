@@ -6,7 +6,7 @@
     <parent>
         <artifactId>light-oauth2</artifactId>
         <groupId>com.networknt</groupId>
-        <version>1.6.37</version>
+        <version>1.6.38-SNAPSHOT</version>
     </parent>
 
     <artifactId>oauth2-provider</artifactId>
