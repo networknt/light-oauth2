@@ -47,7 +47,7 @@ handlers:
   # Direct requests to named services based on the request path
   # - com.networknt.router.middleware.PathPrefixServiceHandler@path
   # - com.networknt.router.RouterHandler@router
-  - com.networknt.resource.PathResourceHandler@resource
+  # - com.networknt.resource.PathResourceHandler@resource
   # Customer business domain specific cross-cutting concerns handlers
   # - com.example.validator.CustomizedValidator@custvalidator
   # Framework endpoint handlers
@@ -91,5 +91,5 @@ paths:
       - info
 
 
-defaultHandlers:
-  - resource
+#defaultHandlers:
+#  - resource
