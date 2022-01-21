@@ -37,6 +37,6 @@ singletons:
 - javax.sql.DataSource:
   - com.zaxxer.hikari.HikariDataSource:
       DriverClassName: org.h2.jdbcx.JdbcDataSource
-      jdbcUrl: jdbc:h2:~/test
+      jdbcUrl: jdbc:h2:mem:test
       username: sa
       password: sa
