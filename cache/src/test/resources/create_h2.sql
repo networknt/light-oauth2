@@ -1,9 +1,9 @@
 DROP table IF EXISTS  user_profile;
-DROP table IF EXISTS  client;
-DROP table IF EXISTS  service;
-DROP table IF EXISTS  service_endpoint;
 DROP table IF EXISTS  client_service;
 DROP table IF EXISTS  refresh_token;
+DROP table IF EXISTS  client;
+DROP table IF EXISTS  service_endpoint;
+DROP table IF EXISTS  service;
 DROP table IF EXISTS  audit_log;
 
 create table user_profile (
