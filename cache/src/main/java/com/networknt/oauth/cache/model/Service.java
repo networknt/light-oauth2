@@ -11,8 +11,13 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import java.io.IOException;
 import java.util.Objects;
 
-public class Service implements IdentifiedDataSerializable {
+public class Service implements IdentifiedDataSerializable, Comparable {
   private String serviceId = null;
+
+  @Override
+  public int compareTo(Object o) {
+    return this.getServiceId().compareTo(((Service)o).getServiceId());
+  }
 
   /**
    * service type
@@ -240,10 +245,9 @@ public class Service implements IdentifiedDataSerializable {
 
   @JsonIgnore
   @Override
-  public int getId() {
+  public int getClassId() {
     return ServiceDataSerializableFactory.SERVICE_TYPE;
   }
-
 
 }
 

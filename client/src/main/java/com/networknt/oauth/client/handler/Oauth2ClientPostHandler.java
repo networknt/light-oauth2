@@ -1,23 +1,19 @@
 package com.networknt.oauth.client.handler;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.httpstring.AttachmentConstants;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
-import com.networknt.oauth.cache.model.User;
 import com.networknt.security.JwtVerifier;
-import com.networknt.status.Status;
 import com.networknt.utility.HashUtil;
 import com.networknt.utility.Util;
-import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Date;
 import java.util.Map;
 import java.util.UUID;
 

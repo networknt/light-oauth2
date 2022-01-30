@@ -12,8 +12,13 @@ import java.io.IOException;
 import java.util.Objects;
 
 
-public class User implements IdentifiedDataSerializable {
+public class User implements IdentifiedDataSerializable, Comparable {
   private String userId = null;
+
+  @Override
+  public int compareTo(Object o) {
+    return this.getUserId().compareTo(((User)o).getUserId());
+  }
 
   /**
    * user type
@@ -264,10 +269,8 @@ public class User implements IdentifiedDataSerializable {
 
   @JsonIgnore
   @Override
-  public int getId() {
+  public int getClassId() {
     return UserDataSerializableFactory.USER_TYPE;
   }
-
-
 }
 

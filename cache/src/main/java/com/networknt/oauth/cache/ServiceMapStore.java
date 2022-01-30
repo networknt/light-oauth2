@@ -1,6 +1,6 @@
 package com.networknt.oauth.cache;
 
-import com.hazelcast.core.MapStore;
+import com.hazelcast.map.MapStore;
 import com.networknt.oauth.cache.model.Service;
 import com.networknt.service.SingletonServiceFactory;
 import org.slf4j.Logger;

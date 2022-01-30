@@ -1,6 +1,6 @@
 package com.networknt.oauth.authorize.handler;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.networknt.oauth.cache.model.User;
 import com.networknt.utility.HashUtil;
 import io.undertow.security.idm.Account;

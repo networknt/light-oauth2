@@ -1,6 +1,6 @@
 package com.networknt.oauth.token.handler;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.networknt.client.Http2Client;
 import com.networknt.config.Config;
 import com.networknt.oauth.cache.CacheStartupHookProvider;

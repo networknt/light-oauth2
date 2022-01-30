@@ -3,7 +3,7 @@ package com.networknt.oauth.token.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.networknt.config.Config;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.auth.Authenticator;

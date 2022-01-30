@@ -1,14 +1,13 @@
 package com.networknt.oauth.token.handler;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.hazelcast.query.PagingPredicate;
+import com.hazelcast.query.Predicates;
 import com.hazelcast.query.impl.predicates.LikePredicate;
 import com.networknt.config.Config;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.RefreshToken;
-import com.networknt.oauth.cache.model.RefreshTokenComparator;
-import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
 import org.slf4j.Logger;
@@ -31,7 +30,7 @@ public class Oauth2RefreshTokenGetHandler extends RefreshTokenAuditHandler imple
         if(logger.isDebugEnabled()) logger.debug("userId = " + userId + " page = " + page + " pageSize = " + pageSize);
         LikePredicate likePredicate = new LikePredicate("userId", userId);
 
-        PagingPredicate pagingPredicate = new PagingPredicate(likePredicate, new RefreshTokenComparator(), pageSize);
+        PagingPredicate pagingPredicate = Predicates.pagingPredicate(likePredicate, pageSize);
         pagingPredicate.setPage(page);
         Collection<RefreshToken> values = tokens.values(pagingPredicate);
 

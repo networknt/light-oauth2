@@ -16,7 +16,7 @@
 
 package com.networknt.oauth.key.handler;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.networknt.body.BodyHandler;
 
 import com.networknt.client.oauth.KeyRequest;

@@ -1,8 +1,6 @@
 package com.networknt.oauth.ldap;
 
-import org.ietf.jgss.Oid;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;

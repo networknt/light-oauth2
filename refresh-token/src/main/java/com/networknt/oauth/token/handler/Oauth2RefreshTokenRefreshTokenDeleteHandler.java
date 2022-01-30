@@ -1,15 +1,9 @@
 package com.networknt.oauth.token.handler;
 
-import com.hazelcast.core.IMap;
-import com.networknt.config.Config;
+import com.hazelcast.map.IMap;
 import com.networknt.handler.LightHttpHandler;
-import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
-import com.networknt.oauth.cache.model.AuditInfo;
-import com.networknt.oauth.cache.model.Oauth2Service;
 import com.networknt.oauth.cache.model.RefreshToken;
-import com.networknt.status.Status;
-import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

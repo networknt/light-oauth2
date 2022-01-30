@@ -1,8 +1,5 @@
 package com.networknt.oauth.cache;
 
-import com.hazelcast.core.IMap;
-import com.hazelcast.query.Predicate;
-import com.hazelcast.query.SqlPredicate;
 import com.networknt.oauth.cache.model.*;
 import com.networknt.service.SingletonServiceFactory;
 import org.h2.tools.RunScript;
