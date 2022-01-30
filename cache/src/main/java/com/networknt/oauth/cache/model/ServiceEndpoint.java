@@ -1,12 +1,14 @@
 package com.networknt.oauth.cache.model;
 import java.io.IOException;
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 
-public class ServiceEndpoint implements IdentifiedDataSerializable {
+public class ServiceEndpoint implements IdentifiedDataSerializable, Comparable {
 
     
     private String operation;
@@ -103,8 +105,9 @@ public class ServiceEndpoint implements IdentifiedDataSerializable {
         return ServiceEndpointDataSerializableFactory.ID;
     }
 
+    @JsonIgnore
     @Override
-    public int getId() {
+    public int getClassId() {
         return ServiceEndpointDataSerializableFactory.SERVICE_ENDPOINT_TYPE;
     }
 
@@ -120,5 +123,10 @@ public class ServiceEndpoint implements IdentifiedDataSerializable {
         this.endpoint = objectDataInput.readUTF();
         this.operation = objectDataInput.readUTF();
         this.scope = objectDataInput.readUTF();
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return this.getEndpoint().compareTo(((ServiceEndpoint)o).getEndpoint());
     }
 }

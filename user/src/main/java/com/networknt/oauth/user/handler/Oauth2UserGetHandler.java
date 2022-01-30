@@ -1,21 +1,21 @@
 package com.networknt.oauth.user.handler;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.hazelcast.query.PagingPredicate;
+import com.hazelcast.query.Predicates;
 import com.hazelcast.query.impl.predicates.LikePredicate;
 import com.networknt.config.Config;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.User;
-import com.networknt.oauth.cache.model.UserComparator;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Deque;
+import java.util.Map;
 
 /**
  * Created by stevehu on 2017-01-03.
@@ -40,7 +40,7 @@ public class Oauth2UserGetHandler extends UserAuditHandler implements HttpHandle
 
         LikePredicate likePredicate = new LikePredicate("userId", userId);
 
-        PagingPredicate pagingPredicate = new PagingPredicate(likePredicate, new UserComparator(), pageSize);
+        PagingPredicate<String, User>  pagingPredicate = Predicates.pagingPredicate(likePredicate, pageSize);
         pagingPredicate.setPage(page);
         Collection<User> values = users.values(pagingPredicate);
 

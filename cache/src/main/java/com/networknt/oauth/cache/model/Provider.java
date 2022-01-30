@@ -13,7 +13,7 @@ import java.util.Objects;
  * This is the cache object Oauth service provider
  *
  */
-public class Provider implements IdentifiedDataSerializable {
+public class Provider implements IdentifiedDataSerializable, Comparable {
   private String providerId = null;
 
   private String serverUrl = null;
@@ -137,10 +137,13 @@ public class Provider implements IdentifiedDataSerializable {
 
   @JsonIgnore
   @Override
-  public int getId() {
+  public int getClassId() {
     return ProviderDataSerializableFactory.PROVIDER_TYPE;
   }
 
-
+  @Override
+  public int compareTo(Object o) {
+    return this.getProviderId().compareTo(((Provider)o).getProviderId());
+  }
 }
 

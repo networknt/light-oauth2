@@ -1,15 +1,13 @@
 package com.networknt.oauth.client.handler;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.hazelcast.query.PagingPredicate;
+import com.hazelcast.query.Predicates;
 import com.hazelcast.query.impl.predicates.LikePredicate;
-import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
-import com.networknt.oauth.cache.model.ClientComparator;
-import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
 import org.slf4j.Logger;
@@ -32,7 +30,7 @@ public class Oauth2ClientGetHandler  extends ClientAuditHandler implements Light
 
         LikePredicate likePredicate = new LikePredicate("host", host);
 
-        PagingPredicate pagingPredicate = new PagingPredicate(likePredicate, new ClientComparator(), pageSize);
+        PagingPredicate pagingPredicate = Predicates.pagingPredicate(likePredicate, pageSize);
         pagingPredicate.setPage(page);
         Collection<Client> values = clients.values(pagingPredicate);
 

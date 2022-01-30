@@ -11,10 +11,15 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import java.io.IOException;
 import java.util.Objects;
 
-public class Client implements IdentifiedDataSerializable {
+public class Client implements IdentifiedDataSerializable, Comparable {
   private String clientId = null;
 
   private String clientSecret = null;
+
+  @Override
+  public int compareTo(Object o) {
+    return this.getClientName().compareTo(((Client)o).getClientName());
+  }
 
   /**
    * client type
@@ -402,10 +407,9 @@ public class Client implements IdentifiedDataSerializable {
 
   @JsonIgnore
   @Override
-  public int getId() {
+  public int getClassId() {
     return ClientDataSerializableFactory.CLIENT_TYPE;
   }
-
 
   public static Client copyClient (Client c){
     Client n = new Client();

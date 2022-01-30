@@ -15,19 +15,16 @@
  */
 package com.networknt.oauth.service.handler;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.hazelcast.query.PagingPredicate;
+import com.hazelcast.query.Predicates;
 import com.hazelcast.query.impl.predicates.LikePredicate;
-import com.networknt.config.Config;
 import com.networknt.config.JsonMapper;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Service;
-import com.networknt.oauth.cache.model.ServiceComparator;
-import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +50,7 @@ public class Oauth2ServiceGetHandler extends ServiceAuditHandler implements Ligh
 
         LikePredicate likePredicate = new LikePredicate("host", host);
 
-        PagingPredicate pagingPredicate = new PagingPredicate(likePredicate, new ServiceComparator(), pageSize);
+        PagingPredicate pagingPredicate = Predicates.pagingPredicate(likePredicate, pageSize);
         pagingPredicate.setPage(page);
         Collection<Service> values = services.values(pagingPredicate);
         Map<String, Object> map = new HashMap<>();

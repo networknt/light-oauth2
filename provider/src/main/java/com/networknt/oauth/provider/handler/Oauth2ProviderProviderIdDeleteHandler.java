@@ -1,9 +1,8 @@
 package com.networknt.oauth.provider.handler;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
-import com.networknt.oauth.cache.model.Client;
 import com.networknt.oauth.cache.model.Provider;
 import com.networknt.oauth.provider.ProviderAuditHandler;
 import io.undertow.server.HttpServerExchange;

@@ -17,7 +17,7 @@ import java.util.Objects;
  * userType and user roles are retrieved from user cache
  * @author Steve Hu
  */
-public class RefreshToken implements IdentifiedDataSerializable {
+public class RefreshToken implements IdentifiedDataSerializable, Comparable {
   private String refreshToken = null;
 
   private String userId = null;
@@ -217,10 +217,13 @@ public class RefreshToken implements IdentifiedDataSerializable {
 
   @JsonIgnore
   @Override
-  public int getId() {
+  public int getClassId() {
     return RefreshTokenDataSerializableFactory.REFRESH_TOKEN_TYPE;
   }
 
-
+  @Override
+  public int compareTo(Object o) {
+    return this.getUserId().compareTo(((RefreshToken)o).getUserId());
+  }
 }
 

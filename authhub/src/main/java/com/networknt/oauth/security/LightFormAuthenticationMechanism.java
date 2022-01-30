@@ -17,7 +17,7 @@
  */
 package com.networknt.oauth.security;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.Client;
 import io.undertow.UndertowLogger;

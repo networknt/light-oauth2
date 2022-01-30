@@ -42,7 +42,7 @@ public class CacheStartupHookProvider implements StartupHookProvider {
         MapConfig serviceConfig = new MapConfig();
         serviceConfig.setName("services");
         NearCacheConfig serviceCacheConfig = new NearCacheConfig();
-        serviceCacheConfig.setEvictionPolicy("NONE");
+        serviceCacheConfig.getEvictionConfig();
         serviceCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
         serviceCacheConfig.setCacheLocalEntries(true); // this enables the local caching
         serviceConfig.setNearCacheConfig(serviceCacheConfig);
@@ -57,7 +57,7 @@ public class CacheStartupHookProvider implements StartupHookProvider {
         MapConfig serviceEndpointConfig = new MapConfig();
         serviceEndpointConfig.setName("serviceEndpoints");
         NearCacheConfig serviceEndpointCacheConfig = new NearCacheConfig();
-        serviceEndpointCacheConfig.setEvictionPolicy("NONE");
+        serviceEndpointCacheConfig.getEvictionConfig();
         serviceEndpointCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
         serviceEndpointCacheConfig.setCacheLocalEntries(true); // this enables the local caching
         serviceEndpointConfig.setNearCacheConfig(serviceEndpointCacheConfig);
@@ -72,7 +72,7 @@ public class CacheStartupHookProvider implements StartupHookProvider {
         MapConfig clientConfig = new MapConfig();
         clientConfig.setName("clients");
         NearCacheConfig clientCacheConfig = new NearCacheConfig();
-        clientCacheConfig.setEvictionPolicy("NONE");
+        clientCacheConfig.getEvictionConfig();
         clientCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
         clientCacheConfig.setCacheLocalEntries(true); // this enables the local caching
         clientConfig.setNearCacheConfig(clientCacheConfig);
@@ -133,7 +133,7 @@ public class CacheStartupHookProvider implements StartupHookProvider {
         userConfig.getMapStoreConfig()
                 .setEnabled(true)
                 .setClassName("com.networknt.oauth.cache.UserMapStore");
-        userConfig.addMapIndexConfig(new MapIndexConfig("email", true));
+        userConfig.addIndexConfig(new IndexConfig(IndexType.SORTED, "email"));
 
         config.addMapConfig(userConfig);
 
@@ -141,7 +141,7 @@ public class CacheStartupHookProvider implements StartupHookProvider {
         MapConfig providerConfig = new MapConfig();
         providerConfig.setName("providers");
         NearCacheConfig providerCacheConfig = new NearCacheConfig();
-        providerCacheConfig.setEvictionPolicy("NONE");
+        providerCacheConfig.getEvictionConfig();
         providerCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
         providerCacheConfig.setCacheLocalEntries(true); // this enables the local caching
         providerConfig.setNearCacheConfig(providerCacheConfig);

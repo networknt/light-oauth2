@@ -1,6 +1,6 @@
 package com.networknt.oauth.provider.handler;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.networknt.body.BodyHandler;
 import com.networknt.config.Config;
 import com.networknt.handler.LightHttpHandler;

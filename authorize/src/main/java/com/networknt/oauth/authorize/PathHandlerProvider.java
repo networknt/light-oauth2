@@ -1,6 +1,6 @@
 package com.networknt.oauth.authorize;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.networknt.health.HealthGetHandler;
 import com.networknt.info.ServerInfoGetHandler;
 import com.networknt.oauth.authorize.handler.MapIdentityManager;

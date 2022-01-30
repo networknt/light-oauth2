@@ -1,15 +1,13 @@
 package com.networknt.oauth.code.handler;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.OAuth2Constants;
 import com.networknt.oauth.cache.model.Client;
-import com.networknt.status.Status;
 import com.networknt.utility.CodeVerifierUtil;
 import com.networknt.utility.Util;
 import io.undertow.security.api.SecurityContext;
-import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
