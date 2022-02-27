@@ -1,5 +1,21 @@
 # Change Log
 
+## [2.1.0](https://github.com/networknt/light-oauth2/tree/2.1.0) (2022-02-27)
+
+
+**Merged pull requests:**
+
+
+- Bump postgresql from 42.2.25 to 42.3.3 [\#342](https://github.com/networknt/light-oauth2/pull/342) ([dependabot](https://github.com/apps/dependabot))
+- Bump postgresql from 9.4.1211 to 42.2.25 [\#341](https://github.com/networknt/light-oauth2/pull/341) ([dependabot](https://github.com/apps/dependabot))
+- fixes \#339 upgrade hazelcast to 4.2.4 and change the packages [\#340](https://github.com/networknt/light-oauth2/pull/340) ([stevehu](https://github.com/stevehu))
+- Bump hazelcast from 3.12 to 4.0.5 [\#338](https://github.com/networknt/light-oauth2/pull/338) ([dependabot](https://github.com/apps/dependabot))
+- Bump h2 from 2.0.206 to 2.1.210 [\#337](https://github.com/networknt/light-oauth2/pull/337) ([dependabot](https://github.com/apps/dependabot))
+- fixes \#335 update the h2 drop table sequence to avoid constrain error [\#336](https://github.com/networknt/light-oauth2/pull/336) ([stevehu](https://github.com/stevehu))
+- fixes \#333 update the cache module server.yml to use h2 in memory ins… [\#334](https://github.com/networknt/light-oauth2/pull/334) ([stevehu](https://github.com/stevehu))
+- Bump h2 from 1.4.196 to 2.0.206 [\#332](https://github.com/networknt/light-oauth2/pull/332) ([dependabot](https://github.com/apps/dependabot))
+
+
 ## [2.0.32](https://github.com/networknt/light-oauth2/tree/2.0.32) (2021-10-19)
 
 
