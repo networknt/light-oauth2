@@ -92,7 +92,7 @@
         <version.hikaricp>3.1.0</version.hikaricp>
         <version.h2>2.1.210</version.h2>
         <version.hazelcast>4.2.4</version.hazelcast>
-        <version.hazelcast-kubernetes>1.1.0</version.hazelcast-kubernetes>
+        <version.hazelcast-kubernetes>2.2.3</version.hazelcast-kubernetes>
         <version.mysql>8.0.16</version.mysql>
         <version.postgres>42.3.3</version.postgres>
         <version.sqlserver>6.5.1.jre8-preview</version.sqlserver>
