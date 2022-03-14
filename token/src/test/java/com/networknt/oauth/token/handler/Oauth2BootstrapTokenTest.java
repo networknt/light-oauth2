@@ -146,7 +146,7 @@ public class Oauth2BootstrapTokenTest {
         params.put("sid", "com.networknt.petstore-1.0.0");
         params.put("client_id", "f7d42348-c647-4efb-a52d-4c5787421e00");
         params.put("client_secret", "f6h1FTI8Q3-7UScPZDzfXA");
-        params.put("scope", "portal.w");
+        params.put("scope", "wrong.w");
         String s = Http2Client.getFormDataString(params);
         final AtomicReference<ClientResponse> reference = new AtomicReference<>();
         final Http2Client client = Http2Client.getInstance();
