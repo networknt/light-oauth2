@@ -7,4 +7,4 @@ bootstrapToken: eyJraWQiOiIxMDAiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1cm46Y29tOm5ldHd
 bootstrapClientId: ${oauthToken.bootstrapClientId:f7d42348-c647-4efb-a52d-4c5787421e00}
 bootstrapClientSecret: ${oauthToken.bootstrapClientSecret:1000:5b37332c202d36362c202d36392c203131362c203132362c2036322c2037382c20342c202d37382c202d3131352c202d35332c202d34352c202d342c202d3132322c203130322c2033325d:29ad1fe88d66584c4d279a6f58277858298dbf9270ffc0de4317a4d38ba4b41f35f122e0825c466f2fa14d91e17ba82b1a2f2a37877a2830fae2973076d93cc2}
 # Bootstrap token issuer scope. It is a SHA256 hash value of portal.w to avoid duplication with other business API scopes. Used for API platform integration only.
-bootstrapScope: ${oauthToken.bootstrapScope:A8E73740C0041C03D67C3A951AA1D7533C8F9F2FB57D7BA107210B9BC9E06DA2}
+bootstrapScope: ${oauthToken.bootstrapScope:portal.w}
