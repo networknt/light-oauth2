@@ -1,62 +1,94 @@
-openapi: 3.0.0
+---
+openapi: "3.0.0"
 info:
-  version: 1.0.0
-  title: OAuth2 Key Service
-  description: OAuth2 Key Service microservices endpoints.
+  version: "1.0.0"
+  title: "OAuth2 Key Service"
+  description: "OAuth2 Key Service microservices endpoints."
   contact:
-    email: stevehu@gmail.com
+    email: "stevehu@gmail.com"
   license:
-    name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 servers:
-  - url: 'https://oauth2.networknt.com'    
+- url: "https://oauth2.networknt.com"
 paths:
-  '/oauth2/key/{keyId}':
+  /oauth2/key/{keyId}:
     get:
-      description: Get a key by Id
-      operationId: getKeyById
+      description: "Get a key by Id"
+      operationId: "getKeyById"
       parameters:
-        - name: keyId
-          in: path
-          description: Key Id
-          required: true
-          schema:
-            type: string
+      - name: "keyId"
+        in: "path"
+        description: "Key Id"
+        required: true
+        schema:
+          type: "string"
       responses:
-        '200':
-          description: Successful response
+        "200":
+          description: "Successful response"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Key'
-        '400':
-          description: Invalid keyId supplied
-        '404':
-          description: Key not found
+                $ref: "#/components/schemas/Key"
+        "400":
+          description: "Invalid keyId supplied"
+        "404":
+          description: "Key not found"
       security:
-        - key_auth:
-            - oauth.key.r
-            - oauth.key.w
+      - key_auth:
+        - "oauth.key.r"
+        - "oauth.key.w"
+  /oauth2/keys:
+    get:
+      description: "Get the statndard jwks"
+      operationId: "getJwks"
+      responses:
+        "200":
+          description: "Successful response"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Jwk"
+        "400":
+          description: "Bad request"
+        "404":
+          description: "Key not found"
+      security:
+      - key_auth:
+        - "oauth.key.r"
+        - "oauth.key.w"
 components:
   securitySchemes:
     key_auth:
-      type: oauth2
+      type: "oauth2"
       flows:
         implicit:
-          authorizationUrl: 'http://localhost:8888/oauth2/code'
+          authorizationUrl: "http://localhost:8888/oauth2/code"
           scopes:
-            oauth.key.w: write key
-            oauth.key.r: read key
+            oauth.key.w: "write key"
+            oauth.key.r: "read key"
   schemas:
     Key:
-      type: object
+      type: "object"
       required:
-        - keyId
-        - certificate
+      - "keyId"
+      - "certificate"
       properties:
         keyId:
-          type: string
-          description: a unique id
+          type: "string"
+          description: "a unique id"
         certificate:
-          type: string
-          description: certificate
+          type: "string"
+          description: "certificate"
+    Jwk:
+      type: "object"
+      required:
+      - "keyId"
+      - "certificate"
+      properties:
+        keyId:
+          type: "string"
+          description: "a unique id"
+        certificate:
+          type: "string"
+          description: "certificate"
