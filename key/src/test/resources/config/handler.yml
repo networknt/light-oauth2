@@ -50,6 +50,7 @@ handlers:
   # - com.networknt.metrics.prometheus.PrometheusGetHandler@getprometheus
   # Business Handlers
   - com.networknt.oauth.key.handler.Oauth2KeyKeyIdGetHandler
+  - com.networknt.oauth.key.handler.Oauth2KeysGetHandler
 
 
 chains:
@@ -71,6 +72,11 @@ paths:
     exec:
       - default
       - com.networknt.oauth.key.handler.Oauth2KeyKeyIdGetHandler
+  - path: '/oauth2/keys'
+    method: 'GET'
+    exec:
+      - default
+      - com.networknt.oauth.key.handler.Oauth2KeysGetHandler
 
   - path: '/health/com.networknt.oauth2-key-1.0.0'
     method: 'get'
