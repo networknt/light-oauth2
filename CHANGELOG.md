@@ -1,5 +1,16 @@
 # Change Log
 
+## [2.1.1](https://github.com/networknt/light-oauth2/tree/2.1.1) (2022-04-26)
+
+
+**Merged pull requests:**
+
+
+- fixes \#350 down port the jwk implementation from oauth-kafka in key s… [\#351](https://github.com/networknt/light-oauth2/pull/351) ([stevehu](https://github.com/stevehu))
+- fixes \#348 update bootstrap token test case for the wrong scope [\#349](https://github.com/networknt/light-oauth2/pull/349) ([stevehu](https://github.com/stevehu))
+- fixes \#346 change the default bootstrapScope to portal.w in oauth-tok… [\#347](https://github.com/networknt/light-oauth2/pull/347) ([stevehu](https://github.com/stevehu))
+- Bump hazelcast from 4.2.4 to 5.1 [\#345](https://github.com/networknt/light-oauth2/pull/345) ([dependabot](https://github.com/apps/dependabot))
+- fixes \#343 upgrade hazelcast-kubernetes to 2.2.3 from 1.1.0 to resolv… [\#344](https://github.com/networknt/light-oauth2/pull/344) ([stevehu](https://github.com/stevehu))
 ## [2.1.0](https://github.com/networknt/light-oauth2/tree/2.1.0) (2022-02-28)
 
 
