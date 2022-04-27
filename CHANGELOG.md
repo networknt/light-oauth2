@@ -11,6 +11,8 @@
 - fixes \#346 change the default bootstrapScope to portal.w in oauth-tok… [\#347](https://github.com/networknt/light-oauth2/pull/347) ([stevehu](https://github.com/stevehu))
 - Bump hazelcast from 4.2.4 to 5.1 [\#345](https://github.com/networknt/light-oauth2/pull/345) ([dependabot](https://github.com/apps/dependabot))
 - fixes \#343 upgrade hazelcast-kubernetes to 2.2.3 from 1.1.0 to resolv… [\#344](https://github.com/networknt/light-oauth2/pull/344) ([stevehu](https://github.com/stevehu))
+
+
 ## [2.1.0](https://github.com/networknt/light-oauth2/tree/2.1.0) (2022-02-28)
 
 
