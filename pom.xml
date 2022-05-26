@@ -80,7 +80,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.light-4j>2.1.2-SNAPSHOT</version.light-4j>
         <version.json-schema-validator>1.0.65</version.json-schema-validator>
-        <version.jackson>2.12.1</version.jackson>
+        <version.jackson>2.13.3</version.jackson>
         <version.slf4j>1.7.32</version.slf4j>
         <version.jose4j>0.6.3</version.jose4j>
         <version.antlr4>4.7</version.antlr4>
