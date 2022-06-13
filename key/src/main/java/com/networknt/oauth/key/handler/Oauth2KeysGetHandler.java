@@ -4,6 +4,7 @@ import com.networknt.config.Config;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.http.RequestEntity;
 import com.networknt.http.ResponseEntity;
+import com.networknt.security.SecurityConfig;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import org.jose4j.jwk.JsonWebKey;
@@ -33,14 +34,11 @@ import java.util.Map;
 public class Oauth2KeysGetHandler implements LightHttpHandler {
     private static final Logger logger = LoggerFactory.getLogger(Oauth2KeysGetHandler.class);
     public static final String CONFIG_SECURITY = "openapi-security";
-    public static final String CONFIG_JWT = "jwt";
-    public static final String CONFIG_CERTIFICATE = "certificate";
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        Map<String, Object> config = Config.getInstance().getJsonMapConfig(CONFIG_SECURITY);
-        Map<String, Object> jwtConfig = (Map<String, Object>)config.get(CONFIG_JWT);
-        Map<String, Object> certificateConfig = (Map<String, Object>)jwtConfig.get(CONFIG_CERTIFICATE);
+        SecurityConfig config = SecurityConfig.load(CONFIG_SECURITY);
+        Map<String, Object> certificateConfig = config.getCertificate();
         // add all the JWK objects to a list
         List<JsonWebKey> jwkList = new ArrayList<>();
 
