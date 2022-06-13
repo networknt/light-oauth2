@@ -26,6 +26,7 @@ import com.networknt.handler.LightHttpHandler;
 import com.networknt.oauth.cache.AuditInfoHandler;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.*;
+import com.networknt.security.SecurityConfig;
 import com.networknt.status.Status;
 import com.networknt.exception.ApiException;
 import com.networknt.exception.ClientException;
@@ -83,11 +84,9 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
         String keyId = exchange.getQueryParameters().get("keyId").getFirst();
         if(logger.isDebugEnabled()) logger.debug("keyId = " + keyId);
         // find the location of the certificate
-        Map<String, Object> config = Config.getInstance().getJsonMapConfig(CONFIG_SECURITY);
-        Map<String, Object> jwtConfig = (Map<String, Object>)config.get(CONFIG_JWT);
-        Map<String, Object> certificateConfig = (Map<String, Object>)jwtConfig.get(CONFIG_CERTIFICATE);
-        String provider_id = config.get(PROVIDER_ID)==null ? "": config.get(PROVIDER_ID).toString();
-
+        SecurityConfig config = SecurityConfig.load(CONFIG_SECURITY);
+        Map<String, Object> certificateConfig = config.getCertificate();
+        String provider_id = config.getProviderId();
         if (getProviderId(keyId)==null || "00".equals(getProviderId(keyId)) || provider_id.equals(getProviderId(keyId))) {
             if (getProviderId(keyId)==null  || provider_id.equals(getProviderId(keyId))) {
                 // Standalone light-oauth server
