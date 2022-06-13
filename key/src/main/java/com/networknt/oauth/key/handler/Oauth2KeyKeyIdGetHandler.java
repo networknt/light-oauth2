@@ -59,17 +59,12 @@ public class Oauth2KeyKeyIdGetHandler  extends AuditInfoHandler implements Light
     static final Logger logger = LoggerFactory.getLogger(Oauth2KeyKeyIdGetHandler.class);
 
     static final String CONFIG_SECURITY = "security";
-    static final String CONFIG_JWT = "jwt";
-    static final String CONFIG_CERTIFICATE = "certificate";
-
     static final String KEY_NOT_FOUND = "ERR12017";
     static final String MISSING_AUTHORIZATION_HEADER = "ERR12002";
     static final String CLIENT_NOT_FOUND = "ERR12014";
     static final String RUNTIME_EXCEPTION = "ERR10010";
     static final String UNAUTHORIZED_CLIENT = "ERR12007";
     static final String INVALID_KEY_ID = "ERR12030";
-
-    private static final String PROVIDER_ID = "providerId";
     private static final String BASIC_PREFIX = BASIC + " ";
     private static final String LOWERCASE_BASIC_PREFIX = BASIC_PREFIX.toLowerCase(Locale.ENGLISH);
     private static final int PREFIX_LENGTH = BASIC_PREFIX.length();
