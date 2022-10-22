@@ -1,5 +1,15 @@
 # Change Log
 
+## [2.1.2](https://github.com/networknt/light-oauth2/tree/2.1.2) (2022-10-22)
+
+
+**Merged pull requests:**
+
+
+- fixes \#362 disable LDAP test case with ApacheDirectoryServer [\#363](https://github.com/networknt/light-oauth2/pull/363) ([stevehu](https://github.com/stevehu))
+- fixes \#359 update key test case to meet the requirement for multiple … [\#360](https://github.com/networknt/light-oauth2/pull/360) ([stevehu](https://github.com/stevehu))
+- Bump postgresql from 42.3.3 to 42.4.1 [\#357](https://github.com/networknt/light-oauth2/pull/357) ([dependabot](https://github.com/apps/dependabot))
+- fixes \#353 update the key service to use SecurityConfig [\#354](https://github.com/networknt/light-oauth2/pull/354) ([stevehu](https://github.com/stevehu))
 ## [2.1.1](https://github.com/networknt/light-oauth2/tree/2.1.1) (2022-04-26)
 
 
