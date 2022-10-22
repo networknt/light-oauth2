@@ -438,6 +438,7 @@ public class Oauth2CodeGetHandlerTest {
      * @throws Exception
      */
     @Test
+    @Ignore
     public void testSpnegoWwwAuth() throws Exception {
         Subject clientSubject = login("jduke", "theduke".toCharArray());
 

@@ -111,6 +111,7 @@ public class LdapAuthTest {
     }
 
     @Test
+    @Ignore
     public void testAuthorization() throws Exception {
         String uid = "jduke";
         String domainName = "undertow.io";
