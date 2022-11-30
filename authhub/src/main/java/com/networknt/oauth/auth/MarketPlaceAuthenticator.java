@@ -1,7 +1,7 @@
 package com.networknt.oauth.auth;
 
 import com.networknt.oauth.github.GithubUtil;
-import com.networknt.oauth.ldap.LdapUtil;
+import com.networknt.ldap.LdapUtil;
 import com.networknt.oauth.security.LightPasswordCredential;
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;

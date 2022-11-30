@@ -1,5 +1,0 @@
-uri: ldaps://localhost:10636/ou=users,dc=undertow,dc=io
-domain: undertow.io
-ldapPrincipal: uid=oauth,ou=users,dc=undertow,dc=io
-searchFilter: (&(uid=%s)(objectClass=person))
-searchBase: ''

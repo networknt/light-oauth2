@@ -3,7 +3,7 @@ package com.networknt.oauth.auth;
 import com.hazelcast.map.IMap;
 import com.networknt.oauth.cache.CacheStartupHookProvider;
 import com.networknt.oauth.cache.model.User;
-import com.networknt.oauth.ldap.LdapUtil;
+import com.networknt.ldap.LdapUtil;
 import com.networknt.oauth.security.LightGSSContextCredential;
 import com.networknt.oauth.security.LightPasswordCredential;
 import com.networknt.utility.HashUtil;
