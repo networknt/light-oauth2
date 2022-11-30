@@ -9,7 +9,7 @@
 
     <artifactId>oauth2-code</artifactId>
     <packaging>jar</packaging>
-    <description>A micro service server that authenticates and redirects authorization code.</description>
+    <description>A microservice server that authenticates and redirects authorization code.</description>
 
     <dependencies>
         <dependency>
