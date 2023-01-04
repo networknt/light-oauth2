@@ -10,6 +10,8 @@
 - Bump postgresql from 42.4.1 to 42.4.3 [\#364](https://github.com/networknt/light-oauth2/pull/364) ([dependabot](https://github.com/apps/dependabot))
 - fixes \#367 update code module to externalize ldap.yml to values.yml [\#368](https://github.com/networknt/light-oauth2/pull/368) ([stevehu](https://github.com/stevehu))
 - fixes \#365 move the ldap to the ldap-util module in light-4j [\#366](https://github.com/networknt/light-oauth2/pull/366) ([stevehu](https://github.com/stevehu))
+
+
 ## [2.1.4](https://github.com/networknt/light-oauth2/tree/2.1.4) (2022-11-30)
 
 
