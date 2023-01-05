@@ -88,10 +88,9 @@
         <version.logback>1.2.11</version.logback>
         <version.junit>4.13.1</version.junit>
         <version.undertow>2.3.0.Final</version.undertow>
-        <version.swagger-parser>1.0.34</version.swagger-parser>
         <version.hikaricp>3.1.0</version.hikaricp>
         <version.h2>2.1.210</version.h2>
-        <version.hazelcast>5.1</version.hazelcast>
+        <version.hazelcast>5.2.1</version.hazelcast>
         <version.hazelcast-kubernetes>2.2.3</version.hazelcast-kubernetes>
         <version.mysql>8.0.28</version.mysql>
         <version.postgres>42.4.3</version.postgres>
@@ -311,21 +310,6 @@
                 <version>${version.light-4j}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.networknt</groupId>
-                <artifactId>swagger-meta</artifactId>
-                <version>${version.light-4j}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.networknt</groupId>
-                <artifactId>swagger-security</artifactId>
-                <version>${version.light-4j}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.networknt</groupId>
-                <artifactId>swagger-validator</artifactId>
-                <version>${version.light-4j}</version>
-            </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>json-schema-validator</artifactId>
