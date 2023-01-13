@@ -99,7 +99,7 @@
         <versions.maven-version>2.4</versions.maven-version>
         <version.mariadb>1.1.7</version.mariadb>
         <version.javadoc-packagelist-plugin>1.0.0</version.javadoc-packagelist-plugin>
-        <version.maven-javadoc>3.1.0</version.maven-javadoc>
+        <version.maven-javadoc>3.4.1</version.maven-javadoc>
     </properties>
  
     <modules>
