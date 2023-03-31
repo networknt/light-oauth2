@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.1.9](https://github.com/networknt/light-oauth2/tree/2.1.9) (2023-03-30)
+## [2.1.9](https://github.com/networknt/light-oauth2/tree/2.1.9) (2023-03-31)
 
 
 **Merged pull requests:**
