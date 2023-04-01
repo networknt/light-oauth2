@@ -1,8 +1,5 @@
 # Singleton service factory configuration/IoC injection
 singletons:
-# Default decryptor implementation
-- com.networknt.utility.Decryptor:
-  - com.networknt.decrypt.AESDecryptor
 # HandlerProvider implementation
 - com.networknt.handler.HandlerProvider:
   - com.networknt.oauth.authorize.PathHandlerProvider

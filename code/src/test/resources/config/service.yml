@@ -1,8 +1,5 @@
 # Singleton service factory configuration/IoC injection
 singletons:
-# Default decryptor implementation
-- com.networknt.utility.Decryptor:
-  - com.networknt.decrypt.AESDecryptor
 # StartupHookProvider implementations, there are one to many and they are called in the same sequence defined.
 - com.networknt.server.StartupHookProvider:
   - com.networknt.oauth.cache.CacheStartupHookProvider
