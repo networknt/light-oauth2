@@ -85,7 +85,7 @@
         <version.jose4j>0.6.3</version.jose4j>
         <version.antlr4>4.7</version.antlr4>
         <version.encoder>1.2.1</version.encoder>
-        <version.logback>1.2.11</version.logback>
+        <version.logback>1.4.6</version.logback>
         <version.junit>4.13.1</version.junit>
         <version.undertow>2.3.5.Final</version.undertow>
         <version.hikaricp>3.1.0</version.hikaricp>
