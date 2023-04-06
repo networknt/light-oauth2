@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.1.10](https://github.com/networknt/light-oauth2/tree/2.1.10) (2023-04-06)
+
+
+**Merged pull requests:**
+
+
+- fixes \#373 update service.yml to remove reference to AESDecryptor [\#374](https://github.com/networknt/light-oauth2/pull/374) ([stevehu](https://github.com/stevehu))
 ## [2.1.9](https://github.com/networknt/light-oauth2/tree/2.1.9) (2023-03-31)
 
 
