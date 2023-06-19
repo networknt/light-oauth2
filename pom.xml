@@ -90,7 +90,7 @@
         <version.undertow>2.3.7.Final</version.undertow>
         <version.hikaricp>3.1.0</version.hikaricp>
         <version.h2>2.1.210</version.h2>
-        <version.hazelcast>5.2.1</version.hazelcast>
+        <version.hazelcast>5.3.1</version.hazelcast>
         <version.hazelcast-kubernetes>2.2.3</version.hazelcast-kubernetes>
         <version.mysql>8.0.32</version.mysql>
         <version.postgres>42.6.0</version.postgres>
