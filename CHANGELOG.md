@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.1.21](https://github.com/networknt/light-oauth2/tree/2.1.21) (2023-06-22)
+
+
+**Merged pull requests:**
+
+
+- fixes \#375 upgrade hazelcast to 5.3.1 to resolve security vulnerabili… [\#376](https://github.com/networknt/light-oauth2/pull/376) ([stevehu](https://github.com/stevehu))
 ## [2.1.20](https://github.com/networknt/light-oauth2/tree/2.1.20) (2023-06-17)
 
 
