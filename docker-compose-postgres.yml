@@ -1,121 +1,135 @@
-  version: '2'
-  services:
-    postgresdb:
-      image: postgres:9.6.0
-      volumes:
-        - ./db/postgres:/docker-entrypoint-initdb.d
-      environment:
-        POSTGRES_PASSWORD: my-secret-pw
-        POSTGRES_DB: oauth2
-    oauth2-code:
-      build: code/
-      ports:
-        - "6881:6881"
-      volumes:
-        - ./db/postgres/config/oauth2-code:/config
-      depends_on:
-        - postgresdb
-      links:
-        - postgresdb
-      #logging:
-      #  driver: "gelf"
-      #  options:
-      #    gelf-address: "udp://localhost:12201"
-      #    tag: "oauth2-code"
-      #    env: "dev"
-    oauth2-token:
-      build: token/
-      ports:
-        - "6882:6882"
-      volumes:
-        - ./db/postgres/config/oauth2-token:/config
-      depends_on:
-        - postgresdb
-      links:
-        - postgresdb
-      #logging:
-      #  driver: "gelf"
-      #  options:
-      #    gelf-address: "udp://localhost:12201"
-      #    tag: "oauth2-token"
-      #    env: "dev"
-    oauth2-service:
-      build: service/
-      ports:
-        - "6883:6883"
-      volumes:
-        - ./db/postgres/config/oauth2-service:/config
-      depends_on:
-        - postgresdb
-      links:
-        - postgresdb
-      #logging:
-      #  driver: "gelf"
-      #  options:
-      #    gelf-address: "udp://localhost:12201"
-      #    tag: "oauth2-service"
-      #    env: "dev"
-    oauth2-client:
-      build: client/
-      ports:
-        - "6884:6884"
-      volumes:
-        - ./db/postgres/config/oauth2-client:/config
-      depends_on:
-        - postgresdb
-      links:
-        - postgresdb
-      #logging:
-      #  driver: "gelf"
-      #  options:
-      #    gelf-address: "udp://localhost:12201"
-      #    tag: "oauth2-client"
-      #    env: "dev"
-    oauth2-user:
-      build: user/
-      ports:
-        - "6885:6885"
-      volumes:
-        - ./db/postgres/config/oauth2-user:/config
-      depends_on:
-        - postgresdb
-      links:
-        - postgresdb
-      #logging:
-      #  driver: "gelf"
-      #  options:
-      #    gelf-address: "udp://localhost:12201"
-      #    tag: "oauth2-user"
-      #    env: "dev"
-    oauth2-key:
-      build: key/
-      ports:
-        - "6886:6886"
-      volumes:
-        - ./db/postgres/config/oauth2-key:/config
-      depends_on:
-        - postgresdb
-      links:
-        - postgresdb
-      #logging:
-      #  driver: "gelf"
-      #  options:
-      #    gelf-address: "udp://localhost:12201"
-      #    tag: "oauth2-key"
-      #    env: "dev"
-    oauth2-refresh-token:
-      build: refresh-token/
-      ports:
-        - "6887:6887"
-      volumes:
-        - ./db/postgres/config/oauth2-refresh-token:/config
-      depends_on:
-        - postgresdb
-      links:
-        - postgresdb
-      #logging:
-      #  driver: "gelf"
-      #  options:
-      #    gelf-address: "udp://localhost:12201"
-      #    tag: "oauth2-refresh-token"
-      #    env: "dev"
+version: '2'
+services:
+  postgresdb:
+    image: postgres:9.6.0
+    volumes:
+      - ./db/postgres:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_PASSWORD: my-secret-pw
+      POSTGRES_DB: oauth2
+  oauth2-code:
+    build:
+      context: code/
+      dockerfile: docker/Dockerfile
+    ports:
+      - "6881:6881"
+    volumes:
+      - ./db/postgres/config/oauth2-code:/config
+    depends_on:
+      - postgresdb
+    links:
+      - postgresdb
+    #logging:
+    #  driver: "gelf"
+    #  options:
+    #    gelf-address: "udp://localhost:12201"
+    #    tag: "oauth2-code"
+    #    env: "dev"
+  oauth2-token:
+    build:
+      context: token/
+      dockerfile: docker/Dockerfile
+    ports:
+      - "6882:6882"
+    volumes:
+      - ./db/postgres/config/oauth2-token:/config
+    depends_on:
+      - postgresdb
+    links:
+      - postgresdb
+    #logging:
+    #  driver: "gelf"
+    #  options:
+    #    gelf-address: "udp://localhost:12201"
+    #    tag: "oauth2-token"
+    #    env: "dev"
+  oauth2-service:
+    build:
+      context: service/
+      dockerfile: docker/Dockerfile
+    ports:
+      - "6883:6883"
+    volumes:
+      - ./db/postgres/config/oauth2-service:/config
+    depends_on:
+      - postgresdb
+    links:
+      - postgresdb
+    #logging:
+    #  driver: "gelf"
+    #  options:
+    #    gelf-address: "udp://localhost:12201"
+    #    tag: "oauth2-service"
+    #    env: "dev"
+  oauth2-client:
+    build:
+      context: client/
+      dockerfile: docker/Dockerfile
+    ports:
+      - "6884:6884"
+    volumes:
+      - ./db/postgres/config/oauth2-client:/config
+    depends_on:
+      - postgresdb
+    links:
+      - postgresdb
+    #logging:
+    #  driver: "gelf"
+    #  options:
+    #    gelf-address: "udp://localhost:12201"
+    #    tag: "oauth2-client"
+    #    env: "dev"
+  oauth2-user:
+    build:
+      context: user/
+      dockerfile: docker/Dockerfile
+    ports:
+      - "6885:6885"
+    volumes:
+      - ./db/postgres/config/oauth2-user:/config
+    depends_on:
+      - postgresdb
+    links:
+      - postgresdb
+    #logging:
+    #  driver: "gelf"
+    #  options:
+    #    gelf-address: "udp://localhost:12201"
+    #    tag: "oauth2-user"
+    #    env: "dev"
+  oauth2-key:
+    build:
+      context: key/
+      dockerfile: docker/Dockerfile
+    ports:
+      - "6886:6886"
+    volumes:
+      - ./db/postgres/config/oauth2-key:/config
+    depends_on:
+      - postgresdb
+    links:
+      - postgresdb
+    #logging:
+    #  driver: "gelf"
+    #  options:
+    #    gelf-address: "udp://localhost:12201"
+    #    tag: "oauth2-key"
+    #    env: "dev"
+  oauth2-refresh-token:
+    build:
+      context: refresh-token/
+      dockerfile: docker/Dockerfile
+    ports:
+      - "6887:6887"
+    volumes:
+      - ./db/postgres/config/oauth2-refresh-token:/config
+    depends_on:
+      - postgresdb
+    links:
+      - postgresdb
+    #logging:
+    #  driver: "gelf"
+    #  options:
+    #    gelf-address: "udp://localhost:12201"
+    #    tag: "oauth2-refresh-token"
+    #    env: "dev"
