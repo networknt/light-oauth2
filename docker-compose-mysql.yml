@@ -9,7 +9,9 @@
          - MYSQL_USER=mysqluser
          - MYSQL_PASSWORD=mysqlpw
     oauth2-code:
-      build: code/
+      build:
+        context: code/
+        dockerfile: docker/Dockerfile
       ports:
         - "6881:6881"
       volumes:
@@ -25,7 +27,9 @@
       #    tag: "oauth2-code"
       #    env: "dev"
     oauth2-token:
-      build: token/
+      build:
+        context: token/
+        dockerfile: docker/Dockerfile
       ports:
         - "6882:6882"
       volumes:
@@ -41,7 +45,9 @@
       #    tag: "oauth2-token"
       #    env: "dev"
     oauth2-service:
-      build: service/
+      build:
+        context: service/
+        dockerfile: docker/Dockerfile
       ports:
         - "6883:6883"
       volumes:
@@ -57,7 +63,9 @@
       #    tag: "oauth2-service"
       #    env: "dev"
     oauth2-client:
-      build: client/
+      build:
+        context: client/
+        dockerfile: docker/Dockerfile
       ports:
         - "6884:6884"
       volumes:
@@ -73,7 +81,9 @@
       #    tag: "oauth2-client"
       #    env: "dev"
     oauth2-user:
-      build: user/
+      build:
+        context: user/
+        dockerfile: docker/Dockerfile
       ports:
         - "6885:6885"
       volumes:
@@ -89,7 +99,9 @@
       #    tag: "oauth2-user"
       #    env: "dev"
     oauth2-key:
-      build: key/
+      build:
+        context: key/
+        dockerfile: docker/Dockerfile
       ports:
         - "6886:6886"
       volumes:
@@ -105,7 +117,9 @@
       #    tag: "oauth2-key"
       #    env: "dev"
     oauth2-refresh-token:
-      build: refresh-token/
+      build:
+        context: refresh-token/
+        dockerfile: docker/Dockerfile
       ports:
         - "6887:6887"
       volumes:
