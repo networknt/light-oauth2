@@ -7,6 +7,8 @@
 
 
 - Fix path dockerfile [\#377](https://github.com/networknt/light-oauth2/pull/377) ([atmoshaman](https://github.com/atmoshaman))
+
+
 ## [2.1.27](https://github.com/networknt/light-oauth2/tree/2.1.27) (2023-10-04)
 
 
