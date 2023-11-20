@@ -5,6 +5,7 @@ import com.networknt.oauth.security.LightBasicAuthenticationMechanism;
 import com.networknt.oauth.security.LightFormAuthenticationMechanism;
 import com.networknt.oauth.security.LightGSSAPIAuthenticationMechanism;
 import com.networknt.oauth.security.LightIdentityManager;
+import com.networknt.server.ServerConfig;
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.AuthenticationMode;
 import io.undertow.security.api.GSSAPIServerSubjectFactory;
@@ -31,9 +32,7 @@ public class BaseWrapper {
 
     private static final String SPNEGO_SERVICE_PASSWORD = "spnegoServicePassword";
     private static final String SECRET_CONFIG = "secret";
-    private static final String SERVER_CONFIG = "server";
     private static final Map<String, Object> secret = Config.getInstance().getJsonMapConfig(SECRET_CONFIG);
-    private static final Map<String, Object> server = Config.getInstance().getJsonMapConfigNoCache(SERVER_CONFIG);
     private static final String spnegoServicePassword = (String)secret.get(SPNEGO_SERVICE_PASSWORD);
 
     final IdentityManager basicIdentityManager = new LightIdentityManager();

@@ -19,6 +19,7 @@ import com.networknt.oauth.security.LightBasicAuthenticationMechanism;
 import com.networknt.oauth.security.LightGSSAPIAuthenticationMechanism;
 import com.networknt.oauth.security.LightIdentityManager;
 
+import com.networknt.server.ServerConfig;
 import io.undertow.Handlers;
 import io.undertow.security.api.AuthenticationMechanism;
 import io.undertow.security.api.AuthenticationMode;
@@ -45,9 +46,8 @@ import io.undertow.util.Methods;
 public class PathHandlerProvider implements HandlerProvider {
     private static final String SPNEGO_SERVICE_PASSWORD = "spnegoServicePassword";
     private static final String SECRET_CONFIG = "secret";
-    private static final String SERVER_CONFIG = "server";
     private static final Map<String, Object> secret = Config.getInstance().getJsonMapConfig(SECRET_CONFIG);
-    private static final Map<String, Object> server = Config.getInstance().getJsonMapConfigNoCache(SERVER_CONFIG);
+    private static final ServerConfig serverConfig = ServerConfig.getInstance();
     private static final String spnegoServicePassword = (String)secret.get(SPNEGO_SERVICE_PASSWORD);
 
     @Override
@@ -55,7 +55,7 @@ public class PathHandlerProvider implements HandlerProvider {
         final IdentityManager basicIdentityManager = new LightIdentityManager();
 
         HttpHandler handler = Handlers.routing()
-            .add(Methods.GET, "/health/"+server.get("serviceId"), new HealthGetHandler())
+            .add(Methods.GET, "/health/" + serverConfig.getServiceId(), new HealthGetHandler())
             .add(Methods.GET, "/server/info", new ServerInfoGetHandler())
             .add(Methods.GET, "/oauth2/code", addGetSecurity(new Oauth2CodeGetHandler(), basicIdentityManager))
             .add(Methods.POST, "/oauth2/code", addFormSecurity(new Oauth2CodePostHandler(), basicIdentityManager))
