@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.1.30](https://github.com/networknt/light-oauth2/tree/2.1.30) (2023-11-20)
+
+
+**Merged pull requests:**
+
+
+- fixes \#380 refactor with ServerConfig [\#381](https://github.com/networknt/light-oauth2/pull/381) ([stevehu](https://github.com/stevehu))
 ## [2.1.29](https://github.com/networknt/light-oauth2/tree/2.1.29) (2023-11-19)
 
 
